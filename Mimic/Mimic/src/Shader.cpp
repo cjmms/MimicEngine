@@ -1,5 +1,7 @@
 #include "Shader.h"
-
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 
 Shader::Shader(const std::string& path)
@@ -137,7 +139,7 @@ unsigned int Shader::getRendererID()
     return rendererID;
 }
 
-/*
+
 void Shader::setMat4(const char* name, glm::mat4 matrix)
 {
     unsigned int location = getUniformLocation(name);
@@ -207,4 +209,3 @@ void Shader::setInt(const std::string& name, int value)
 {
     setInt(name.c_str(), value);
 }
-*/
