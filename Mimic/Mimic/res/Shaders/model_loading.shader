@@ -24,9 +24,17 @@ out vec4 FragColor;
 
 in vec2 TexCoords;
 
-uniform sampler2D texture_diffuse1;
+
+struct Material {
+    sampler2D texture_albedo;
+    sampler2D texture_metallic;
+    sampler2D texture_normal;
+};
+
+uniform Material material;
+
 
 void main()
 {
-    FragColor = texture(texture_diffuse1, TexCoords);
+    FragColor = texture(material.texture_normal, TexCoords);
 }
