@@ -1,5 +1,5 @@
 #include "Camera.h"
-
+#include <iostream>
 
 Camera::Camera()
 	: sensitivity(0.1f), deltaTime(0.0f), lastFrame(0.0f), firstMouse(true), fov(45.0f),
@@ -85,10 +85,10 @@ void Camera::updateCameraDirection(float currentX, float currentY)
 
 void Camera::setCameraKey(GLFWwindow* window)
 {
-	if (disabled) return;
+	//if (disabled) return;
 	setCameraSpeed(1.5f);
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) 
 		cameraPos += cameraSpeed * cameraFront;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		cameraPos -= cameraSpeed * cameraFront;
