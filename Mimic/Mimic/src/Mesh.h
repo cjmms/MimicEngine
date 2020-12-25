@@ -11,7 +11,6 @@ struct Vertex
 	glm::vec3 Position;
 	glm::vec3 Normal;
 	glm::vec2 TexCoord;
-
 };
 
 struct Texture
@@ -36,7 +35,7 @@ public:
 	void Draw(Shader& shader);
 
 private:
-	unsigned int VAO, VBO, IBO;
+	unsigned int VAO;
 
 	void setup();
 

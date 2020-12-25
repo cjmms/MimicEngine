@@ -29,11 +29,10 @@ void Model::loadModel(std::string path)
     directory = path.substr(0, path.find_last_of('/'));
 
     double before = glfwGetTime();
-    std::cout << "Loading model, model address: " << directory << std::endl;
+    std::cout << "Loading model, model address: " << path << std::endl;
 
     processNode(scene->mRootNode, scene);
-    std::cout << "Model loading complete, loading time: " << 
-        glfwGetTime() - before << "s " << std::endl;
+    std::cout << "Model loading complete, loading time: " <<  glfwGetTime() - before << "s " << std::endl;
 }
 
 
@@ -53,32 +52,29 @@ void Model::processNode(aiNode* node, const aiScene* scene)
 }
 
 
-Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
+void Model::setVec3(glm::vec3& des, aiVector3D& source)
 {
-    // data to fill
+    des.x = source.x;
+    des.y = source.y;
+    des.z = source.z;
+}
+
+
+std::vector<Vertex> Model::processVertices(aiMesh* mesh)
+{
     std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
-    std::vector<Texture> textures;
-
-
     // walk through each of the mesh's vertices
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
         Vertex vertex;
-        glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
+
         // positions
-        vector.x = mesh->mVertices[i].x;
-        vector.y = mesh->mVertices[i].y;
-        vector.z = mesh->mVertices[i].z;
-        vertex.Position = vector;
+        setVec3(vertex.Position, mesh->mVertices[i]);
+
         // normals
         if (mesh->HasNormals())
-        {
-            vector.x = mesh->mNormals[i].x;
-            vector.y = mesh->mNormals[i].y;
-            vector.z = mesh->mNormals[i].z;
-            vertex.Normal = vector;
-        }
+            setVec3(vertex.Normal, mesh->mNormals[i]);
+
         // texture coordinates
         if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
         {
@@ -88,25 +84,25 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
             vec.x = mesh->mTextureCoords[0][i].x;
             vec.y = mesh->mTextureCoords[0][i].y;
             vertex.TexCoord = vec;
+
             // tangent
-            //vector.x = mesh->mTangents[i].x;
-            //vector.y = mesh->mTangents[i].y;
-            //vector.z = mesh->mTangents[i].z;
-            //vertex.Tangent = vector;
+            //setVec3(vertex.Tangent, mesh->mTangents[i]);
+
             // bitangent
-            //vector.x = mesh->mBitangents[i].x;
-            //vector.y = mesh->mBitangents[i].y;
-            //vector.z = mesh->mBitangents[i].z;
-            //vertex.Bitangent = vector;
+            //setVec3(vertex.Bitangent, mesh->mBitangents[i]);
         }
         else
             vertex.TexCoord = glm::vec2(0.0f, 0.0f);
 
         vertices.push_back(vertex);
     }
+    return vertices;
+}
 
 
-    // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
+std::vector<unsigned int> Model::processIndices(aiMesh* mesh)
+{
+    std::vector<unsigned int> indices;
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {
         aiFace face = mesh->mFaces[i];
@@ -114,17 +110,19 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
         for (unsigned int j = 0; j < face.mNumIndices; j++)
             indices.push_back(face.mIndices[j]);
     }
+    return indices;
+}
 
 
-    // process materials
-    aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+std::vector<Texture> Model::processTextures(aiMaterial* material)
+{
     // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
     // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
     // Same applies to other texture as the following list summarizes:
     // diffuse: texture_diffuseN
     // specular: texture_specularN
     // normal: texture_normalN
-
+    std::vector<Texture> textures;
 
     // 1. diffuse maps
     std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
@@ -139,6 +137,18 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
+    return textures;
+}
+
+
+Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
+{
+    // process materials
+    aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+    std::vector<Texture> textures = processTextures(material);
+    std::vector<Vertex> vertices = processVertices(mesh);
+    std::vector<unsigned int> indices = processIndices(mesh);
 
     // return a mesh object created from the extracted mesh data
     return Mesh(vertices, textures, indices);
@@ -176,6 +186,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
     }
     return textures;
 }
+
 
 unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma)
 {
