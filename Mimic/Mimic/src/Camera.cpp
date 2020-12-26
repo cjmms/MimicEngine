@@ -159,7 +159,7 @@ void Camera::zoomIn(float yoffset)
 
 glm::mat4 Camera::getProjectionMatrix()
 {
-	return glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
+	return glm::perspective(glm::radians(fov), 1200.0f / 860.0f, 0.1f, 100.0f);
 }
 
 

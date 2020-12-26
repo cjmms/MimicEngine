@@ -18,7 +18,7 @@
 class Model
 {
 public:
-	Model(const char* path);
+	Model(const char* path, bool loadMat = true);
 	void Draw(Shader& shader);
 
 private:
@@ -31,7 +31,7 @@ private:
 
 
 	// Entry point of loading a model
-	void loadModel(std::string path);
+	void loadModel(std::string path, bool loadMat);
 
 	// loading a tree of nodes recursives, for each node, load its mesh
 	void processNode(aiNode* node, const aiScene* scene);

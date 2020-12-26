@@ -38,8 +38,8 @@ const float PI = 3.14159265359;
 
 // lights
     // ------
-vec3 lightPosition = vec3(0.0f, 0.0f, 10.0f);
-vec3 lightColor = vec3(150.0f, 150.0f, 150.0f);
+//vec3 lightPosition = vec3(0.0f, 0.0f, 10.0f);
+//vec3 lightColor = vec3(150.0f, 150.0f, 150.0f);
 
 struct Material {
     sampler2D texture_albedo;
@@ -50,6 +50,9 @@ struct Material {
 };
 
 uniform Material material;
+
+uniform vec3 lightPositions[2];
+uniform vec3 lightColors[2];
 
 // from tangent space to world space
 vec3 getNormalFromMap()
@@ -131,14 +134,14 @@ void main()
 
     // reflectance equation
     vec3 Lo = vec3(0.0);
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < 2; ++i)
     {
         // calculate per-light radiance
-        vec3 L = normalize(lightPosition - WorldPos);
+        vec3 L = normalize(lightPositions[i] - WorldPos);
         vec3 H = normalize(V + L);
-        float distance = length(lightPosition - WorldPos);
+        float distance = length(lightPositions[i] - WorldPos);
         float attenuation = 1.0 / (distance * distance);
-        vec3 radiance = lightColor * attenuation;
+        vec3 radiance = lightColors[i] * attenuation;
 
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, roughness);
@@ -180,5 +183,6 @@ void main()
 
     FragColor = vec4(color, 1.0);
 
-    FragColor = texture(material.texture_normal, TexCoords);
+    //FragColor = texture(material.texture_normal, TexCoords);
+    FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
