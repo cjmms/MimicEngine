@@ -91,8 +91,15 @@ int main(void)
     // load models
     // -----------
     Model ourModel("res/objects/backpack/backpack.obj");
+    //Model ourModel("res/objects/Rocket/Rocket.obj");
 
+    // view/projection transformations
+    shader.Bind();
 
+    // render the loaded model      
+    glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));	// it's a bit too big for our scene, so scale it down
+    shader.setMat4("model", model);
+    shader.setVec3("camPos", camera.getCameraPos());
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -102,16 +109,10 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-        // view/projection transformations
-        shader.Bind();
-        shader.setMat4("projection", camera.getProjectionMatrix());
-        shader.setMat4("view", camera.getViewMatrix());
-
-        // render the loaded model      
-        glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f));	// it's a bit too big for our scene, so scale it down
-        shader.setMat4("model", model);
         ourModel.Draw(shader);
 
+        shader.setMat4("projection", camera.getProjectionMatrix());
+        shader.setMat4("view", camera.getViewMatrix());
         camera.cameraUpdateFrameTime();
 
         /* Swap front and back buffers */
