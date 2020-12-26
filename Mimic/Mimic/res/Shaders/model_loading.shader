@@ -36,5 +36,5 @@ uniform Material material;
 
 void main()
 {
-    FragColor = texture(material.texture_normal, TexCoords);
+    FragColor = texture(material.texture_metallic, TexCoords);
 }

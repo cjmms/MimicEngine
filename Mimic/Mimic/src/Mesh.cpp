@@ -30,13 +30,9 @@ void Mesh::Draw(Shader& shader)
     for (unsigned int i = 0; i < textures.size(); i++)
     {
         glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
-        
         shader.setInt(("material." + textures[i].type).c_str(), i);
-
-        //std::cout << "Binding: " << ("material." + textures[i].type).c_str() << std::endl;
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
-    glActiveTexture(GL_TEXTURE0);
     
     // draw mesh
     glBindVertexArray(VAO);

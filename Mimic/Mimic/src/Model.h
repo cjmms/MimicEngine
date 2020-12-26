@@ -24,12 +24,11 @@ public:
 private:
 	std::vector<Mesh> meshes;
 
+	std::vector<Texture> textures;
+
 	// path to current model object
 	std::string directory;
 
-	// keep track of loaded texture
-	// make sure that no redundant texture loading
-	std::vector<Texture> textures_loaded;
 
 	// Entry point of loading a model
 	void loadModel(std::string path);
@@ -42,14 +41,14 @@ private:
 
 	std::vector<Vertex> processVertices(aiMesh* mesh);
 	std::vector<unsigned int> processIndices(aiMesh* mesh);
-	std::vector<Texture> processTextures(aiMaterial* material);
 
-	// load textures from a material base on texture type
-	std::vector<Texture> loadMaterialTextures( aiMaterial* mat, aiTextureType type, 
-											   std::string typeName);
 
 	// helper function, convert aiVector3D to glm::vec3
 	void setVec3(glm::vec3& des, aiVector3D& source);
+
+	// load all textures, albedo, metallic, ao, normal, roughness
+	void loadMaterial();
+	void loadTexture(std::string name, std::string type);
 };
 
 // helper function
