@@ -12,7 +12,9 @@ Model::Model(const char* path, bool loadMat )
 // iterate all meshes, draw all meshes
 void Model::Draw(Shader& shader)
 {
+    shader.Bind();
 	for (auto mesh : meshes) mesh.Draw(shader);
+    shader.unBind();
 }
 
 

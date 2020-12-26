@@ -164,7 +164,7 @@ glm::mat4 Camera::getProjectionMatrix()
 
 
 
-glm::vec3 Camera::getCameraPos()
+glm::vec3 Camera::getCameraPos() const
 {
 	/*std::cout << "camera pos: " <<
 		"x: " << cameraPos.x <<
@@ -174,7 +174,7 @@ glm::vec3 Camera::getCameraPos()
 	return cameraPos;
 }
 
-glm::vec3 Camera::getCameraDir()
+glm::vec3 Camera::getCameraDir() const
 {
 	return cameraFront;
 }

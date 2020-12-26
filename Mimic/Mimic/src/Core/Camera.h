@@ -46,8 +46,8 @@ public:
 
 
 
-	glm::vec3 getCameraPos();
-	glm::vec3 getCameraDir();
+	glm::vec3 getCameraPos() const;
+	glm::vec3 getCameraDir() const;
 
 	void disable();
 	void enable();
