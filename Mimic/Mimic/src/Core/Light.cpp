@@ -22,8 +22,7 @@ void Light::Draw(Shader& shader)
 	shader.Bind();
 
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
-	model = glm::scale(model, glm::vec3(0.3));
-	//model = glm::translate(model, position);
+	model = glm::scale(model, glm::vec3(0.1));
 	shader.setMat4("model", model);
 
 	shader.setMat4("projection", camera.getProjectionMatrix());

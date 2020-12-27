@@ -3,6 +3,8 @@
 #include "Core/Shader.h"
 
 
+
+
 class ResourceManager
 {
 public:
@@ -10,17 +12,21 @@ public:
 
 	void close();
 
+	// maybe use sth to  keep track of loaded textures?
+	static unsigned int loadTexture(char const* path, bool gamma = false);
 
+	static unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma = false);
 
 };
 
-class Rectangle 
+class Quad
 {
 public:
-	Rectangle();
+	Quad();
 
 	void Draw(Shader& shader);
 
 private:
 	unsigned int VAO;
 };
+

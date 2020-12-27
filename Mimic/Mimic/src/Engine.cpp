@@ -36,9 +36,9 @@ void Engine::run()
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
-    /*
+    
 
-    Light light1(glm::vec3(5.0f, 5.0f, -10.0f), glm::vec3(150.0f, 150.0f, 150.0f));
+    Light light1(glm::vec3(0.0f, 2.50f, 5.0f), glm::vec3(150.0f, 150.0f, 150.0f));
 
     Shader lightShader("res/Shaders/basic.shader");
     Shader shader("res/Shaders/model_loading.shader");
@@ -50,17 +50,18 @@ void Engine::run()
 
     // load models
     // -----------
-    //Model backpack("res/objects/backpack/backpack.obj");
-    Model lion("res/objects/lion/lion.obj");
+    Model backpack("res/objects/backpack/backpack.obj");
+    //Model lion("res/objects/lion/lion.obj");
 
 
     // render the loaded model 
     shader.setMat4("model", glm::mat4(1.0f));
     shader.setVec3("camPos", camera.getCameraPos());
 
-    */
-    Shader quadShader("res/Shaders/Quad.shader");
-    Rectangle quad;
+    
+
+    // debug mode?
+    //Shader quadShader("res/Shaders/Quad.shader");
 
     
 
@@ -73,16 +74,16 @@ void Engine::run()
         glClearColor(0.5, 0.5, 0.5, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //camera.cameraUpdateFrameTime();
+        camera.cameraUpdateFrameTime();
 
-        //shader.Bind();
-        //shader.setMat4("projection", camera.getProjectionMatrix());
-        //shader.setMat4("view", camera.getViewMatrix());
-        //lion.Draw(shader);
+        shader.Bind();
+        shader.setMat4("projection", camera.getProjectionMatrix());
+        shader.setMat4("view", camera.getViewMatrix());
+        backpack.Draw(shader);
 
 
-        //light1.Draw(lightShader);
+        light1.Draw(lightShader);
 
-        quad.Draw(quadShader);
+        //Quad().Draw(quadShader);
     }
 }

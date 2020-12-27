@@ -6,6 +6,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+
 /*
 * .obj model file
 * Architecture of Model:
@@ -50,7 +51,4 @@ private:
 	void loadMaterial();
 	void loadTexture(std::string name, std::string type);
 };
-
-// helper function
-unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma = true);
 
