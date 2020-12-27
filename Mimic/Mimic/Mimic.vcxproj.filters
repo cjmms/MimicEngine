@@ -45,6 +45,9 @@
     <ClCompile Include="src\UI_Manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\VertexBuffer.h">
@@ -74,9 +77,13 @@
     <ClInclude Include="src\UI_Manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\basic.shader" />
     <None Include="res\Shaders\model_loading.shader" />
+    <None Include="res\Shaders\Quad.shader" />
   </ItemGroup>
 </Project>

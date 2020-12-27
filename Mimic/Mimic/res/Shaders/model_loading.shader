@@ -36,10 +36,6 @@ uniform vec3 camPos;
 
 const float PI = 3.14159265359;
 
-// lights
-    // ------
-//vec3 lightPosition = vec3(0.0f, 0.0f, 10.0f);
-//vec3 lightColor = vec3(150.0f, 150.0f, 150.0f);
 
 struct Material {
     sampler2D texture_albedo;
@@ -51,8 +47,8 @@ struct Material {
 
 uniform Material material;
 
-uniform vec3 lightPositions[2];
-uniform vec3 lightColors[2];
+uniform vec3 lightPositions[1];
+uniform vec3 lightColors[1];
 
 // from tangent space to world space
 vec3 getNormalFromMap()

@@ -2,7 +2,6 @@
 #include <iostream>
 
 
-//extern Camera camera;
 
 void processInput(GLFWwindow* window)
 {
@@ -73,6 +72,8 @@ bool UI_Manager::init()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+
+    disableCursor();
 
     return true;
 }

@@ -88,6 +88,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\Core\Light.cpp" />
     <ClCompile Include="src\Core\Camera.cpp" />
@@ -100,6 +101,7 @@
     <ClCompile Include="src\UI_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Core\Light.h" />
     <ClInclude Include="src\Core\Camera.h" />
@@ -113,6 +115,7 @@
   <ItemGroup>
     <None Include="res\Shaders\basic.shader" />
     <None Include="res\Shaders\model_loading.shader" />
+    <None Include="res\Shaders\Quad.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
