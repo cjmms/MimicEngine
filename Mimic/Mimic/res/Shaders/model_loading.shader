@@ -41,7 +41,7 @@ struct Material {
     sampler2D texture_albedo;
     sampler2D texture_metallic;
     sampler2D texture_normal;
-    sampler2D texture_ao;
+    //sampler2D texture_ao;
     sampler2D texture_roughness;
 };
 
@@ -118,7 +118,7 @@ void main()
     vec3 albedo = pow(texture(material.texture_albedo, TexCoords).rgb, vec3(2.2));
     float metallic = texture(material.texture_metallic, TexCoords).r;
     float roughness = texture(material.texture_roughness, TexCoords).r;
-    float ao = texture(material.texture_ao, TexCoords).r;
+    //float ao = texture(material.texture_ao, TexCoords).r;
 
     vec3 N = getNormalFromMap();
     vec3 V = normalize(camPos - WorldPos);
@@ -168,9 +168,12 @@ void main()
 
     // ambient lighting (note that the next IBL tutorial will replace 
     // this ambient lighting with environment lighting).
-    vec3 ambient = vec3(0.03) * albedo * ao;
+    // vec3 ambient = vec3(0.03) * albedo * ao;
+    //vec3 color = ambient + Lo;
 
-    vec3 color = ambient + Lo;
+    // NO AO
+    vec3 color = Lo;
+
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));
@@ -179,6 +182,8 @@ void main()
 
     FragColor = vec4(color, 1.0);
 
-    //FragColor = texture(material.texture_normal, TexCoords);
+
     //FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+
+    //FragColor = texture(material.texture_roughness, TexCoords); 
 }

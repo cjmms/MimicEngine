@@ -59,6 +59,7 @@ unsigned int ResourceManager::loadTexture(char const* path, bool gamma)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         stbi_image_free(data);
+        std::cout << path << " loaded successfully."<< std::endl;
     }
     else
     {

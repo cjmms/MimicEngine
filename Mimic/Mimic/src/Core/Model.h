@@ -25,7 +25,9 @@ public:
 private:
 	std::vector<Mesh> meshes;
 
-	std::vector<Texture> textures;
+	//std::vector<Texture> textures;
+
+	std::vector<Texture> textures_loaded;
 
 	// path to current model object
 	std::string directory;
@@ -50,5 +52,7 @@ private:
 	// load all textures, albedo, metallic, ao, normal, roughness
 	void loadMaterial();
 	void loadTexture(std::string name, std::string type);
+
+	std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
 };
 

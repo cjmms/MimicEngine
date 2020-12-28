@@ -22,8 +22,10 @@ Mesh::Mesh(std::vector<Vertex> vertices,
 
 // Try to avoid having multiple textures with same type
 
-// Why I designed this function this way:
-// Becasue I don't understand why the fuck you need 2 albedo textures for 1 fucking PBR object
+// Why I designed this way:
+// Becasue I don't understand why the fuck you need 2 albedo textures for 1 fucking PBR mesh
+
+// uniform name: material.texture_diffuse   (texture_diffuse is type name in this case)
 void Mesh::Draw(Shader& shader)
 {
     // setup texture uniform

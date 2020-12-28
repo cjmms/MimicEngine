@@ -86,7 +86,7 @@ void Camera::updateCameraDirection(float currentX, float currentY)
 void Camera::setCameraKey(GLFWwindow* window)
 {
 	//if (disabled) return;
-	setCameraSpeed(1.5f);
+	setCameraSpeed(15.5f);
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) 
 		cameraPos += cameraSpeed * cameraFront;
@@ -159,7 +159,7 @@ void Camera::zoomIn(float yoffset)
 
 glm::mat4 Camera::getProjectionMatrix()
 {
-	return glm::perspective(glm::radians(fov), 1200.0f / 860.0f, 0.1f, 100.0f);
+	return glm::perspective(glm::radians(fov), 1200.0f / 860.0f, 0.1f, 300.0f);
 }
 
 
