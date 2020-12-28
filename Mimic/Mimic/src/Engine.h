@@ -4,9 +4,13 @@
 
 class Engine
 {
+
+
 public:
 	void init();
 	void run();
 	void close();
+
+
 };
 

@@ -88,6 +88,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\Core\Light.cpp" />
@@ -101,6 +102,7 @@
     <ClCompile Include="src\UI_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Core\Light.h" />
