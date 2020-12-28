@@ -25,8 +25,6 @@ public:
 private:
 	std::vector<Mesh> meshes;
 
-	//std::vector<Texture> textures;
-
 	std::vector<Texture> textures_loaded;
 
 	// path to current model object

@@ -42,30 +42,7 @@ void Model::loadModel(std::string path, bool loadMat)
     processNode(scene->mRootNode, scene);
     std::cout << "Model loading complete, loading time: " <<  glfwGetTime() - before << "s " << std::endl;
 }
-/*
 
-void Model::loadMaterial()
-{
-    std::cout << "Loading Material" << std::endl;
-   loadTexture("albedo.tga", "texture_albedo");
-   loadTexture("metallic.jpg", "texture_metallic");
-   loadTexture("normal.jpg", "texture_normal");
-   loadTexture("roughness.jpg", "texture_roughness");
-   loadTexture("ao.jpg", "texture_ao");
-}
-*/
-/*
-void Model::loadTexture(std::string name, std::string type)
-{
-    Texture texture;
-    texture.id = ResourceManager::TextureFromFile(name.c_str(), this->directory);
-    texture.type = type;
-    texture.path = name.c_str();
-    textures.push_back(texture);
-
-    std::cout << "Texture Loading: " << name << (texture.id == -1 ? " failed!!!" : " succeed.") << std::endl;
-}
-*/
 
 
 void Model::processNode(aiNode* node, const aiScene* scene)
@@ -147,34 +124,44 @@ std::vector<unsigned int> Model::processIndices(aiMesh* mesh)
 
 
 
-
+/*
+* Assimp will bind "keyword" in .mtl file with tis own aiTextureType
+* For example: 
+* map_Kd albedo.jpg in .mtl file 
+* assimp will treat albedo.jpg a texture with aiTextureType_DIFFUSE 
+* 
+* Unfortunately, the matching I find online are incorrect between keyword and aiTextureType
+* 
+* After many testings these matchings have been validated:
+* map_Kd aiTextureType_DIFFUSE
+* map_Bump aiTextureType_HEIGHT
+* map_Ka aiTextureType_AMBIENT
+* map_Ns aiTextureType_SHININESS
+*/
 Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 {
     std::vector<Vertex> vertices = processVertices(mesh);
     std::vector<unsigned int> indices = processIndices(mesh);
 
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-    // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
-    // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
-    // Same applies to other texture as the following list summarizes:
-    // diffuse: texture_diffuseN
-    // specular: texture_specularN
-    // normal: texture_normalN
 
 
     std::vector<Texture> textures;
-    // 1. diffuse maps
+    // mapped to map_Kd in .mtl
     std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_albedo");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-    // 2. specular maps
-    std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_metallic");
-    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-    // 3. normal maps
+
+    // mapped to map_Bump in .mtl
     std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
     textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-    // 4. height maps
-    std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_roughness");
+
+    // mapped to map_Ka in .mtl
+    std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_metallic");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+
+    // mapped to map_Ns in .mtl
+    std::vector<Texture> tMaps = loadMaterialTextures(material, aiTextureType_SHININESS, "texture_roughness");
+    textures.insert(textures.end(), tMaps.begin(), tMaps.end());
 
     // return a mesh object created from the extracted mesh data
     return Mesh(vertices, textures, indices);
@@ -187,11 +174,8 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
     {
         aiString str;
-        //if (type != aiTextureType_UNKNOWN)
-            mat->GetTexture(type, i, &str);
-       // else
-         //   mat->GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, i, &str);
-        //mat->GetTexture(aiTextureType_UNKNOWN);
+        mat->GetTexture(type, i, &str);
+
         // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
         bool skip = false;
         for (unsigned int j = 0; j < textures_loaded.size(); j++)

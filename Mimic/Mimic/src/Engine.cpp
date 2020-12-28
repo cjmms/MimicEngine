@@ -38,7 +38,7 @@ void Engine::run()
 
     
 
-    Light light1(glm::vec3(0.0f, 2.50f, 5.0f), glm::vec3(150.0f, 150.0f, 150.0f));
+    Light light1(glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(150.0f, 150.0f, 150.0f));
 
     Shader lightShader("res/Shaders/basic.shader");
     Shader shader("res/Shaders/model_loading.shader");
@@ -50,14 +50,14 @@ void Engine::run()
 
     // load models
     // -----------
-    Model backpack("res/objects/backpack/backpack.obj");
+    //Model backpack("res/objects/backpack/backpack.obj");
     //Model lion("res/objects/lion/lion.obj");
-    //Model sponza("res/objects/sponza/sponza.obj", false);
+    Model sponza("res/objects/sponza/sponza.obj");
 
 
     // render the loaded model 
     glm::mat4 model = glm::mat4(1.0);
-    model = glm::scale(model, glm::vec3(1.1));
+    model = glm::scale(model, glm::vec3(0.1));
     shader.setMat4("model", model);
     shader.setVec3("camPos", camera.getCameraPos());
 
@@ -82,11 +82,11 @@ void Engine::run()
         shader.Bind();
         shader.setMat4("projection", camera.getProjectionMatrix());
         shader.setMat4("view", camera.getViewMatrix());
-        //sponza.Draw(shader);
+        sponza.Draw(shader);
         //lion.Draw(shader);
-        backpack.Draw(shader);
+        //backpack.Draw(shader);
 
-        //light1.Draw(lightShader);
+        light1.Draw(lightShader);
 
         //Quad().Draw(quadShader);
     }
