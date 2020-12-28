@@ -32,7 +32,7 @@ public:
 		  std::vector<Texture> textures, 
 		  std::vector<unsigned int> indices );
 
-	void Draw(Shader& shader);
+	void Draw(Shader& shader) const;
 
 private:
 	unsigned int VAO;

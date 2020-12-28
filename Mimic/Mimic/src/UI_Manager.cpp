@@ -34,13 +34,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 
 
-
-
-
-
-
-
-
 bool UI_Manager::init()
 {
     /* Initialize the library */

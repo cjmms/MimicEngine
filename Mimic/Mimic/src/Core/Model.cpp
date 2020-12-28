@@ -13,7 +13,7 @@ Model::Model(const char* path, bool loadMat )
 }
 
 // iterate all meshes, draw all meshes
-void Model::Draw(Shader& shader)
+void Model::Draw(Shader& shader) const
 {
     shader.Bind();
 	for (auto mesh : meshes) mesh.Draw(shader);
@@ -61,7 +61,7 @@ void Model::processNode(aiNode* node, const aiScene* scene)
 }
 
 
-void Model::setVec3(glm::vec3& des, aiVector3D& source)
+void Model::setVec3(glm::vec3& des, aiVector3D& source) const
 {
     des.x = source.x;
     des.y = source.y;
@@ -69,7 +69,7 @@ void Model::setVec3(glm::vec3& des, aiVector3D& source)
 }
 
 
-std::vector<Vertex> Model::processVertices(aiMesh* mesh)
+std::vector<Vertex> Model::processVertices(aiMesh* mesh) const
 {
     std::vector<Vertex> vertices;
     // walk through each of the mesh's vertices
@@ -109,7 +109,7 @@ std::vector<Vertex> Model::processVertices(aiMesh* mesh)
 }
 
 
-std::vector<unsigned int> Model::processIndices(aiMesh* mesh)
+std::vector<unsigned int> Model::processIndices(aiMesh* mesh) const
 {
     std::vector<unsigned int> indices;
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
@@ -138,7 +138,7 @@ std::vector<unsigned int> Model::processIndices(aiMesh* mesh)
 * map_Ka aiTextureType_AMBIENT
 * map_Ns aiTextureType_SHININESS
 */
-Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
+Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) 
 {
     std::vector<Vertex> vertices = processVertices(mesh);
     std::vector<unsigned int> indices = processIndices(mesh);
@@ -168,7 +168,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 }
 
 
-std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
+std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) 
 {
     std::vector<Texture> textures;
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)

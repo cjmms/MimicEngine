@@ -20,7 +20,7 @@ class Model
 {
 public:
 	Model(const char* path, bool loadMat = true);
-	void Draw(Shader& shader);
+	void Draw(Shader& shader) const;
 
 private:
 	std::vector<Mesh> meshes;
@@ -40,16 +40,11 @@ private:
 	// load vertices, indices and material(textures) from mesh
 	Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 
-	std::vector<Vertex> processVertices(aiMesh* mesh);
-	std::vector<unsigned int> processIndices(aiMesh* mesh);
-
+	std::vector<Vertex> processVertices(aiMesh* mesh) const;
+	std::vector<unsigned int> processIndices(aiMesh* mesh) const;
 
 	// helper function, convert aiVector3D to glm::vec3
-	void setVec3(glm::vec3& des, aiVector3D& source);
-
-	// load all textures, albedo, metallic, ao, normal, roughness
-	void loadMaterial();
-	void loadTexture(std::string name, std::string type);
+	void setVec3(glm::vec3& des, aiVector3D& source) const;
 
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
 };

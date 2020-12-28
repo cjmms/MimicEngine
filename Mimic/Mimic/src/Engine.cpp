@@ -8,6 +8,16 @@
 
 
 
+
+/*
+* TODO: shadow mapping
+* TODO: deferred shading
+* TODO: imGUI
+* TODO: Volumetric lighting
+* TODO: SSAO
+* TODO: soft shadow
+*/
+
 Camera camera;
 UI_Manager UI_Mgr;
 
@@ -19,6 +29,17 @@ void Engine::init()
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
+
+
+    // init scene
+    scene = new Scene();
+    scene->addLightSource(glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
+    scene->addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    scene->addLightSource(glm::vec3(-40.0f, 100.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+
+    scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
+    //Model backpack("res/objects/backpack/backpack.obj");
 }
 
 void Engine::close()
@@ -26,31 +47,12 @@ void Engine::close()
 	UI_Mgr.close();
 }
 
+
+
 void Engine::run()
 {
-    Scene lightScene;
-    lightScene.addLightSource(glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(150.0f, 150.0f, 150.0f));
-    lightScene.addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
-    lightScene.addLightSource(glm::vec3(100.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
-
     Shader shader("res/Shaders/model_loading.shader");
 
-    // load models
-    // -----------
-    //Model backpack("res/objects/backpack/backpack.obj");
-    Model sponza("res/objects/sponza/sponza.obj");
-
-    lightScene.BindLightSources(shader);
-
-    shader.Bind();
-    // render the loaded model 
-    glm::mat4 model = glm::mat4(1.0);
-    model = glm::scale(model, glm::vec3(0.1));
-    shader.setMat4("model", model);
-    shader.setVec3("camPos", camera.getCameraPos());
-
-
-    // debug mode?
     //Shader quadShader("res/Shaders/Quad.shader");
 
     
@@ -63,14 +65,8 @@ void Engine::run()
 
         camera.cameraUpdateFrameTime();
 
-        shader.Bind();
-        shader.setMat4("projection", camera.getProjectionMatrix());
-        shader.setMat4("view", camera.getViewMatrix());
-
-        sponza.Draw(shader);
-
-        lightScene.RenderLightSources();
-
+        scene->RenderObjects(shader);
+        scene->RenderLightSources();
 
         //Quad().Draw(quadShader);
     }

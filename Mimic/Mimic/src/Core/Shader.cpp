@@ -197,7 +197,7 @@ void Shader::setFloat(const std::string& name, float value)
 
 
 
-void Shader::setInt(const char* name, int value)
+void Shader::setInt(const char* name, int value) 
 {
     unsigned int location = getUniformLocation(name);
     glUniform1i(location, value);
