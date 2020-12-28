@@ -59,14 +59,14 @@ bool UI_Manager::init()
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    if (glewInit() != GLEW_OK)
+    if (glewInit() != GLEW_OK) {
         std::cout << "GLEW init error" << std::endl;
+        return false;
+    }
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-
-    //stbi_set_flip_vertically_on_load(true);
 
     disableCursor();
 

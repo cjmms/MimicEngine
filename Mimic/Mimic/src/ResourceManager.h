@@ -24,7 +24,7 @@ class Quad
 public:
 	Quad();
 
-	void Draw(Shader& shader);
+	void Draw(Shader& shader, unsigned int texture);
 
 private:
 	unsigned int VAO;

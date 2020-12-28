@@ -7,7 +7,7 @@ Light::Light(glm::vec3 position, glm::vec3 intensity)
 	:position(position), intensity(intensity)
 {
 	// disable material loading
-	lightSphere = new Model("res/objects/sphere/sphere.obj", false);
+	lightSphere = new Model("res/objects/sphere/sphere.obj");
 }
 
 

@@ -25,6 +25,7 @@ void ResourceManager::close()
 
 unsigned int ResourceManager::loadTexture(char const* path, bool gamma)
 {
+    stbi_set_flip_vertically_on_load(true);
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
@@ -115,13 +116,13 @@ Quad::Quad()
 }
 
 
-void Quad::Draw(Shader& shader)
+void Quad::Draw(Shader& shader, unsigned int texture)
 {
     shader.Bind();
 
-    //shader.setInt("map", 0);
-    //glActiveTexture(GL_TEXTURE0);
-    //glBindTexture(GL_TEXTURE_2D, texture);
+    shader.setInt("map", 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
 
     glBindVertexArray(VAO);
 

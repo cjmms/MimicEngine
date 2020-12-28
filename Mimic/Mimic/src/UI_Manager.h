@@ -29,10 +29,6 @@ public:
 private:
 	unsigned int window_width, window_height;
 	GLFWwindow* window;
-	//Camera camera;
-
-
-
 
 };
 

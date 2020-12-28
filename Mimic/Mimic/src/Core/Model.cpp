@@ -7,9 +7,9 @@
 
 
 
-Model::Model(const char* path, bool loadMat )
+Model::Model(const char* path)
 {
-    loadModel(path, loadMat);
+    loadModel(path);
 }
 
 // iterate all meshes, draw all meshes
@@ -23,10 +23,11 @@ void Model::Draw(Shader& shader) const
 
 
 
-void Model::loadModel(std::string path, bool loadMat)
+void Model::loadModel(std::string path)
 {
     Assimp::Importer import;
-    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate );
+
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
@@ -37,8 +38,6 @@ void Model::loadModel(std::string path, bool loadMat)
 
     std::cout << "Loading model, model address: " << path << std::endl;
     double before = glfwGetTime();
-
-    //if (loadMat) loadMaterial();
     processNode(scene->mRootNode, scene);
     std::cout << "Model loading complete, loading time: " <<  glfwGetTime() - before << "s " << std::endl;
 }

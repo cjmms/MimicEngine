@@ -31,6 +31,7 @@ void Scene::addObjects(const char* address, glm::vec3 scale)
 {
     Model* model = new Model(address);
 
+
     objects.push_back(new Object(model, scale));
 }
 
