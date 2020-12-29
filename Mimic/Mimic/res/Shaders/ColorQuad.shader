@@ -11,7 +11,7 @@ void main() {
 }
 
 
-
+//  This shader is designed to show color buffer
 
 #shader fragment
 #version 330 core
@@ -24,11 +24,5 @@ uniform sampler2D map;
 
 void main()
 {
-	// depth buffer test
-	//vec3 color = vec3(texture(map, TextureCoord).r);
-	//FragColor = vec4(color, 1.0f);
-
-	// color buffer test
 	FragColor = texture(map, TextureCoord);
-	//FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

@@ -51,6 +51,9 @@
     <ClCompile Include="src\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\FBO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\VertexBuffer.h">
@@ -86,10 +89,14 @@
     <ClInclude Include="src\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\FBO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\basic.shader" />
     <None Include="res\Shaders\model_loading.shader" />
-    <None Include="res\Shaders\Quad.shader" />
+    <None Include="res\Shaders\ColorQuad.shader" />
+    <None Include="res\Shaders\DepthQuad.shader" />
   </ItemGroup>
 </Project>

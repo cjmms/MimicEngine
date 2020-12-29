@@ -88,6 +88,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\FBO.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\Engine.cpp" />
@@ -102,6 +103,7 @@
     <ClCompile Include="src\UI_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\FBO.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\Engine.h" />
@@ -116,8 +118,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\basic.shader" />
+    <None Include="res\Shaders\DepthQuad.shader" />
     <None Include="res\Shaders\model_loading.shader" />
-    <None Include="res\Shaders\Quad.shader" />
+    <None Include="res\Shaders\ColorQuad.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

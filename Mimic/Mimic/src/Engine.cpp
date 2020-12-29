@@ -7,12 +7,11 @@
 #include "ResourceManager.h"
 
 #include <iostream>
+#include "Core/FBO.h"
 
 
 
 /*
-* TODO: screen resize
-* TODO: FBO
 * TODO: shadow mapping
 * TODO: deferred shading
 * TODO: imGUI
@@ -56,62 +55,25 @@ void Engine::run()
 {
     Shader shader("res/Shaders/model_loading.shader");
 
-    Shader quadShader("res/Shaders/Quad.shader");
-
-    // test only
-    unsigned int texture = ResourceManager::loadTexture("res/hanon.jpg", false);
-
-    //UI_Mgr.enableCursor();
+    Shader depthQuadShader("res/Shaders/DepthQuad.shader");
 
 
-    //------------------------------------------------------------
-    unsigned int FBO, RBO, colorAttachment;
-    glGenFramebuffers(1, &FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-
-    // generate FBO color attachment, bind to current FBO
-    glGenTextures(1, &colorAttachment);
-    glBindTexture(GL_TEXTURE_2D, colorAttachment);  // bind texture
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);        // unbind texture
-
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorAttachment, 0);
-
-    // generate FBO depth, stencil attachment(24 bits, 8 bits), bind to current FBO
-    glGenRenderbuffers(1, &RBO);
-    glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
-    // check if framebuffer created successfullly
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    //------------------------------------------------------------------------------
-
-
+    FBO_Depth depthBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
 
     while (!UI_Mgr.windowClosed())
     {
         UI_Mgr.update();
 
-
         camera.cameraUpdateFrameTime();
 
-        glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+        depthBufferFBO.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         scene->RenderObjects(shader);
         scene->RenderLightSources();
 
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        depthBufferFBO.Unbind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Quad().Draw(quadShader, colorAttachment);
+        Quad().Draw(depthQuadShader, depthBufferFBO.getDepthAttachment());
     }
 }
