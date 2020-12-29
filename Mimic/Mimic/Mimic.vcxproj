@@ -118,6 +118,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\basic.shader" />
+    <None Include="res\Shaders\DepthMap.shader" />
     <None Include="res\Shaders\DepthQuad.shader" />
     <None Include="res\Shaders\model_loading.shader" />
     <None Include="res\Shaders\ColorQuad.shader" />

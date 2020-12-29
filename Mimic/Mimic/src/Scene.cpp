@@ -57,6 +57,23 @@ void Scene::RenderObjects(Shader& shader) const
 
 
 
+void Scene::RenderShadowMap(glm::mat4 lightView, glm::mat4 lightProjection, Shader& shader) const
+{
+    shader.Bind();
+
+    // pass projection and view matrix
+    shader.setMat4("projection", lightProjection);
+    shader.setMat4("view", lightView);
+
+    for (auto obj : objects) obj->Draw(shader);
+
+    shader.unBind();
+}
+
+
+
+
+
 
 
 
@@ -83,3 +100,6 @@ void Object::Draw(Shader& shader) const
 
     shader.unBind();
 }
+
+
+

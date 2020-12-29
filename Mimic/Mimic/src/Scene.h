@@ -27,6 +27,8 @@ public:
 	void addObjects(const char* address, glm::vec3 scale);
 	void RenderObjects(Shader& shader) const;
 
+	void RenderShadowMap(glm::mat4 lightView, glm::mat4 lightProjection, Shader& shader) const;
+
 
 
 private:
