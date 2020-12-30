@@ -10,6 +10,8 @@
 #include "Core/FBO.h"
 
 
+#define SHADOW_MAP_DEBUG 0
+
 
 /*
 * TODO: shadow mapping
@@ -41,7 +43,7 @@ void Engine::init()
         glm::vec3(0.0f, 1.0f, 0.0f));
 
     // width / height is 1.0, front plane: 0.1f, back plane 125.0f
-    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 125.0f);
+    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
 
 
     // init scene
@@ -49,7 +51,7 @@ void Engine::init()
     scene->addLightSource(glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
     scene->addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
     scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
-    //scene->addLightSource(glm::vec3(-40.0f, 90.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    scene->addLightSource(glm::vec3(-40.0f, 90.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
 
     scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
     //Model backpack("res/objects/backpack/backpack.obj");
@@ -70,19 +72,29 @@ void Engine::run()
         glm::vec3(0.0f, 1.0f, 0.0f));
 
     // width / height is 1.0, front plane: 0.1f, back plane 125.0f
-    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 125.0f);
+    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
 
-
+    FBO_Depth depthBufferFBO(860, 860);
 
     Shader shader("res/Shaders/model_loading.shader");
 
     Shader depthQuadShader("res/Shaders/DepthQuad.shader");
     Shader ShadowMapShader("res/Shaders/DepthMap.shader");
 
+    shader.Bind();
+    shader.setMat4("lightView", lightView);
+    shader.setMat4("lightProjection", lightProjection);
+    
+    shader.setInt("shadowMap", 7);
+    glActiveTexture(GL_TEXTURE7);
+    glBindTexture(GL_TEXTURE_2D, depthBufferFBO.getDepthAttachment());
 
-    FBO_Depth depthBufferFBO(860, 860);
+    shader.setVec3("lightPos", glm::vec3(-40.0f, 90.0f, 0.0f));
 
-    UI_Mgr.enableCursor();
+    shader.unBind();
+
+
+    //UI_Mgr.enableCursor();
 
     while (!UI_Mgr.windowClosed())
     {
@@ -95,16 +107,16 @@ void Engine::run()
         glClear( GL_DEPTH_BUFFER_BIT);
         scene->RenderShadowMap(lightView, lightProjection, ShadowMapShader );
 
-        /*
-        depthBufferFBO.Bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        scene->RenderObjects(shader);
-        scene->RenderLightSources();
-        */
 
         depthBufferFBO.Unbind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Quad().Draw(depthQuadShader, depthBufferFBO.getDepthAttachment());
-        
+
+        if (SHADOW_MAP_DEBUG) {
+            Quad().Draw(depthQuadShader, depthBufferFBO.getDepthAttachment());
+        }
+        else {
+            scene->RenderObjects(shader);
+            scene->RenderLightSources();
+        }
     }
 }

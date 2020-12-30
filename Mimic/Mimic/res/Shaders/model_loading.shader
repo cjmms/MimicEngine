@@ -8,16 +8,22 @@ layout(location = 2) in vec2 aTexCoords;
 out vec2 TexCoords;
 out vec3 WorldPos;
 out vec3 Normal;
+out vec4 lightSpaceFragPos;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+
+uniform mat4 lightProjection;
+uniform mat4 lightView;
 
 void main()
 {
     TexCoords = aTexCoords;
     WorldPos = vec3(model * vec4(aPos, 1.0));
     Normal = mat3(model) * aNormal;
+
+    lightSpaceFragPos = lightProjection * lightView * model * vec4(aPos, 1.0f);
 
     gl_Position = projection * view * model * vec4(aPos, 1.0);
 }
@@ -31,8 +37,11 @@ out vec4 FragColor;
 in vec2 TexCoords;
 in vec3 WorldPos;
 in vec3 Normal;
+in vec4 lightSpaceFragPos;
 
 uniform vec3 camPos;
+uniform vec3 lightPos;
+uniform sampler2D shadowMap;
 
 const float PI = 3.14159265359;
 
@@ -111,23 +120,9 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 // ----------------------------------------------------------------------------
 
 
-
-
-void main()
+// reflection equation
+vec3 reflection(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, vec3 F0)
 {
-    vec3 albedo = pow(texture(material.texture_albedo, TexCoords).rgb, vec3(2.2));
-    float metallic = texture(material.texture_metallic, TexCoords).r;
-    float roughness = texture(material.texture_roughness, TexCoords).r;
-
-    vec3 N = getNormalFromMap();
-    vec3 V = normalize(camPos - WorldPos);
-
-    // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
-    // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
-    vec3 F0 = vec3(0.04);
-    F0 = mix(F0, albedo, metallic);
-
-    // reflectance equation
     vec3 Lo = vec3(0.0);
     for (int i = 0; i < N_LIGHTS; ++i)
     {
@@ -164,15 +159,62 @@ void main()
         // add to outgoing radiance Lo
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
     }
+    return Lo;
+}
 
-    // ambient lighting (note that the next IBL tutorial will replace 
-    // this ambient lighting with environment lighting).
-    //vec3 ambient = vec3(0.03) * albedo * ao;
-    //vec3 color = ambient + Lo;
+//----------------------------------------------------------------------
+
+float calculateShadow(vec3 N, vec3 lightDir)
+{
+    vec3 projCoord = lightSpaceFragPos.xyz / lightSpaceFragPos.w;
+    // transform to [0,1] range
+    projCoord = projCoord * 0.5 + 0.5;
+
+    if (projCoord.z > 1 || projCoord.z < 0) return 0;
+    if (projCoord.x > 1 || projCoord.x < 0) return 0;
+    if (projCoord.y > 1 || projCoord.y < 0) return 0;
+
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoord.xy).r;
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoord.z;
+
+    float bias = 0.001f;
+    // check whether current frag pos is in shadow
+    float shadow = (currentDepth - bias) > closestDepth ? 1.0 : 0.0;
+
+    return shadow;
+}
+
+
+
+
+void main()
+{
+    vec3 lightDir = normalize(lightPos - WorldPos);
+
+    vec3 albedo = pow(texture(material.texture_albedo, TexCoords).rgb, vec3(2.2));
+    float metallic = texture(material.texture_metallic, TexCoords).r;
+    float roughness = texture(material.texture_roughness, TexCoords).r;
+
+    vec3 N = getNormalFromMap();
+    vec3 V = normalize(camPos - WorldPos);
+
+    // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
+    // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, albedo, metallic);
+
+
+    // reflectance equation
+    vec3 Lo = reflection(N, V, albedo, metallic, roughness, F0);
 
     // NO AO
     vec3 color = Lo;
 
+    // calcualte shadow at here    
+    float shadow = 1 - calculateShadow(N, lightDir);
+    color *= shadow;
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));
@@ -181,14 +223,4 @@ void main()
 
     FragColor = vec4(color, 1.0);
 
-    /*
-    float near = 0.1;
-    float far = 100.0;
-    float z = gl_FragCoord.z * 2.0 - 1.0; // back to NDC 
-    float depth =  (2.0 * near * far) / (far + near - z * (far - near)) / far;
-
-    FragColor = vec4(vec3(depth), 1.0f);
-    */
-
-   // FragColor = texture(material.texture_albedo, TexCoords);
 }
