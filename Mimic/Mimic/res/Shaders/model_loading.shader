@@ -210,8 +210,8 @@ void main()
     vec3 color = Lo;
 
     // calcualte shadow at here    
-    float shadow = 1 - calculateShadow(N);
-    color *= shadow;
+    //float shadow = 1 - calculateShadow(N);
+    //color *= shadow;
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));
