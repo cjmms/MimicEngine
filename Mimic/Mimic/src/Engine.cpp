@@ -38,7 +38,7 @@ void Engine::init()
     // light view and light projection are hard coded for testing volumetric lighting
     // CSM should be used to implement shadow instead rather than basic shadow mapping
     glm::mat4 lightView = glm::lookAt(
-        glm::vec3(-40.0f, 90.0f, 0.0f),
+        glm::vec3(-40.0f, 80.0f, 0.0f),
         glm::vec3(30.0f, 60.0f, 55.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -51,7 +51,7 @@ void Engine::init()
     scene->addLightSource(glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
     scene->addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
     scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
-    scene->addLightSource(glm::vec3(-40.0f, 90.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    scene->addLightSource(glm::vec3(-60.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
 
     scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
     //Model backpack("res/objects/backpack/backpack.obj");
@@ -67,14 +67,15 @@ void Engine::close()
 void Engine::run()
 {
     glm::mat4 lightView = glm::lookAt(
-        glm::vec3(-40.0f, 90.0f, 0.0f),
+        glm::vec3(-60.0f, 70.0f, 0.0f),
         glm::vec3(30.0f, 60.0f, 55.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
     // width / height is 1.0, front plane: 0.1f, back plane 125.0f
     glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
 
-    FBO_Depth depthBufferFBO(860, 860);
+    FBO_Depth depthBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
+    //FBO_Depth depthBufferFBO(860, 860);
 
     Shader shader("res/Shaders/model_loading.shader");
 
@@ -89,8 +90,6 @@ void Engine::run()
     glActiveTexture(GL_TEXTURE7);
     glBindTexture(GL_TEXTURE_2D, depthBufferFBO.getDepthAttachment());
 
-    shader.setVec3("lightPos", glm::vec3(-40.0f, 90.0f, 0.0f));
-
     shader.unBind();
 
 
@@ -102,7 +101,11 @@ void Engine::run()
 
         camera.cameraUpdateFrameTime();
 
-        
+       /* std::cout << "position: " << camera.getCameraPos().x << ", " << 
+            camera.getCameraPos().y << ", " << 
+            camera.getCameraPos().z << std::endl;
+*/
+
         depthBufferFBO.Bind();
         glClear( GL_DEPTH_BUFFER_BIT);
         scene->RenderShadowMap(lightView, lightProjection, ShadowMapShader );

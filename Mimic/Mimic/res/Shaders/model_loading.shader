@@ -40,7 +40,6 @@ in vec3 Normal;
 in vec4 lightSpaceFragPos;
 
 uniform vec3 camPos;
-uniform vec3 lightPos;
 uniform sampler2D shadowMap;
 
 const float PI = 3.14159265359;
@@ -164,7 +163,7 @@ vec3 reflection(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, ve
 
 //----------------------------------------------------------------------
 
-float calculateShadow(vec3 N, vec3 lightDir)
+float calculateShadow(vec3 N)
 {
     vec3 projCoord = lightSpaceFragPos.xyz / lightSpaceFragPos.w;
     // transform to [0,1] range
@@ -191,8 +190,6 @@ float calculateShadow(vec3 N, vec3 lightDir)
 
 void main()
 {
-    vec3 lightDir = normalize(lightPos - WorldPos);
-
     vec3 albedo = pow(texture(material.texture_albedo, TexCoords).rgb, vec3(2.2));
     float metallic = texture(material.texture_metallic, TexCoords).r;
     float roughness = texture(material.texture_roughness, TexCoords).r;
@@ -213,7 +210,7 @@ void main()
     vec3 color = Lo;
 
     // calcualte shadow at here    
-    float shadow = 1 - calculateShadow(N, lightDir);
+    float shadow = 1 - calculateShadow(N);
     color *= shadow;
 
     // HDR tonemapping
