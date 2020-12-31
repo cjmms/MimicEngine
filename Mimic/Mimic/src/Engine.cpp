@@ -68,6 +68,7 @@ void Engine::run()
     Shader shader("res/Shaders/model_loading.shader");
     Shader Fill_G_Buffer("res/Shaders/FillG-Buffer.shader");
     Shader ColorQuadShader("res/Shaders/ColorQuad.shader");
+    Shader DeferredShader("res/Shaders/DeferredPBR.shader");
 
 
     //-------------------------------------------------------------------------------------------
@@ -129,9 +130,26 @@ void Engine::run()
     //--------------------------------------------------------------------------
 
 
+    // bind G buffer to texture unit
+    DeferredShader.Bind();
+    DeferredShader.setInt("gPositionDepth", 6);
+    glActiveTexture(GL_TEXTURE6);
+    glBindTexture(GL_TEXTURE_2D, gPositionDepth);
 
+    DeferredShader.setInt("gAlbedoMetallic", 7);
+    glActiveTexture(GL_TEXTURE7);
+    glBindTexture(GL_TEXTURE_2D, gAlbedoMetallic);
 
+    DeferredShader.setInt("gNormalRoughness", 8);
+    glActiveTexture(GL_TEXTURE8);
+    glBindTexture(GL_TEXTURE_2D, gNormalRoughness);
 
+    DeferredShader.setVec3("camPos", camera.getCameraPos());
+
+    DeferredShader.setVec3("lightPositions[0]", glm::vec3(-5.0f, 15.0f, 10.0f));
+    DeferredShader.setVec3("lightColors[0]", glm::vec3(550.0f, 550.0f, 550.0f));
+
+    DeferredShader.unBind();
 
 
 
@@ -139,7 +157,7 @@ void Engine::run()
 
     
 
-    /*
+    
     glm::mat4 lightView = glm::lookAt(
         glm::vec3(-60.0f, 70.0f, 0.0f),
         glm::vec3(30.0f, 60.0f, 55.0f),
@@ -163,7 +181,7 @@ void Engine::run()
     glBindTexture(GL_TEXTURE_2D, depthBufferFBO.getDepthAttachment());
 
     shader.unBind();
-    */
+    
 
     //UI_Mgr.enableCursor();
 
@@ -185,17 +203,17 @@ void Engine::run()
 
 
         //depthBufferFBO.Unbind();
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //if (SHADOW_MAP_DEBUG) {
           //  Quad().Draw(depthQuadShader, depthBufferFBO.getDepthAttachment());
         //}
         //else {
-            //scene->RenderObjects(shader);
-            //scene->RenderLightSources();
+            scene->RenderObjects(shader);
+            scene->RenderLightSources();
         //}
 
-
+/*
         // Fill G buffer
         glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -205,7 +223,9 @@ void Engine::run()
         // unbind G buffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Quad().Draw(ColorQuadShader, gAlbedoMetallic);
-
+        //Quad().Draw(ColorQuadShader, gAlbedoMetallic);    // works
+        //Quad().Draw(ColorQuadShader, gPositionDepth);     // fails
+        Quad().Draw(DeferredShader, gNormalRoughness);   // works
+        */
     }
 }

@@ -28,4 +28,5 @@ void main()
 
 	// test G buffer
 	FragColor = vec4(texture(map, TextureCoord).rgb, 1.0f);
+	//FragColor = vec4(vec3(texture(map, TextureCoord).a), 1.0f);
 }

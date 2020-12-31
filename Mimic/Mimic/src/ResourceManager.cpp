@@ -120,9 +120,9 @@ void Quad::Draw(Shader& shader, unsigned int texture)
 {
     shader.Bind();
 
-    shader.setInt("map", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    //shader.setInt("map", 0);
+    //glActiveTexture(GL_TEXTURE0);
+    //glBindTexture(GL_TEXTURE_2D, texture);
 
     glBindVertexArray(VAO);
 

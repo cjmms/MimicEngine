@@ -100,5 +100,6 @@
     <None Include="res\Shaders\DepthQuad.shader" />
     <None Include="res\Shaders\DepthMap.shader" />
     <None Include="res\Shaders\FillG-Buffer.shader" />
+    <None Include="res\Shaders\DeferredPBR.shader" />
   </ItemGroup>
 </Project>

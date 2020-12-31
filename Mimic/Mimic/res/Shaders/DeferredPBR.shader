@@ -1,32 +1,18 @@
 #shader vertex
 #version 330 core
-layout(location = 0) in vec3 aPos;
-layout(location = 1) in vec3 aNormal;
-layout(location = 2) in vec2 aTexCoords;
-
+layout(Location = 0) in vec2 aPos;
+layout(Location = 1) in vec2 aTextureCoord;
 
 out vec2 TexCoords;
-out vec3 WorldPos;
-out vec3 Normal;
-out vec4 lightSpaceFragPos;
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-
-uniform mat4 lightProjection;
-uniform mat4 lightView;
-
-void main()
-{
-    TexCoords = aTexCoords;
-    WorldPos = vec3(model * vec4(aPos, 1.0));
-    Normal = mat3(model) * aNormal;
-
-    lightSpaceFragPos = lightProjection * lightView * model * vec4(aPos, 1.0f);
-
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+void main() {
+    gl_Position = vec4(aPos.x, aPos.y, 0.0f, 1.0f);
+    TexCoords = aTextureCoord;
 }
+
+
+
+
 
 
 
@@ -35,47 +21,22 @@ void main()
 out vec4 FragColor;
 
 in vec2 TexCoords;
-in vec3 WorldPos;
-in vec3 Normal;
-in vec4 lightSpaceFragPos;
 
 uniform vec3 camPos;
-uniform sampler2D shadowMap;
+
 
 const float PI = 3.14159265359;
 
 
-struct Material {
-    sampler2D texture_albedo;
-    sampler2D texture_metallic;
-    sampler2D texture_normal;
-    sampler2D texture_roughness;
-};
-
-uniform Material material;
+uniform sampler2D gPositionDepth;
+uniform sampler2D gAlbedoMetallic;
+uniform sampler2D gNormalRoughness;
 
 
 const int N_LIGHTS = 10;
 uniform vec3 lightPositions[N_LIGHTS];
 uniform vec3 lightColors[N_LIGHTS];
 
-// from tangent space to world space
-vec3 getNormalFromMap()
-{
-    vec3 tangentNormal = texture(material.texture_normal, TexCoords).xyz * 2.0 - 1.0;
-
-    vec3 Q1 = dFdx(WorldPos);
-    vec3 Q2 = dFdy(WorldPos);
-    vec2 st1 = dFdx(TexCoords);
-    vec2 st2 = dFdy(TexCoords);
-
-    vec3 N = normalize(Normal);
-    vec3 T = normalize(Q1 * st2.t - Q2 * st1.t);
-    vec3 B = -normalize(cross(N, T));
-    mat3 TBN = mat3(T, B, N);
-
-    return normalize(TBN * tangentNormal);
-}
 
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -121,7 +82,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 
 // reflection equation
-vec3 reflection(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, vec3 F0)
+vec3 reflection(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, vec3 F0, vec3 WorldPos)
 {
     vec3 Lo = vec3(0.0);
     for (int i = 0; i < N_LIGHTS; ++i)
@@ -164,39 +125,19 @@ vec3 reflection(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, ve
 
 //----------------------------------------------------------------------
 
-float calculateShadow(vec3 N)
-{
-    vec3 projCoord = lightSpaceFragPos.xyz / lightSpaceFragPos.w;
-    // transform to [0,1] range
-    projCoord = projCoord * 0.5 + 0.5;
-
-    if (projCoord.z > 1 || projCoord.z < 0) return 0;
-    if (projCoord.x > 1 || projCoord.x < 0) return 0;
-    if (projCoord.y > 1 || projCoord.y < 0) return 0;
-
-    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(shadowMap, projCoord.xy).r;
-    // get depth of current fragment from light's perspective
-    float currentDepth = projCoord.z;
-
-    float bias = 0.001f;
-    // check whether current frag pos is in shadow
-    float shadow = (currentDepth - bias) > closestDepth ? 1.0 : 0.0;
-
-    return shadow;
-}
 
 
 
 
 void main()
 {
+    vec3 WorldPos = texture(gPositionDepth, TexCoords).rgb;
 
-    vec3 albedo = pow(texture(material.texture_albedo, TexCoords).rgb, vec3(2.2));
-    float metallic = texture(material.texture_metallic, TexCoords).r;
-    float roughness = texture(material.texture_roughness, TexCoords).r;
+    vec3 albedo = pow(texture(gAlbedoMetallic, TexCoords).rgb, vec3(2.2));
+    float metallic = texture(gAlbedoMetallic, TexCoords).a;
+    float roughness = texture(gNormalRoughness, TexCoords).a;
 
-    vec3 N = getNormalFromMap();
+    vec3 N = texture(gNormalRoughness, TexCoords).rbg;
     vec3 V = normalize(camPos - WorldPos);
 
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
@@ -206,14 +147,11 @@ void main()
 
 
     // reflectance equation
-    vec3 Lo = reflection(N, V, albedo, metallic, roughness, F0);
+    vec3 Lo = reflection(N, V, albedo, metallic, roughness, F0, WorldPos);
 
     // NO AO
     vec3 color = Lo;
 
-    // calcualte shadow at here    
-    //float shadow = 1 - calculateShadow(N);
-    //color *= shadow;
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));
