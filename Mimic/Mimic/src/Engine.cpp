@@ -48,9 +48,9 @@ void Engine::init()
     // init scene
     scene = new Scene();
     scene->addLightSource(glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
-    scene->addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
-    scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
-    scene->addLightSource(glm::vec3(-60.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    //scene->addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    //scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    //scene->addLightSource(glm::vec3(-60.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
 
     scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
     //Model backpack("res/objects/backpack/backpack.obj");
@@ -80,7 +80,7 @@ void Engine::run()
     unsigned int gBuffer;
     glGenFramebuffers(1, &gBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-    unsigned int gPositionDepth, gNormalRoughness, gAlbedoMetallic;
+    unsigned int gPosition, gNormalRoughness, gAlbedoMetallic;
 
     // Albedo + Metallic
     glGenTextures(1, &gAlbedoMetallic);
@@ -92,12 +92,22 @@ void Engine::run()
 
 
     // Position + Depth
-    glGenTextures(1, &gPositionDepth);
-    glBindTexture(GL_TEXTURE_2D, gPositionDepth);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    //glGenTextures(1, &gPositionDepth);
+    //glBindTexture(GL_TEXTURE_2D, gPositionDepth);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gPositionDepth, 0);
+
+
+    glGenTextures(1, &gPosition);
+    glBindTexture(GL_TEXTURE_2D, gPosition);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gPositionDepth, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gPosition, 0);
+
+
 
 
     // Normal + Roughness
@@ -132,9 +142,9 @@ void Engine::run()
 
     // bind G buffer to texture unit
     DeferredShader.Bind();
-    DeferredShader.setInt("gPositionDepth", 6);
+    DeferredShader.setInt("gPosition", 6);
     glActiveTexture(GL_TEXTURE6);
-    glBindTexture(GL_TEXTURE_2D, gPositionDepth);
+    glBindTexture(GL_TEXTURE_2D, gPosition);
 
     DeferredShader.setInt("gAlbedoMetallic", 7);
     glActiveTexture(GL_TEXTURE7);
@@ -156,7 +166,7 @@ void Engine::run()
 
 
     
-
+    /*
     
     glm::mat4 lightView = glm::lookAt(
         glm::vec3(-60.0f, 70.0f, 0.0f),
@@ -181,7 +191,7 @@ void Engine::run()
     glBindTexture(GL_TEXTURE_2D, depthBufferFBO.getDepthAttachment());
 
     shader.unBind();
-    
+    */
 
     //UI_Mgr.enableCursor();
 
@@ -201,31 +211,33 @@ void Engine::run()
         //glClear( GL_DEPTH_BUFFER_BIT);
         //scene->RenderShadowMap(lightView, lightProjection, ShadowMapShader );
 
+        if (0) {
+            //depthBufferFBO.Unbind();
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //depthBufferFBO.Unbind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        //if (SHADOW_MAP_DEBUG) {
-          //  Quad().Draw(depthQuadShader, depthBufferFBO.getDepthAttachment());
-        //}
-        //else {
+            //if (SHADOW_MAP_DEBUG) {
+              //  Quad().Draw(depthQuadShader, depthBufferFBO.getDepthAttachment());
+            //}
+            //else {
             scene->RenderObjects(shader);
-            scene->RenderLightSources();
-        //}
+            //scene->RenderLightSources();
+            //}
+        }
+        else
+        {
 
-/*
-        // Fill G buffer
-        glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        scene->RenderObjects(Fill_G_Buffer);
-        //scene->RenderLightSources();
+            // Fill G buffer
+            glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            scene->RenderObjects(Fill_G_Buffer);
+            //scene->RenderLightSources();
 
-        // unbind G buffer
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //Quad().Draw(ColorQuadShader, gAlbedoMetallic);    // works
-        //Quad().Draw(ColorQuadShader, gPositionDepth);     // fails
-        Quad().Draw(DeferredShader, gNormalRoughness);   // works
-        */
+            // unbind G buffer
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            //Quad().Draw(ColorQuadShader, gAlbedoMetallic);    // works
+            //Quad().Draw(ColorQuadShader, gPositionDepth);     // fails
+            Quad().Draw(DeferredShader, gNormalRoughness);   // works
+        }
     }
 }

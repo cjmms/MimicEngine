@@ -28,7 +28,7 @@ void main()
 #shader fragment
 #version 330 core
 layout(location = 0) out vec4 gAlbedoMetallic;
-layout(location = 1) out vec4 gPositionDepth;
+layout(location = 1) out vec3 gPosition;
 layout(location = 2) out vec4 gNormalRoughness;
 
 in vec2 TexCoords;
@@ -47,7 +47,7 @@ uniform Material material;
 
 vec3 getNormalFromMap()
 {
-    vec3 tangentNormal = texture(material.texture_normal, TexCoords).xyz * 2.0 - 1.0;
+    vec3 tangentNormal = texture(material.texture_normal, TexCoords).rgb * 2.0 - 1.0;
 
     vec3 Q1 = dFdx(WorldPos);
     vec3 Q2 = dFdy(WorldPos);
@@ -73,9 +73,8 @@ void main()
     gAlbedoMetallic.a = texture(material.texture_metallic, TexCoords).r;
 
     // store fragment position vector in the G buffer
-    gPositionDepth.rgb = WorldPos;
-    // store depth in z buffer into G buffer
-    gPositionDepth.a = gl_FragCoord.z;
+    gPosition = WorldPos;
+
 
     // store normal vector into G buffer
     gNormalRoughness.rgb = getNormalFromMap();
