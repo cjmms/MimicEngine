@@ -10,8 +10,8 @@ void Scene::BindLightSources(Shader& shader) const
     
     //for (unsigned int i = 0; i < lightSources.size(); i++)
    // {
-     //   shader.setVec3("lightPositions[" + std::to_string(i) + "]", lightSources[i]->getPos());
-       // shader.setVec3("lightColors[" + std::to_string(i) + "]", lightSources[i]->getIntensity());
+       // shader.setVec3("lightPositions[" + std::to_string(i) + "]", lightSources[i]->getPos());
+      //  shader.setVec3("lightColors[" + std::to_string(i) + "]", lightSources[i]->getIntensity());
     //}
     
     shader.setVec3("lightPositions[0]", glm::vec3(-5.0f, 15.0f, 10.0f));

@@ -147,20 +147,16 @@ void main()
 
 
     // reflectance equation
-    //vec3 Lo = reflection(N, V, albedo, metallic, roughness, F0, WorldPos);
+   // vec3 Lo = reflection(N, V, albedo, metallic, roughness, F0, WorldPos);
 
-    //------------------------------------------------------------------------
-
-    vec3 lightPos = vec3(-5.0f, 15.0f, 10.0f);
-
-    vec3 Lo = vec3(0.0);
     int i = 0;
+    vec3 Lo = vec3(0.0);
+   // for (int i = 0; i < N_LIGHTS; ++i)
+   // {
         // calculate per-light radiance
-        //vec3 L = normalize(lightPositions[i] - WorldPos);
-        vec3 L = normalize(lightPos - WorldPos);
+        vec3 L = normalize(lightPositions[i] - WorldPos);
         vec3 H = normalize(V + L);
-        //float distance = length(lightPositions[i] - WorldPos);
-        float distance = length(lightPos - WorldPos);
+        float distance = length(lightPositions[i] - WorldPos);
         float attenuation = 1.0 / (distance * distance);
         vec3 radiance = lightColors[i] * attenuation;
 
@@ -190,38 +186,29 @@ void main()
         // add to outgoing radiance Lo
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
     
-    
-
-
-
-    //---------------------------------------------------------------------------
-
+    //return Lo;
 
 
 
     // NO AO
     vec3 color = Lo;
 
-
     // HDR tonemapping
     color = color / (color + vec3(1.0));
     // gamma correct
     color = pow(color, vec3(1.0 / 2.2));
 
-    FragColor = vec4(color, 1.0);
-    //FragColor = vec4(albedo, 1.0f);
-    FragColor = vec4(N, 1.0f);
-    FragColor = vec4(vec3(metallic), 1.0f);
-    FragColor = vec4(vec3(roughness), 1.0f);
-    FragColor = vec4(WorldPos, 1.0f);
-    //FragColor = vec4(F0, 1.0f);
-    //FragColor = vec4(Lo, 1.0f);
-    //FragColor = vec4(L, 1.0f);
-    //FragColor = vec4(lightPositions[i], 1.0f);
-    FragColor = vec4(H, 1.0f);
-    FragColor = vec4(radiance, 1.0f);
-    FragColor = vec4(F, 1.0f);
-    FragColor = vec4(Lo, 1.0f);
 
     FragColor = vec4(color, 1.0f);
+    FragColor = vec4(nominator, 1.0f);
+    FragColor = vec4(F, 1.0f);
+    FragColor = vec4(vec3(NDF), 1.0f);
+    FragColor = vec4(vec3(max(dot(N, H), 0.0)), 1.0f);
+    //FragColor = vec4(vec3(G), 1.0f);
+    //FragColor = vec4(vec3(roughness), 1.0f);
+    //FragColor = vec4(H, 1.0f);
+    //FragColor = vec4(specular, 1.0f);
+    //FragColor = vec4(N, 1.0f);
+    FragColor = vec4(color, 1.0f);
+
 }
