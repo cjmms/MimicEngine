@@ -24,7 +24,11 @@ class Quad
 public:
 	Quad();
 
-	void Draw(Shader& shader, unsigned int texture);
+	// pass texture as a uniform, draw a quad
+	void Draw(Shader& shader, unsigned int texture) const;
+
+	// Draw a quad
+	void Draw(Shader& shader) const;
 
 private:
 	unsigned int VAO;

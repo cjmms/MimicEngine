@@ -6,6 +6,8 @@
   * Diffuse, normal, specular, AO, normal mapping. Textures are imported as bindless GL textures through stb_image.h
   * 3D Model file with .obj format through my code and Assimp library
 * PBR
+* Deferred Rendering Pipeline
+* Basic Shadow Mapping (Might replaced by CSM later if time available)
 * Camera
 * Basic HDR and Gamma Correction
 

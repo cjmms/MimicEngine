@@ -28,7 +28,7 @@ public:
 	void RenderObjects(Shader& shader) const;
 
 	void RenderShadowMap(glm::mat4 lightView, glm::mat4 lightProjection, Shader& shader) const;
-
+	void BindLightSources(Shader& shader) const;
 
 
 private:
@@ -36,7 +36,8 @@ private:
 	std::vector<Object* > objects;
 	Shader *lightShader;
 
-	void BindLightSources(Shader& shader) const;
+	// this func will not bind and unbind shader, it only passes uniforms
+	//void BindLightSources(Shader& shader) const;
 
 };
 

@@ -116,13 +116,13 @@ Quad::Quad()
 }
 
 
-void Quad::Draw(Shader& shader, unsigned int texture)
+void Quad::Draw(Shader& shader, unsigned int texture) const
 {
     shader.Bind();
 
-    //shader.setInt("map", 0);
-    //glActiveTexture(GL_TEXTURE0);
-    //glBindTexture(GL_TEXTURE_2D, texture);
+    shader.setInt("map", 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
 
     glBindVertexArray(VAO);
 
@@ -134,6 +134,20 @@ void Quad::Draw(Shader& shader, unsigned int texture)
     shader.unBind();
 }
 
+
+
+
+
+void Quad::Draw(Shader& shader) const
+{
+    shader.Bind();
+
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+
+    shader.unBind();
+}
 
 
 

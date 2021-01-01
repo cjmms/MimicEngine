@@ -191,7 +191,6 @@ float calculateShadow(vec3 N)
 
 void main()
 {
-
     vec3 albedo = pow(texture(material.texture_albedo, TexCoords).rgb, vec3(2.2));
     float metallic = texture(material.texture_metallic, TexCoords).r;
     float roughness = texture(material.texture_roughness, TexCoords).r;
@@ -206,48 +205,8 @@ void main()
 
 
     // reflectance equation
-    //vec3 Lo = reflection(N, V, albedo, metallic, roughness, F0);
+    vec3 Lo = reflection(N, V, albedo, metallic, roughness, F0);
 
-    int i = 0;
-    vec3 Lo = vec3(0.0);
-    // for (int i = 0; i < N_LIGHTS; ++i)
-    // {
-         // calculate per-light radiance
-    vec3 L = normalize(lightPositions[i] - WorldPos);
-    vec3 H = normalize(V + L);
-    float distance = length(lightPositions[i] - WorldPos);
-    float attenuation = 1.0 / (distance * distance);
-    vec3 radiance = lightColors[i] * attenuation;
-
-    // Cook-Torrance BRDF
-    float NDF = DistributionGGX(N, H, roughness);
-    float G = GeometrySmith(N, V, L, roughness);
-    vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
-
-    vec3 nominator = NDF * G * F;
-    float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; // 0.001 to prevent divide by zero.
-    vec3 specular = nominator / denominator;
-
-    // kS is equal to Fresnel
-    vec3 kS = F;
-    // for energy conservation, the diffuse and specular light can't
-    // be above 1.0 (unless the surface emits light); to preserve this
-    // relationship the diffuse component (kD) should equal 1.0 - kS.
-    vec3 kD = vec3(1.0) - kS;
-    // multiply kD by the inverse metalness such that only non-metals 
-    // have diffuse lighting, or a linear blend if partly metal (pure metals
-    // have no diffuse light).
-    kD *= 1.0 - metallic;
-
-    // scale light by NdotL
-    float NdotL = max(dot(N, L), 0.0);
-
-    // add to outgoing radiance Lo
-    Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-
-
-
-    //---------------------------------------------------------------------------------------------
     // NO AO
     vec3 color = Lo;
 
@@ -260,20 +219,6 @@ void main()
     // gamma correct
     color = pow(color, vec3(1.0 / 2.2));
 
-    FragColor = vec4(color, 1.0f);
-    //FragColor = vec4(F0, 1.0f);
-    FragColor = vec4(nominator, 1.0f);
-    // works
-    //FragColor = vec4(F, 1.0f);
-    
-    // not working
-    FragColor = vec4(vec3(NDF), 1.0f);
-    FragColor = vec4(vec3(max(dot(N, H), 0.0)), 1.0f);
-    //FragColor = vec4(vec3(G), 1.0f);
-    //FragColor = vec4(vec3(roughness), 1.0f);
-    //FragColor = vec4(H, 1.0f);
-    //FragColor = vec4(specular, 1.0f);
-    //FragColor = vec4(N, 1.0f);
 
     FragColor = vec4(color, 1.0f);
 }
