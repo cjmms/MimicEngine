@@ -10,7 +10,7 @@ public:
 	Light(glm::vec3 position, glm::vec3 intensity);
 	~Light();
 	
-	void Draw(Shader& shader);
+	void Draw(Shader& shader) const;
 
 	inline glm::vec3 getPos() const { return position; }
 	inline glm::vec3 getIntensity() const { return intensity; }

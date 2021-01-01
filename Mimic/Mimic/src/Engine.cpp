@@ -8,13 +8,13 @@
 
 #include <iostream>
 #include "Core/FBO.h"
+#include "Renderer.h"
 
 
 #define SHADOW_MAP_DEBUG 0
 
 
 /*
-* TODO: deferred shading
 * TODO: imGUI
 * TODO: Volumetric lighting
 * TODO: SSAO
@@ -149,7 +149,7 @@ void Engine::run()
 
 
 
-
+    Renderer renderer(false);
 
     
     /*
@@ -197,15 +197,16 @@ void Engine::run()
         //glClear( GL_DEPTH_BUFFER_BIT);
         //scene->RenderShadowMap(lightView, lightProjection, ShadowMapShader );
 
-        if (0) {
+        if (1) {
             //depthBufferFBO.Unbind();
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             //if (SHADOW_MAP_DEBUG) 
               //  Quad().Draw(depthQuadShader, depthBufferFBO.getDepthAttachment());
             
-            scene->RenderObjects(shader);
-            scene->RenderLightSources();
+
+            renderer.Render(scene);
+            renderer.RenderLightSources(scene);
         }
         else
         {

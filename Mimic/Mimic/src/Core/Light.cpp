@@ -17,7 +17,7 @@ Light::~Light()
 }
 
 
-void Light::Draw(Shader& shader)
+void Light::Draw(Shader& shader) const
 {
 	shader.Bind();
 

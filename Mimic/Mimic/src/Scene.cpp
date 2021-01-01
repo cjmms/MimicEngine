@@ -75,6 +75,15 @@ void Scene::RenderShadowMap(glm::mat4 lightView, glm::mat4 lightProjection, Shad
 
 
 
+
+
+
+
+
+
+
+
+
 Object::Object(Model* model, glm::vec3 scale)
     : model(model), scale(scale)
 {}

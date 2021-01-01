@@ -30,6 +30,8 @@ public:
 	void RenderShadowMap(glm::mat4 lightView, glm::mat4 lightProjection, Shader& shader) const;
 	void BindLightSources(Shader& shader) const;
 
+	inline const std::vector<Light* >& getLightSources() const { return lightSources; }
+	inline const std::vector<Object* >& getObjects() const { return objects; }
 
 private:
 	std::vector<Light* > lightSources;
