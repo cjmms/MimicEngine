@@ -10,8 +10,10 @@ struct Object
 
 	Object(Model* model, glm::vec3 scale);
 	~Object();
-	void Draw(Shader& shader) const;
-	
+
+	glm::mat4 getModelMatrix() const;
+	inline Model const* getModel() { return model; }
+
 };
 
 
@@ -22,13 +24,10 @@ public:
 	~Scene();
 
 	inline void addLightSource(glm::vec3 position, glm::vec3 intensity) { lightSources.push_back(new Light(position, intensity)); }
-	inline void RenderLightSources() const { for (auto light : lightSources) light->Draw(*lightShader); }
 
 	void addObjects(const char* address, glm::vec3 scale);
-	void RenderObjects(Shader& shader) const;
 
 	void RenderShadowMap(glm::mat4 lightView, glm::mat4 lightProjection, Shader& shader) const;
-	void BindLightSources(Shader& shader) const;
 
 	inline const std::vector<Light* >& getLightSources() const { return lightSources; }
 	inline const std::vector<Object* >& getObjects() const { return objects; }
@@ -36,10 +35,7 @@ public:
 private:
 	std::vector<Light* > lightSources;
 	std::vector<Object* > objects;
-	Shader *lightShader;
 
-	// this func will not bind and unbind shader, it only passes uniforms
-	//void BindLightSources(Shader& shader) const;
 
 };
 

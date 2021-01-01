@@ -18,19 +18,44 @@
 */
 
 
+enum RenderingType
+{
+	DEFERRED,
+	FORWARD
+};
+
+
 
 class Renderer
 {
 private:
-	bool isDeferred;
+	RenderingType type;
 	Shader *PBR_Forward_Shader;
 	Shader *lightShader;
+	Shader *Fill_G_Buffer;
+	Shader *DeferredShader;
+
+	unsigned int gBuffer;
 	
 	void BindLightSources(Shader* shader, Scene const* scene) const;
 
+	/*
+	* G-Buffer has 3 Color Buffers
+	* Layout: 
+	*        |  Albedo.r  |  Albedo.g  |  Albedo.b  |  Metallic  |		Unsigned Byte
+	*		 | Position.x | Position.y | Position.z |    Empty   |		FLOAT 16 Bit
+	*		 |  Normal.x  |  Normal.y  |  Normal.z  |  Roughness |		FLOAT 16 Bit
+	*/
+	void init_G_Buffer(unsigned int width, unsigned int height);
+
+	void Draw(Shader *shader, Scene const* scene) const;
+
+	void DeferredRender(Scene const* scene) const;
+
+	inline bool isDeferred() const { return DEFERRED == type; }
 
 public:
-	Renderer(bool isDeferred);
+	Renderer(RenderingType type);
 
 	~Renderer();
 	

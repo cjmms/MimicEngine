@@ -1,16 +1,97 @@
 #include "Renderer.h"
 #include "Core/Camera.h"
+#include "UI_Manager.h"
+#include <iostream>
+#include "ResourceManager.h"
 
 extern Camera camera;
+extern UI_Manager UI_Mgr;
 
-Renderer::Renderer(bool isDeferred)
-	:isDeferred(isDeferred), lightShader(new Shader("res/Shaders/basic.shader"))
+Renderer::Renderer(RenderingType type)
+	:type(type), lightShader(new Shader("res/Shaders/basic.shader")),
+	PBR_Forward_Shader(NULL), DeferredShader(NULL), Fill_G_Buffer(NULL), gBuffer(0)
 {
 	glEnable(GL_DEPTH_TEST);
 
-	if (!isDeferred)
+	//if (!isDeferred())
+	//{
 		PBR_Forward_Shader = new Shader("res/Shaders/model_loading.shader");
+	//}
+	//else
+	//{
+		Fill_G_Buffer = new Shader("res/Shaders/FillG-Buffer.shader");
+		DeferredShader = new Shader("res/Shaders/DeferredPBR.shader");
+		init_G_Buffer(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
+	//}
 }
+
+
+
+
+void Renderer::init_G_Buffer(unsigned int width, unsigned int height)
+{
+    glGenFramebuffers(1, &gBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+    unsigned int gPosition, gNormalRoughness, gAlbedoMetallic;
+
+    // Albedo + Metallic
+    glGenTextures(1, &gAlbedoMetallic);
+    glBindTexture(GL_TEXTURE_2D, gAlbedoMetallic);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gAlbedoMetallic, 0);
+
+	// position
+    glGenTextures(1, &gPosition);
+    glBindTexture(GL_TEXTURE_2D, gPosition);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gPosition, 0);
+
+    // Normal + Roughness
+    glGenTextures(1, &gNormalRoughness);
+    glBindTexture(GL_TEXTURE_2D, gNormalRoughness);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gNormalRoughness, 0);
+
+
+    // - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
+    unsigned int G_Buffer[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    glDrawBuffers(3, G_Buffer);
+
+    // create and attach depth buffer (renderbuffer)
+    unsigned int rboDepth;
+    glGenRenderbuffers(1, &rboDepth);
+    glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+    // finally check if framebuffer is complete
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "Framebuffer not complete!" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    DeferredShader->Bind();
+    // TODO: need to be done in a better way
+    DeferredShader->setInt("gPosition", 6);
+    glActiveTexture(GL_TEXTURE6);
+    glBindTexture(GL_TEXTURE_2D, gPosition);
+
+    DeferredShader->setInt("gAlbedoMetallic", 7);
+    glActiveTexture(GL_TEXTURE7);
+    glBindTexture(GL_TEXTURE_2D, gAlbedoMetallic);
+
+    DeferredShader->setInt("gNormalRoughness", 8);
+    glActiveTexture(GL_TEXTURE8);
+    glBindTexture(GL_TEXTURE_2D, gNormalRoughness);
+    DeferredShader->unBind();
+}
+
+
+
 
 
 
@@ -21,40 +102,91 @@ Renderer::~Renderer()
 
 void Renderer::Render(Scene const* scene) const
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	PBR_Forward_Shader->Bind();
-
-	// pass light source
-	BindLightSources(PBR_Forward_Shader, scene);
-
-	// pass projection and view matrix
-	PBR_Forward_Shader->setMat4("projection", camera.getProjectionMatrix());
-	PBR_Forward_Shader->setMat4("view", camera.getViewMatrix());
-
-	// pass camera position
-	PBR_Forward_Shader->setVec3("camPos", camera.getCameraPos());
-
-	for (auto obj : scene->getObjects()) obj->Draw(*PBR_Forward_Shader);
-
-	PBR_Forward_Shader->unBind();
+    if (isDeferred()) DeferredRender(scene);
+    else Draw(PBR_Forward_Shader, scene);
 }
+
+
+
+void Renderer::Draw(Shader* shader, Scene const* scene) const
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    shader->Bind();
+
+    // pass light source
+    BindLightSources(shader, scene);
+
+    // pass projection and view matrix
+    shader->setMat4("projection", camera.getProjectionMatrix());
+    shader->setMat4("view", camera.getViewMatrix());
+
+    // pass camera position
+    shader->setVec3("camPos", camera.getCameraPos());
+
+    for (auto obj : scene->getObjects())
+    {
+        shader->setMat4("model", obj->getModelMatrix());
+        obj->getModel()->Draw(*shader);
+    }
+    shader->unBind();
+}
+
+
+
+void Renderer::DeferredRender(Scene const* scene) const
+{
+    // First Pass, fill G-Buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);     // Bind to G-Buffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    Fill_G_Buffer->Bind();
+    Fill_G_Buffer->setMat4("projection", camera.getProjectionMatrix());
+    Fill_G_Buffer->setMat4("view", camera.getViewMatrix());
+
+    for (auto obj : scene->getObjects()) {
+        Fill_G_Buffer->setMat4("model", obj->getModelMatrix());
+        obj->getModel()->Draw(*Fill_G_Buffer);
+    }
+    Fill_G_Buffer->unBind();
+
+
+    // Second Buffer, Render to a Quad
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);           // Unbind G-Buffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    DeferredShader->Bind();
+    BindLightSources(DeferredShader, scene);
+    DeferredShader->setVec3("camPos", camera.getCameraPos());
+    DeferredShader->unBind();
+
+    Quad().Draw(*DeferredShader);
+}
+
 
 
 void Renderer::RenderLightSources(Scene const* scene) const
 {
-	//glDisable(GL_DEPTH_TEST);
+	if (isDeferred()) glDisable(GL_DEPTH_TEST);
+
+    lightShader->Bind();
+    lightShader->setMat4("projection", camera.getProjectionMatrix());
+    lightShader->setMat4("view", camera.getViewMatrix());
+    lightShader->unBind();
 
 	// This is a bad design, since Light* can still be changed
 	// The right way should be passing a pair of iterators instead ( Maybe? )
 	const std::vector<Light* > lights = scene->getLightSources();
-	for (auto light : lights) light->Draw(*lightShader);
+    for (auto light : lights) {
+        lightShader->Bind();
+        lightShader->setMat4("model", light->getModelMatrix());
+        lightShader->unBind();
 
-	//glEnable(GL_DEPTH_TEST);
+        light->getModel()->Draw(*lightShader);
+    }
+
+	if (isDeferred()) glEnable(GL_DEPTH_TEST);
 }
-
-
-
 
 
 

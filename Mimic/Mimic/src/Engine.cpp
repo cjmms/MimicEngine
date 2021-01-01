@@ -1,13 +1,8 @@
 #include "Engine.h"
 #include "Core/Camera.h"
 #include "UI_Manager.h"
-
-#include "Core/Shader.h"
 #include "Scene.h"
-#include "ResourceManager.h"
-
 #include <iostream>
-#include "Core/FBO.h"
 #include "Renderer.h"
 
 
@@ -29,22 +24,6 @@ void Engine::init()
 {
 	UI_Mgr.init();
 
-    // configure global opengl state
-    // -----------------------------
-    glEnable(GL_DEPTH_TEST);
-
-
-    // light view and light projection are hard coded for testing volumetric lighting
-    // CSM should be used to implement shadow instead rather than basic shadow mapping
-    glm::mat4 lightView = glm::lookAt(
-        glm::vec3(-40.0f, 80.0f, 0.0f),
-        glm::vec3(30.0f, 60.0f, 55.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f));
-
-    // width / height is 1.0, front plane: 0.1f, back plane 125.0f
-    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
-
-
     // init scene
     scene = new Scene();
     scene->addLightSource(glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
@@ -65,91 +44,7 @@ void Engine::close()
 
 void Engine::run()
 {
-    Shader shader("res/Shaders/model_loading.shader");
-    Shader Fill_G_Buffer("res/Shaders/FillG-Buffer.shader");
-    Shader ColorQuadShader("res/Shaders/ColorQuad.shader");
-    Shader DeferredShader("res/Shaders/DeferredPBR.shader");
-
-
-    //-------------------------------------------------------------------------------------------
-    // init G-buffer
-    unsigned int width = UI_Mgr.getScreenWidth();
-    unsigned int height = UI_Mgr.getScreenHeight();
-
-
-    unsigned int gBuffer;
-    glGenFramebuffers(1, &gBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-    unsigned int gPosition, gNormalRoughness, gAlbedoMetallic;
-
-    // Albedo + Metallic
-    glGenTextures(1, &gAlbedoMetallic);
-    glBindTexture(GL_TEXTURE_2D, gAlbedoMetallic);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gAlbedoMetallic, 0);
-
-
-    glGenTextures(1, &gPosition);
-    glBindTexture(GL_TEXTURE_2D, gPosition);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gPosition, 0);
-
-
-    // Normal + Roughness
-    glGenTextures(1, &gNormalRoughness);
-    glBindTexture(GL_TEXTURE_2D, gNormalRoughness);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gNormalRoughness, 0);
-
-
-    // - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
-    unsigned int G_Buffer[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-    glDrawBuffers(3, G_Buffer);
-
-    // create and attach depth buffer (renderbuffer)
-    unsigned int rboDepth;
-    glGenRenderbuffers(1, &rboDepth);
-    glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
-    // finally check if framebuffer is complete
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "Framebuffer not complete!" << std::endl;
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    // G-Buffer created
-    //--------------------------------------------------------------------------
-
-
-    // bind G buffer to texture unit
-    DeferredShader.Bind();
-    DeferredShader.setInt("gPosition", 6);
-    glActiveTexture(GL_TEXTURE6);
-    glBindTexture(GL_TEXTURE_2D, gPosition);
-
-    DeferredShader.setInt("gAlbedoMetallic", 7);
-    glActiveTexture(GL_TEXTURE7);
-    glBindTexture(GL_TEXTURE_2D, gAlbedoMetallic);
-
-    DeferredShader.setInt("gNormalRoughness", 8);
-    glActiveTexture(GL_TEXTURE8);
-    glBindTexture(GL_TEXTURE_2D, gNormalRoughness);
-
-    DeferredShader.setVec3("camPos", camera.getCameraPos());
-
-    scene->BindLightSources(DeferredShader);
-
-    DeferredShader.unBind();
-
-
-
-    Renderer renderer(false);
+    Renderer renderer(FORWARD);
 
     
     /*
@@ -187,7 +82,6 @@ void Engine::run()
 
         camera.cameraUpdateFrameTime();
 
-
        /* std::cout << "position: " << camera.getCameraPos().x << ", " << 
             camera.getCameraPos().y << ", " << 
             camera.getCameraPos().z << std::endl;
@@ -197,32 +91,12 @@ void Engine::run()
         //glClear( GL_DEPTH_BUFFER_BIT);
         //scene->RenderShadowMap(lightView, lightProjection, ShadowMapShader );
 
-        if (1) {
-            //depthBufferFBO.Unbind();
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //depthBufferFBO.Unbind();
 
-            //if (SHADOW_MAP_DEBUG) 
-              //  Quad().Draw(depthQuadShader, depthBufferFBO.getDepthAttachment());
-            
-
-            renderer.Render(scene);
-            renderer.RenderLightSources(scene);
-        }
-        else
-        {
-            // Fill G buffer
-            glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            scene->RenderObjects(Fill_G_Buffer);
-            //scene->RenderLightSources();
-
-            // unbind G buffer
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            Quad().Draw(DeferredShader);
-            glDisable(GL_DEPTH_TEST);
-            scene->RenderLightSources();
-            glEnable(GL_DEPTH_TEST);
-        }
+        //if (SHADOW_MAP_DEBUG) 
+        //  Quad().Draw(depthQuadShader, depthBufferFBO.getDepthAttachment());
+       
+        renderer.Render(scene);
+        renderer.RenderLightSources(scene);
     }
 }
