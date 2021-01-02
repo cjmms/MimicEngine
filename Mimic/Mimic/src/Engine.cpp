@@ -9,11 +9,32 @@
 #define SHADOW_MAP_DEBUG 0
 
 
+
 /*
+* DONE: BRDF
+* DONE: Camera
+* DONE: Deferred Rendering Pipeline
+* DONE: Forward Rendering Pipeline
+* DONE: Shadow Mapping
+* DONE: Point Light
+* DONE: Model Loading
+* DONE: Texture Loading
+* 
 * TODO: imGUI
 * TODO: Volumetric lighting
 * TODO: SSAO
+* TODO: bloom
+* TODO: Spot Light
+* TODO: HDR with adaptive exposure
+* TODO: Cascaded Shadow Mapping
 * TODO: soft shadow
+* TODO: light volume
+* TODO: instancing
+* TODO: SSR
+* TODO: Depth of Field with Bokeh
+* TODO: Voxel based global illumination
+* TODO: Camera and object motion blur
+* TODO: Precomputed Atmospheric Scattering
 */
 
 Camera camera;
@@ -75,6 +96,8 @@ void Engine::run()
     */
 
     //UI_Mgr.enableCursor();
+
+    renderer.setDepthMap(scene);
 
     while (!UI_Mgr.windowClosed())
     {

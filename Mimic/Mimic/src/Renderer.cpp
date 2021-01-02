@@ -3,6 +3,7 @@
 #include "UI_Manager.h"
 #include <iostream>
 #include "ResourceManager.h"
+#include "Core/FBO.h"
 
 extern Camera camera;
 extern UI_Manager UI_Mgr;
@@ -13,16 +14,13 @@ Renderer::Renderer(RenderingType type)
 {
 	glEnable(GL_DEPTH_TEST);
 
-	//if (!isDeferred())
-	//{
-		PBR_Forward_Shader = new Shader("res/Shaders/model_loading.shader");
-	//}
-	//else
-	//{
-		Fill_G_Buffer = new Shader("res/Shaders/FillG-Buffer.shader");
-		DeferredShader = new Shader("res/Shaders/DeferredPBR.shader");
-		init_G_Buffer(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
-	//}
+    // init forward rendering shader
+	PBR_Forward_Shader = new Shader("res/Shaders/model_loading.shader");
+
+    // init Deferred Rendering shader and G buffer
+	Fill_G_Buffer = new Shader("res/Shaders/FillG-Buffer.shader");
+	DeferredShader = new Shader("res/Shaders/DeferredPBR.shader");
+	init_G_Buffer(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
 }
 
 
@@ -91,7 +89,50 @@ void Renderer::init_G_Buffer(unsigned int width, unsigned int height)
 }
 
 
+void Renderer::passDepthMap(Shader* shader) 
+{
+    glm::mat4 lightView = glm::lookAt(
+        glm::vec3(-60.0f, 70.0f, 0.0f),
+        glm::vec3(30.0f, 60.0f, 55.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f));
 
+    // width / height is 1.0, front plane: 0.1f, back plane 125.0f
+    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
+
+    shader->Bind();
+    shader->setMat4("lightView", lightView);
+    shader->setMat4("lightProjection", lightProjection);
+
+    shader->setInt("shadowMap", 4);
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, depthBufferFBO->getDepthAttachment());
+
+    shader->unBind();
+}
+
+
+
+
+void Renderer::setDepthMap(Scene const* scene)
+{
+    glm::mat4 lightView = glm::lookAt(
+        glm::vec3(-60.0f, 70.0f, 0.0f),
+        glm::vec3(30.0f, 60.0f, 55.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f));
+
+    // width / height is 1.0, front plane: 0.1f, back plane 125.0f
+    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
+
+    Shader ShadowMapShader("res/Shaders/DepthMap.shader");
+
+    depthBufferFBO = new FBO_Depth(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
+
+    depthBufferFBO->Bind();
+    glClear(GL_DEPTH_BUFFER_BIT);
+    Draw(&ShadowMapShader, scene);
+
+    depthBufferFBO->Unbind();
+}
 
 
 
@@ -100,10 +141,16 @@ Renderer::~Renderer()
 
 
 
-void Renderer::Render(Scene const* scene) const
+void Renderer::Render(Scene const* scene) 
 {
     if (isDeferred()) DeferredRender(scene);
-    else Draw(PBR_Forward_Shader, scene);
+    else 
+    {
+        passDepthMap(PBR_Forward_Shader);
+        Draw(PBR_Forward_Shader, scene);
+        Shader depthQuadShader("res/Shaders/DepthQuad.shader");
+        Quad::Quad().Draw(depthQuadShader, depthBufferFBO->getDepthAttachment());
+    }
 }
 
 

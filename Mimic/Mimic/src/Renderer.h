@@ -1,6 +1,8 @@
 #pragma once
 #include "Core/Shader.h"
 #include "Scene.h"
+#include "Core/FBO.h"
+
 
 /*
 * Purpose of Renderer: render object base on input, hide all details of how rendering works
@@ -35,7 +37,11 @@ private:
 	Shader *Fill_G_Buffer;
 	Shader *DeferredShader;
 
+	Shader *ShadowMapShader;
+
 	unsigned int gBuffer;
+
+	FBO_Depth *depthBufferFBO;
 	
 	void BindLightSources(Shader* shader, Scene const* scene) const;
 
@@ -54,15 +60,19 @@ private:
 
 	inline bool isDeferred() const { return DEFERRED == type; }
 
+	void passDepthMap(Shader* shader);
+
 public:
 	Renderer(RenderingType type);
 
 	~Renderer();
 	
-	void Render(Scene const* scene) const;
+	void Render(Scene const* scene);
 
 	// shader is always fixed for light source
 	// the purpose of rendering light is for testing
 	void RenderLightSources(Scene const* scene) const;
+
+	void setDepthMap(Scene const* scene);
 };
 
