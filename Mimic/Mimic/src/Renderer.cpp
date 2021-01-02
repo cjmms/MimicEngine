@@ -277,10 +277,10 @@ void Renderer::Render(Scene const* scene)
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-        //Shader quadShader("res/Shaders/ColorQuad.shader");
+        Shader quadShader("res/Shaders/ColorQuad.shader");
         Shader depthQuadShader("res/Shaders/DepthQuad.shader");
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Quad::Quad().Draw(depthQuadShader, depthMap);
+        Quad::Quad().Draw(quadShader, depthMap);
     }
 }
 

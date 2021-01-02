@@ -18,7 +18,7 @@ class FBO_Color
 {
 private:
 	unsigned int fbo;
-	unsigned int colorBuffer;
+	//unsigned int colorBuffer;
 	//unsigned int depthBuffer;
 
 public:
@@ -34,6 +34,7 @@ public:
 	inline unsigned int getColorAttachment() const { return colorBuffer; };
 
 	unsigned int depthBuffer;
+	unsigned int colorBuffer;
 };
 
 

@@ -4,6 +4,10 @@
 #include "Scene.h"
 #include <iostream>
 #include "Renderer.h"
+#include "Core/Model.h"
+#include "Core/Shader.h"
+#include "Core//FBO.h"
+#include "ResourceManager.h"
 
 
 #define SHADOW_MAP_DEBUG 0
@@ -45,6 +49,8 @@ void Engine::init()
 {
 	UI_Mgr.init();
 
+    glEnable(GL_DEPTH_TEST);
+    /*
     // init scene
     scene = new Scene();
     scene->addLightSource(glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
@@ -54,6 +60,7 @@ void Engine::init()
 
     scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
     //Model backpack("res/objects/backpack/backpack.obj");
+    */
 }
 
 void Engine::close()
@@ -65,11 +72,10 @@ void Engine::close()
 
 void Engine::run()
 {
-    Renderer renderer(FORWARD);
+    //Renderer renderer(FORWARD);
 
     
     /*
-    
     glm::mat4 lightView = glm::lookAt(
         glm::vec3(-60.0f, 70.0f, 0.0f),
         glm::vec3(30.0f, 60.0f, 55.0f),
@@ -77,49 +83,54 @@ void Engine::run()
 
     // width / height is 1.0, front plane: 0.1f, back plane 125.0f
     glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
-
-    FBO_Depth depthBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
-    //FBO_Depth depthBufferFBO(860, 860);
-
-    Shader depthQuadShader("res/Shaders/DepthQuad.shader");
-    Shader ShadowMapShader("res/Shaders/DepthMap.shader");
-
-    shader.Bind();
-    shader.setMat4("lightView", lightView);
-    shader.setMat4("lightProjection", lightProjection);
-    
-    shader.setInt("shadowMap", 7);
-    glActiveTexture(GL_TEXTURE7);
-    glBindTexture(GL_TEXTURE_2D, depthBufferFBO.getDepthAttachment());
-
-    shader.unBind();
     */
 
     //UI_Mgr.enableCursor();
     
     //renderer.setDepthMap(scene);
 
+    Model bag("res/objects/backpack/backpack.obj");
+
+    Shader shader("res/Shaders/DepthMap.shader");
+    Shader depthquad("res/Shaders/DepthQuad.shader");
+    Shader colorquad("res/Shaders/ColorQuad.shader");
+
+    FBO_Depth fbo(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
+
     while (!UI_Mgr.windowClosed())
     {
         UI_Mgr.update();
 
         camera.cameraUpdateFrameTime();
-
+       // glClear( GL_DEPTH_BUFFER_BIT);
        /* std::cout << "position: " << camera.getCameraPos().x << ", " << 
             camera.getCameraPos().y << ", " << 
             camera.getCameraPos().z << std::endl;
        */
 
-        //depthBufferFBO.Bind();
-        //glClear( GL_DEPTH_BUFFER_BIT);
-        //scene->RenderShadowMap(lightView, lightProjection, ShadowMapShader );
 
-        //depthBufferFBO.Unbind();
+        fbo.Bind();
+        // resolution of shadow map
+        //glViewport(0, 0, 860, 860);
 
-        //if (SHADOW_MAP_DEBUG) 
-        //  Quad().Draw(depthQuadShader, depthBufferFBO.getDepthAttachment());
-       
-        renderer.Render(scene);
-        renderer.RenderLightSources(scene);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        shader.Bind();
+        shader.setMat4("view", camera.getViewMatrix());
+        shader.setMat4("projection", camera.getProjectionMatrix());
+        glm::mat4 model(1.0);
+        shader.setMat4("model", model);
+
+        bag.Draw(shader);
+        fbo.Unbind();
+
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //quad.Bind();
+        Quad::Quad().Draw(depthquad, fbo.getDepthAttachment());
+
+
+        //renderer.Render(scene);
+        //renderer.RenderLightSources(scene);
     }
 }
