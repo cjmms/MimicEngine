@@ -96,8 +96,8 @@ void Engine::run()
     */
 
     //UI_Mgr.enableCursor();
-
-    renderer.setDepthMap(scene);
+    
+    //renderer.setDepthMap(scene);
 
     while (!UI_Mgr.windowClosed())
     {

@@ -19,6 +19,7 @@ class FBO_Color
 private:
 	unsigned int fbo;
 	unsigned int colorBuffer;
+	//unsigned int depthBuffer;
 
 public:
 	/*
@@ -31,6 +32,8 @@ public:
 	inline void Unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); };
 
 	inline unsigned int getColorAttachment() const { return colorBuffer; };
+
+	unsigned int depthBuffer;
 };
 
 
