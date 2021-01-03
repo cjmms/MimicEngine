@@ -56,6 +56,8 @@ private:
 
 	void Draw(Shader *shader, Scene const* scene) const;
 
+	void RenderObj(Shader* shader, Scene const* scene) const;
+
 	void DeferredRender(Scene const* scene) const;
 
 	inline bool isDeferred() const { return DEFERRED == type; }

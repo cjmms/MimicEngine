@@ -50,7 +50,7 @@ void Engine::init()
 	UI_Mgr.init();
 
     glEnable(GL_DEPTH_TEST);
-    /*
+    
     // init scene
     scene = new Scene();
     scene->addLightSource(glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
@@ -60,7 +60,7 @@ void Engine::init()
 
     scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
     //Model backpack("res/objects/backpack/backpack.obj");
-    */
+    
 }
 
 void Engine::close()
@@ -72,9 +72,10 @@ void Engine::close()
 
 void Engine::run()
 {
+    Renderer renderer(DEFERRED);
     //Renderer renderer(FORWARD);
 
-    
+    //renderer.setDepthMap(scene);
     /*
     glm::mat4 lightView = glm::lookAt(
         glm::vec3(-60.0f, 70.0f, 0.0f),
@@ -89,13 +90,13 @@ void Engine::run()
     
     //renderer.setDepthMap(scene);
 
-    Model bag("res/objects/backpack/backpack.obj");
+    //Model bag("res/objects/backpack/backpack.obj");
 
-    Shader shader("res/Shaders/DepthMap.shader");
-    Shader depthquad("res/Shaders/DepthQuad.shader");
-    Shader colorquad("res/Shaders/ColorQuad.shader");
+    //Shader shader("res/Shaders/DepthMap.shader");
+    //Shader depthquad("res/Shaders/DepthQuad.shader");
+    //Shader colorquad("res/Shaders/ColorQuad.shader");
 
-    FBO_Depth fbo(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
+    //FBO_Depth fbo(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
 
     while (!UI_Mgr.windowClosed())
     {
@@ -109,10 +110,10 @@ void Engine::run()
        */
 
 
-        fbo.Bind();
+        //fbo.Bind();
         // resolution of shadow map
         //glViewport(0, 0, 860, 860);
-
+        /*
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.Bind();
@@ -128,9 +129,9 @@ void Engine::run()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         //quad.Bind();
         Quad::Quad().Draw(depthquad, fbo.getDepthAttachment());
+        */
 
-
-        //renderer.Render(scene);
-        //renderer.RenderLightSources(scene);
+        renderer.Render(scene);
+        renderer.RenderLightSources(scene);
     }
 }

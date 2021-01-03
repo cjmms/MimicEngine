@@ -5,7 +5,7 @@
 
 
 Shader::Shader(const std::string& path)
-    :rendererID(0), shaderFilePath(path)
+    :rendererID(0), shaderFilePath(path), textureUnit(0)
 {
     ShaderProgramSource source = parseShader(shaderFilePath);
     rendererID = createShader(source.VertexSource,
@@ -142,8 +142,10 @@ unsigned int Shader::getRendererID()
 
 void Shader::setMat4(const char* name, glm::mat4 matrix)
 {
+    this->Bind();
     unsigned int location = getUniformLocation(name);
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+    this->unBind();
 }
 
 
@@ -156,8 +158,10 @@ void Shader::setMat4(const std::string& name, glm::mat4 matrix)
 
 void Shader::setVec3(const char* name, glm::vec3 vec)
 {
+    this->Bind();
     unsigned int location = getUniformLocation(name);
     glUniform3fv(location, 1, glm::value_ptr(vec));
+    this->unBind();
 }
 
 
@@ -199,8 +203,10 @@ void Shader::setFloat(const std::string& name, float value)
 
 void Shader::setInt(const char* name, int value) 
 {
+    this->Bind();
     unsigned int location = getUniformLocation(name);
     glUniform1i(location, value);
+    this->unBind();
 }
 
 
@@ -208,4 +214,33 @@ void Shader::setInt(const char* name, int value)
 void Shader::setInt(const std::string& name, int value)
 {
     setInt(name.c_str(), value);
+}
+
+
+void Shader::setTexture(const char* name, unsigned int texture, int index)
+{
+    if (index != -1)
+    {
+        this->setInt(name, index);
+
+        this->Bind();
+        glActiveTexture(GL_TEXTURE0 + index);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        this->unBind();
+        return;
+    }
+    this->setInt(name, textureUnit);
+
+    this->Bind();
+    glActiveTexture(GL_TEXTURE0 + textureUnit);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    this->unBind();
+
+    textureUnit++;
+}
+
+
+void Shader::setTexture(const std::string& name, unsigned int texture, int index)
+{
+    setTexture(name.c_str(), texture, index);
 }

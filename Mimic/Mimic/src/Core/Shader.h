@@ -21,6 +21,7 @@ private:
 
 	// program ID of shader
 	unsigned int rendererID;
+	unsigned int textureUnit;
 
 public:
 	Shader() :rendererID(0) {};
@@ -42,7 +43,9 @@ public:
 
 	void setInt(const char* name, int value);
 	void setInt(const std::string& name, int value);
-	
+
+	void setTexture(const char* name, unsigned int texture, int index = -1);
+	void setTexture(const std::string& name, unsigned int texture, int index = -1);
 
 private:
 	// path: res/Shaders/basic.shader

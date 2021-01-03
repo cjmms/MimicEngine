@@ -30,16 +30,14 @@ void Mesh::Draw(Shader& shader) const
 {
     // setup texture uniform
     for (unsigned int i = 0; i < textures.size(); i++)
-    {
-        glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
-        shader.setInt(("material." + textures[i].type).c_str(), i);
-        glBindTexture(GL_TEXTURE_2D, textures[i].id);
-    }
+        shader.setTexture(("material." + textures[i].type).c_str(), textures[i].id, i);
     
     // draw mesh
+    shader.Bind();
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+    shader.unBind();
 }
 
 void Mesh::setup()

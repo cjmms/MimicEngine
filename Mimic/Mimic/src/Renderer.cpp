@@ -72,20 +72,25 @@ void Renderer::init_G_Buffer(unsigned int width, unsigned int height)
         std::cout << "Framebuffer not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    DeferredShader->Bind();
+    //DeferredShader->Bind();
     // TODO: need to be done in a better way
-    DeferredShader->setInt("gPosition", 6);
-    glActiveTexture(GL_TEXTURE6);
-    glBindTexture(GL_TEXTURE_2D, gPosition);
+    DeferredShader->setTexture("gPosition", gPosition, 6);
+    DeferredShader->setTexture("gAlbedoMetallic", gAlbedoMetallic, 7);
+    DeferredShader->setTexture("gNormalRoughness", gNormalRoughness, 8);
 
-    DeferredShader->setInt("gAlbedoMetallic", 7);
-    glActiveTexture(GL_TEXTURE7);
-    glBindTexture(GL_TEXTURE_2D, gAlbedoMetallic);
+    //DeferredShader->setInt("gPosition", 6);
+    //glActiveTexture(GL_TEXTURE6);
+    //glBindTexture(GL_TEXTURE_2D, gPosition);
 
-    DeferredShader->setInt("gNormalRoughness", 8);
-    glActiveTexture(GL_TEXTURE8);
-    glBindTexture(GL_TEXTURE_2D, gNormalRoughness);
-    DeferredShader->unBind();
+    //DeferredShader->setInt("gAlbedoMetallic", 7);
+    //glActiveTexture(GL_TEXTURE7);
+    //glBindTexture(GL_TEXTURE_2D, gAlbedoMetallic);
+
+    //DeferredShader->setInt("gNormalRoughness", 8);
+    //glActiveTexture(GL_TEXTURE8);
+    //glBindTexture(GL_TEXTURE_2D, gNormalRoughness);
+    //DeferredShader->unBind();
+
 }
 
 
@@ -130,21 +135,11 @@ void Renderer::setDepthMap(Scene const* scene)
     depthBufferFBO->Bind();
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    ShadowMapShader.Bind();
     // pass projection and view matrix
     ShadowMapShader.setMat4("projection", lightProjection);
     ShadowMapShader.setMat4("view", lightView);
-    ShadowMapShader.unBind();
 
-    for (auto obj : scene->getObjects())
-    {
-        ShadowMapShader.Bind();
-        ShadowMapShader.setMat4("model", obj->getModelMatrix());
-        ShadowMapShader.unBind();
-
-        obj->getModel()->Draw(ShadowMapShader);
-    }
-    //ShadowMapShader.unBind();
+    Draw(&ShadowMapShader, scene);
 
     depthBufferFBO->Unbind();
 }
@@ -162,8 +157,12 @@ void Renderer::Render(Scene const* scene)
     else 
     {
         //passDepthMap(PBR_Forward_Shader);
-        //Draw(PBR_Forward_Shader, scene);
 
+        RenderObj(PBR_Forward_Shader, scene);
+
+        //Shader depthQuadShader("res/Shaders/DepthQuad.shader");
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //Quad::Quad().Draw(depthQuadShader, depthBufferFBO->getDepthAttachment());
 
         glm::mat4 lightView = glm::lookAt(
             glm::vec3(-60.0f, 70.0f, 0.0f),
@@ -236,9 +235,11 @@ void Renderer::Render(Scene const* scene)
         */
         //----------------------------------------------------------------------------------------
         
-
+        /*
         // configure depth map FBO
         // -----------------------
+        glEnable(GL_DEPTH_TEST);
+
         const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
         unsigned int depthMapFBO;
         glGenFramebuffers(1, &depthMapFBO);
@@ -270,7 +271,7 @@ void Renderer::Render(Scene const* scene)
 
         for (auto obj : scene->getObjects())
         {
-            shader.setMat4("model", obj->getModelMatrix());
+            shader.setMat4("model", glm::scale(glm::mat4(1.0f), glm::vec3(0.1f)));
             obj->getModel()->Draw(shader);
         }
         shader.unBind();
@@ -280,7 +281,9 @@ void Renderer::Render(Scene const* scene)
         Shader quadShader("res/Shaders/ColorQuad.shader");
         Shader depthQuadShader("res/Shaders/DepthQuad.shader");
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Quad::Quad().Draw(quadShader, depthMap);
+        Quad::Quad().Draw(depthQuadShader, depthMap);
+        */
+        
     }
 }
 
@@ -288,13 +291,23 @@ void Renderer::Render(Scene const* scene)
 
 void Renderer::Draw(Shader* shader, Scene const* scene) const
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    for (auto obj : scene->getObjects())
+    {
+        shader->setMat4("model", obj->getModelMatrix());
+        obj->getModel()->Draw(*shader);
+    }
+}
 
-    shader->Bind();
+
+
+
+void Renderer::RenderObj(Shader* shader, Scene const* scene) const
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // pass light source
     BindLightSources(shader, scene);
-     
+
     // pass projection and view matrix
     shader->setMat4("projection", camera.getProjectionMatrix());
     shader->setMat4("view", camera.getViewMatrix());
@@ -302,13 +315,13 @@ void Renderer::Draw(Shader* shader, Scene const* scene) const
     // pass camera position
     shader->setVec3("camPos", camera.getCameraPos());
 
-    for (auto obj : scene->getObjects())
-    {
-        shader->setMat4("model", obj->getModelMatrix());
-        obj->getModel()->Draw(*shader);
-    }
-    shader->unBind();
+    Draw(shader, scene);
 }
+
+
+
+
+
 
 
 
@@ -318,25 +331,18 @@ void Renderer::DeferredRender(Scene const* scene) const
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);     // Bind to G-Buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    Fill_G_Buffer->Bind();
     Fill_G_Buffer->setMat4("projection", camera.getProjectionMatrix());
     Fill_G_Buffer->setMat4("view", camera.getViewMatrix());
 
-    for (auto obj : scene->getObjects()) {
-        Fill_G_Buffer->setMat4("model", obj->getModelMatrix());
-        obj->getModel()->Draw(*Fill_G_Buffer);
-    }
-    Fill_G_Buffer->unBind();
-
+    Draw(Fill_G_Buffer, scene);
 
     // Second Buffer, Render to a Quad
     glBindFramebuffer(GL_FRAMEBUFFER, 0);           // Unbind G-Buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    DeferredShader->Bind();
     BindLightSources(DeferredShader, scene);
     DeferredShader->setVec3("camPos", camera.getCameraPos());
-    DeferredShader->unBind();
+
 
     Quad().Draw(*DeferredShader);
 }
@@ -347,18 +353,14 @@ void Renderer::RenderLightSources(Scene const* scene) const
 {
 	if (isDeferred()) glDisable(GL_DEPTH_TEST);
 
-    lightShader->Bind();
     lightShader->setMat4("projection", camera.getProjectionMatrix());
     lightShader->setMat4("view", camera.getViewMatrix());
-    lightShader->unBind();
 
 	// This is a bad design, since Light* can still be changed
 	// The right way should be passing a pair of iterators instead ( Maybe? )
 	const std::vector<Light* > lights = scene->getLightSources();
     for (auto light : lights) {
-        lightShader->Bind();
         lightShader->setMat4("model", light->getModelMatrix());
-        lightShader->unBind();
 
         light->getModel()->Draw(*lightShader);
     }

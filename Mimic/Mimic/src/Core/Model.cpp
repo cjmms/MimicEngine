@@ -15,9 +15,9 @@ Model::Model(const char* path)
 // iterate all meshes, draw all meshes
 void Model::Draw(Shader& shader) const
 {
-    shader.Bind();
+    //shader.Bind();
 	for (auto mesh : meshes) mesh.Draw(shader);
-    shader.unBind();
+    //shader.unBind();
 }
 
 
