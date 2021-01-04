@@ -39,7 +39,7 @@ private:
 
 	Shader *ShadowMapShader;
 
-	unsigned int gBuffer;
+	unsigned int gBuffer, gPosition, gNormalRoughness, gAlbedoMetallic;
 
 	FBO_Depth *depthBufferFBO;
 	

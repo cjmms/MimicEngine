@@ -217,26 +217,38 @@ void Shader::setInt(const std::string& name, int value)
 }
 
 
-void Shader::setTexture(const char* name, unsigned int texture, int index)
+void Shader::setTexture(const char* name, unsigned int texture)
 {
-    if (index != -1)
+    
+    auto it = std::find(textures.begin(), textures.end(), name);
+
+    // If element was found
+    if (it != textures.end())
     {
+        // calculating the index
+        int index = it - textures.begin();
+        
         this->setInt(name, index);
 
         this->Bind();
         glActiveTexture(GL_TEXTURE0 + index);
         glBindTexture(GL_TEXTURE_2D, texture);
         this->unBind();
-        return;
     }
-    this->setInt(name, textureUnit);
+    else {
+        // If the element is not
+        // present in the vector
 
-    this->Bind();
-    glActiveTexture(GL_TEXTURE0 + textureUnit);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    this->unBind();
+        this->setInt(name, textureUnit);
 
-    textureUnit++;
+        this->Bind();
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        this->unBind();
+
+        textureUnit++;
+        textures.push_back(name);
+    }
 }
 
 

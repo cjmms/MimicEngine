@@ -30,7 +30,7 @@ void Renderer::init_G_Buffer(unsigned int width, unsigned int height)
 {
     glGenFramebuffers(1, &gBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-    unsigned int gPosition, gNormalRoughness, gAlbedoMetallic;
+    //unsigned int gPosition, gNormalRoughness, gAlbedoMetallic;
 
     // Albedo + Metallic
     glGenTextures(1, &gAlbedoMetallic);
@@ -74,22 +74,9 @@ void Renderer::init_G_Buffer(unsigned int width, unsigned int height)
 
     //DeferredShader->Bind();
     // TODO: need to be done in a better way
-    DeferredShader->setTexture("gPosition", gPosition, 6);
-    DeferredShader->setTexture("gAlbedoMetallic", gAlbedoMetallic, 7);
-    DeferredShader->setTexture("gNormalRoughness", gNormalRoughness, 8);
-
-    //DeferredShader->setInt("gPosition", 6);
-    //glActiveTexture(GL_TEXTURE6);
-    //glBindTexture(GL_TEXTURE_2D, gPosition);
-
-    //DeferredShader->setInt("gAlbedoMetallic", 7);
-    //glActiveTexture(GL_TEXTURE7);
-    //glBindTexture(GL_TEXTURE_2D, gAlbedoMetallic);
-
-    //DeferredShader->setInt("gNormalRoughness", 8);
-    //glActiveTexture(GL_TEXTURE8);
-    //glBindTexture(GL_TEXTURE_2D, gNormalRoughness);
-    //DeferredShader->unBind();
+   // DeferredShader->setTexture("gPosition", gPosition, 6);
+   // DeferredShader->setTexture("gAlbedoMetallic", gAlbedoMetallic, 7);
+    //DeferredShader->setTexture("gNormalRoughness", gNormalRoughness, 8);
 
 }
 
@@ -339,6 +326,10 @@ void Renderer::DeferredRender(Scene const* scene) const
     // Second Buffer, Render to a Quad
     glBindFramebuffer(GL_FRAMEBUFFER, 0);           // Unbind G-Buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    DeferredShader->setTexture("gPosition", gPosition);
+    DeferredShader->setTexture("gAlbedoMetallic", gAlbedoMetallic);
+    DeferredShader->setTexture("gNormalRoughness", gNormalRoughness);
 
     BindLightSources(DeferredShader, scene);
     DeferredShader->setVec3("camPos", camera.getCameraPos());

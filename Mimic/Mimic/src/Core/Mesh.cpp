@@ -30,7 +30,7 @@ void Mesh::Draw(Shader& shader) const
 {
     // setup texture uniform
     for (unsigned int i = 0; i < textures.size(); i++)
-        shader.setTexture(("material." + textures[i].type).c_str(), textures[i].id, i);
+        shader.setTexture(("material." + textures[i].type).c_str(), textures[i].id);
     
     // draw mesh
     shader.Bind();
