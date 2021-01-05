@@ -8,9 +8,10 @@
 extern Camera camera;
 extern UI_Manager UI_Mgr;
 
-Renderer::Renderer(RenderingType type)
+Renderer::Renderer(RenderingType type, bool debugMode)
 	:type(type), lightShader(new Shader("res/Shaders/basic.shader")),
-	PBR_Forward_Shader(NULL), DeferredShader(NULL), Fill_G_Buffer(NULL), gBuffer(0)
+	PBR_Forward_Shader(NULL), DeferredShader(NULL), Fill_G_Buffer(NULL), gBuffer(0),
+    debugMode(debugMode)
 {
 	glEnable(GL_DEPTH_TEST);
 
@@ -21,6 +22,16 @@ Renderer::Renderer(RenderingType type)
 	Fill_G_Buffer = new Shader("res/Shaders/FillG-Buffer.shader");
 	DeferredShader = new Shader("res/Shaders/DeferredPBR.shader");
 	init_G_Buffer(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
+
+    // init shader and fbo for shadow mapping
+    ShadowMapShader = new Shader("res/Shaders/DepthMap.shader");
+    depthBufferFBO = new FBO_Depth(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
+
+
+    if (debugMode) {
+        DepthQuadShader = new Shader("res/Shaders/DepthQuad.shader");
+    }
+
 }
 
 
@@ -30,7 +41,6 @@ void Renderer::init_G_Buffer(unsigned int width, unsigned int height)
 {
     glGenFramebuffers(1, &gBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-    //unsigned int gPosition, gNormalRoughness, gAlbedoMetallic;
 
     // Albedo + Metallic
     glGenTextures(1, &gAlbedoMetallic);
@@ -72,65 +82,29 @@ void Renderer::init_G_Buffer(unsigned int width, unsigned int height)
         std::cout << "Framebuffer not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    //DeferredShader->Bind();
-    // TODO: need to be done in a better way
-   // DeferredShader->setTexture("gPosition", gPosition, 6);
-   // DeferredShader->setTexture("gAlbedoMetallic", gAlbedoMetallic, 7);
-    //DeferredShader->setTexture("gNormalRoughness", gNormalRoughness, 8);
-
-}
-
-
-void Renderer::passDepthMap(Shader* shader) 
-{
-    glm::mat4 lightView = glm::lookAt(
-        glm::vec3(-60.0f, 70.0f, 0.0f),
-        glm::vec3(30.0f, 60.0f, 55.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f));
-
-    // width / height is 1.0, front plane: 0.1f, back plane 125.0f
-    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
-
-    shader->Bind();
-    shader->setMat4("lightView", lightView);
-    shader->setMat4("lightProjection", lightProjection);
-
-    shader->setInt("shadowMap", 4);
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, depthBufferFBO->getDepthAttachment());
-
-    shader->unBind();
 }
 
 
 
-
-void Renderer::setDepthMap(Scene const* scene)
+void Renderer::RenderShadowMap(glm::mat4 view, glm::mat4 projection, Scene const* scene)
 {
-    glm::mat4 lightView = glm::lookAt(
-        glm::vec3(-60.0f, 70.0f, 0.0f),
-        glm::vec3(30.0f, 60.0f, 55.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f));
-
-    // width / height is 1.0, front plane: 0.1f, back plane 125.0f
-    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
-
-    Shader ShadowMapShader("res/Shaders/DepthMap.shader");
-
-    depthBufferFBO = new FBO_Depth(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
-
     depthBufferFBO->Bind();
-    glClear(GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // pass projection and view matrix
-    ShadowMapShader.setMat4("projection", lightProjection);
-    ShadowMapShader.setMat4("view", lightView);
+    ShadowMapShader->setMat4("view", view);
+    ShadowMapShader->setMat4("projection", projection);
 
-    Draw(&ShadowMapShader, scene);
-
+    Draw(ShadowMapShader, scene);
     depthBufferFBO->Unbind();
 }
 
+
+
+void Renderer::VisualizeDepthBuffer(unsigned int depthAttachment) const
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    Quad::Quad().Draw(*DepthQuadShader, depthAttachment);
+}
 
 
 Renderer::~Renderer()
@@ -138,139 +112,22 @@ Renderer::~Renderer()
 
 
 
-void Renderer::Render(Scene const* scene) 
+void Renderer::Render(Scene const* scene)  
 {
+    glm::mat4 lightView = glm::lookAt(
+        glm::vec3(-60.0f, 70.0f, 0.0f), glm::vec3(30.0f, 60.0f, 55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
+
+    RenderShadowMap(lightView, lightProjection, scene);
+
+
     if (isDeferred()) DeferredRender(scene);
-    else 
-    {
-        //passDepthMap(PBR_Forward_Shader);
-
-        RenderObj(PBR_Forward_Shader, scene);
-
-        //Shader depthQuadShader("res/Shaders/DepthQuad.shader");
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //Quad::Quad().Draw(depthQuadShader, depthBufferFBO->getDepthAttachment());
-
-        glm::mat4 lightView = glm::lookAt(
-            glm::vec3(-60.0f, 70.0f, 0.0f),
-            glm::vec3(30.0f, 60.0f, 55.0f),
-            glm::vec3(0.0f, 1.0f, 0.0f));
-
-
-        glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
-        /*
-        Shader ShadowMapShader("res/Shaders/DepthMap.shader");
-
-        //FBO_Color FBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
-
-        //FBO.Bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        PBR_Forward_Shader->Bind();
-        // pass projection and view matrix
-        PBR_Forward_Shader->setMat4("projection", lightProjection);
-        PBR_Forward_Shader->setMat4("view", lightView);
-
-        PBR_Forward_Shader->setVec3("camPos", camera.getCameraPos());
-
-        for (auto obj : scene->getObjects())
-        {
-
-            PBR_Forward_Shader->setMat4("model", obj->getModelMatrix());
-
-            obj->getModel()->Draw(*PBR_Forward_Shader);
-        }
-        PBR_Forward_Shader->unBind();
-        */
-        //--------------------------------------------------------------------------------------
-        /*
-        Shader shader("res/Shaders/DepthMap.shader");
-
-        FBO_Color FBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
-        FBO.Bind();
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        PBR_Forward_Shader->Bind();
-
-        // pass light source
-        BindLightSources(PBR_Forward_Shader, scene);
-
-        PBR_Forward_Shader->setMat4("projection", camera.getProjectionMatrix());
-        PBR_Forward_Shader->setMat4("view", camera.getViewMatrix());
-        // pass projection and view matrix
-        //PBR_Forward_Shader->setMat4("projection", lightProjection);
-        //PBR_Forward_Shader->setMat4("view", lightView);
-
-        // pass camera position
-        PBR_Forward_Shader->setVec3("camPos", camera.getCameraPos());
-
-        for (auto obj : scene->getObjects())
-        {
-            PBR_Forward_Shader->setMat4("model", obj->getModelMatrix());
-            obj->getModel()->Draw(*PBR_Forward_Shader);
-        }
-        PBR_Forward_Shader->unBind();
-        FBO.Unbind();
-
-        //ShadowMapShader.unBind();
-
-        Shader quadShader("res/Shaders/ColorQuad.shader");
-        Shader depthQuadShader("res/Shaders/DepthQuad.shader");
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Quad::Quad().Draw(depthQuadShader, FBO.depthBuffer);
-        */
-        //----------------------------------------------------------------------------------------
-        
-        /*
-        // configure depth map FBO
-        // -----------------------
-        glEnable(GL_DEPTH_TEST);
-
-        const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-        unsigned int depthMapFBO;
-        glGenFramebuffers(1, &depthMapFBO);
-        // create depth texture
-        unsigned int depthMap;
-        glGenTextures(1, &depthMap);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        // attach depth texture as FBO's depth buffer
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
-        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        Shader shader("res/Shaders/DepthMap.shader");
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        shader.Bind();
-
-        shader.setMat4("projection", camera.getProjectionMatrix());
-        shader.setMat4("view", camera.getViewMatrix());
-
-
-        for (auto obj : scene->getObjects())
-        {
-            shader.setMat4("model", glm::scale(glm::mat4(1.0f), glm::vec3(0.1f)));
-            obj->getModel()->Draw(shader);
-        }
-        shader.unBind();
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-        Shader quadShader("res/Shaders/ColorQuad.shader");
-        Shader depthQuadShader("res/Shaders/DepthQuad.shader");
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Quad::Quad().Draw(depthQuadShader, depthMap);
-        */
-        
+    else ForwardRender(PBR_Forward_Shader, scene);
+    
+    if (debugMode) {
+        // For debugging purposes
+        VisualizeDepthBuffer(depthBufferFBO->getDepthAttachment());
     }
 }
 
@@ -288,7 +145,7 @@ void Renderer::Draw(Shader* shader, Scene const* scene) const
 
 
 
-void Renderer::RenderObj(Shader* shader, Scene const* scene) const
+void Renderer::ForwardRender(Shader* shader, Scene const* scene) const
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -323,7 +180,7 @@ void Renderer::DeferredRender(Scene const* scene) const
 
     Draw(Fill_G_Buffer, scene);
 
-    // Second Buffer, Render to a Quad
+    // Second Pass, Render to a Quad
     glBindFramebuffer(GL_FRAMEBUFFER, 0);           // Unbind G-Buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -333,7 +190,6 @@ void Renderer::DeferredRender(Scene const* scene) const
 
     BindLightSources(DeferredShader, scene);
     DeferredShader->setVec3("camPos", camera.getCameraPos());
-
 
     Quad().Draw(*DeferredShader);
 }

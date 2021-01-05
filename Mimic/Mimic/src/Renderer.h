@@ -20,6 +20,7 @@
 */
 
 
+
 enum RenderingType
 {
 	DEFERRED,
@@ -39,9 +40,15 @@ private:
 
 	Shader *ShadowMapShader;
 
+	// some shaders for debuging purposes
+	Shader* DepthQuadShader;
+
+
 	unsigned int gBuffer, gPosition, gNormalRoughness, gAlbedoMetallic;
 
 	FBO_Depth *depthBufferFBO;
+
+	bool debugMode;
 	
 	void BindLightSources(Shader* shader, Scene const* scene) const;
 
@@ -54,18 +61,47 @@ private:
 	*/
 	void init_G_Buffer(unsigned int width, unsigned int height);
 
+
+
+	// Draw the scene base on shader and model matrix inside scene
+	// !!! This function does NOT bind view and projection matrix !!!
+	// view and projection can be anything
+	// example: orthographic projection / perspective projection
+	// example: from camera point of view / from light point of view
 	void Draw(Shader *shader, Scene const* scene) const;
 
-	void RenderObj(Shader* shader, Scene const* scene) const;
+
+	// Draw the scene base on perpective projection, base on camera position
+	// This function will bind the light before draw the scene
+	// Forward Rendering
+	void ForwardRender(Shader* shader, Scene const* scene) const;
+
+
 
 	void DeferredRender(Scene const* scene) const;
 
+
+
 	inline bool isDeferred() const { return DEFERRED == type; }
 
-	void passDepthMap(Shader* shader);
+
+	// Fill the depth map
+	// Draw a scene by using view and projection matrix provided
+	// the Shadow map will store inside depth attachment of depthBufferFBO
+	void RenderShadowMap(glm::mat4 view, glm::mat4 projection, Scene const* scene);
+
+
+
+	// some helper functions for debugging
+
+	// Visualize depth buffer
+	// render depth buffer in a quad
+	// This function will not check if depthAttachment is a depth buffer or not
+	void VisualizeDepthBuffer(unsigned int depthAttachment) const;
+
 
 public:
-	Renderer(RenderingType type);
+	Renderer(RenderingType type, bool debugMode = true);
 
 	~Renderer();
 	
@@ -74,7 +110,5 @@ public:
 	// shader is always fixed for light source
 	// the purpose of rendering light is for testing
 	void RenderLightSources(Scene const* scene) const;
-
-	void setDepthMap(Scene const* scene);
 };
 

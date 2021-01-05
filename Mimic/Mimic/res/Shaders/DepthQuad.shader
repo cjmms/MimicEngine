@@ -27,14 +27,10 @@ void main()
 {
 	float sampleZ = texture(map, TextureCoord).r;
 
-	//if (sampleZ < 0.01) FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-	//else FragColor = vec4(vec3(sampleZ), 1.0);
-
 	float near = 0.1;
-	float far = 300.0;
+	float far = 100.0;
 	float z = sampleZ * 2.0 - 1.0; // back to NDC 
 	float depth = (2.0 * near * far) / (far + near - z * (far - near)) / far;
 
-	FragColor = vec4(vec3(sampleZ), 1.0f);
-	//FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+	FragColor = vec4(vec3(depth), 1.0f);
 }
