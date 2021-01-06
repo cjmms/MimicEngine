@@ -78,6 +78,8 @@ public:
 	glm::mat4 getProjectionMatrix();
 	glm::mat4 getInverseProjectionMatrix();
 
+	void Print() const;
+
 
 private:
 	// calculate and normalize camera front vector base on yaw and pitch

@@ -16,7 +16,7 @@ Renderer::Renderer(RenderingType type, bool debugMode)
 	glEnable(GL_DEPTH_TEST);
 
     // init forward rendering shader
-	PBR_Forward_Shader = new Shader("res/Shaders/model_loading.shader");
+	PBR_Forward_Shader = new Shader("res/Shaders/ForwardPBR.shader");
 
     // init Deferred Rendering shader and G buffer
 	Fill_G_Buffer = new Shader("res/Shaders/FillG-Buffer.shader");
@@ -113,18 +113,35 @@ Renderer::~Renderer()
 
 
 void Renderer::Render(Scene const* scene)  
-{
+{/*
     glm::mat4 lightView = glm::lookAt(
         glm::vec3(-60.0f, 70.0f, 0.0f), glm::vec3(30.0f, 60.0f, 55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
+    
+    */
+    float near_plane = 1.0f, far_plane = 200.0f;
+    glm::vec3 pos(-60.0f, 70.0f, 0.0f);
+    glm::vec3 des(-60.0f, 69.0f, 0.0f);
+    glm::mat4 lightProjection = glm::ortho(0.0f, 100.0f, 100.0f, 0.0f, near_plane, far_plane);
+
+    glm::mat4 lightView = glm::lookAt(pos, des, glm::vec3(0.0, 1.0, 0.0));
+      
 
     RenderShadowMap(lightView, lightProjection, scene);
 
 
     if (isDeferred()) DeferredRender(scene);
-    else ForwardRender(PBR_Forward_Shader, scene);
-    
+    else {
+        // bind light matrix
+        PBR_Forward_Shader->setMat4("lightProjection", lightProjection);
+        PBR_Forward_Shader->setMat4("lightView", lightView);
+
+        // bind shadow map
+        PBR_Forward_Shader->setTexture("shadowMap", depthBufferFBO->getDepthAttachment());
+
+        ForwardRender(PBR_Forward_Shader, scene);
+    }
     if (debugMode) {
         // For debugging purposes
         VisualizeDepthBuffer(depthBufferFBO->getDepthAttachment());

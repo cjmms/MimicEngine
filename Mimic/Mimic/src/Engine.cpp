@@ -57,7 +57,7 @@ void Engine::init()
     scene->addLightSource(glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
     scene->addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
     scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
-    scene->addLightSource(glm::vec3(-60.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    scene->addLightSource(glm::vec3(-70.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
 
     scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
     //Model backpack("res/objects/backpack/backpack.obj");
@@ -73,14 +73,18 @@ void Engine::close()
 
 void Engine::run()
 {
-    Renderer renderer(DEFERRED);
-    //Renderer renderer(FORWARD);
+    //Renderer renderer(DEFERRED, false);
+    Renderer renderer(FORWARD, true);
 
     //UI_Mgr.enableCursor();
+
+
 
     while (!UI_Mgr.windowClosed())
     {
         UI_Mgr.update();
+
+        //camera.Print();
 
         camera.cameraUpdateFrameTime();
 

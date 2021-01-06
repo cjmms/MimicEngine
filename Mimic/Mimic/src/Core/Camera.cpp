@@ -190,3 +190,20 @@ glm::mat4 Camera::getInverseProjectionMatrix()
 {
 	return glm::inverse(getProjectionMatrix());
 }
+
+
+
+void Camera::Print() const
+{
+	std::cout << "Camera Position: " << cameraPos.x << ", " 
+									 << cameraPos.y << ", " 
+									 << cameraPos.z << std::endl;
+
+	std::cout << "Camera Front: " << cameraFront.x << ", "
+		<< cameraFront.y << ", "
+		<< cameraFront.z << std::endl;
+
+	std::cout << "Camera Up: " << cameraUp.x << ", "
+		<< cameraUp.y << ", "
+		<< cameraUp.z << std::endl;
+}
