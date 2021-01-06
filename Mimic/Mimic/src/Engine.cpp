@@ -74,7 +74,7 @@ void Engine::close()
 void Engine::run()
 {
     //Renderer renderer(DEFERRED, false);
-    Renderer renderer(FORWARD, true);
+    Renderer renderer(FORWARD, false);
 
     //UI_Mgr.enableCursor();
 

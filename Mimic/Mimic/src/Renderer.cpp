@@ -113,20 +113,21 @@ Renderer::~Renderer()
 
 
 void Renderer::Render(Scene const* scene)  
-{/*
+{
+    /*
     glm::mat4 lightView = glm::lookAt(
         glm::vec3(-60.0f, 70.0f, 0.0f), glm::vec3(30.0f, 60.0f, 55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
-    
     */
-    float near_plane = 1.0f, far_plane = 200.0f;
-    glm::vec3 pos(-60.0f, 70.0f, 0.0f);
-    glm::vec3 des(-60.0f, 69.0f, 0.0f);
-    glm::mat4 lightProjection = glm::ortho(0.0f, 100.0f, 100.0f, 0.0f, near_plane, far_plane);
 
-    glm::mat4 lightView = glm::lookAt(pos, des, glm::vec3(0.0, 1.0, 0.0));
-      
+    glm::mat4 lightView = glm::lookAt( glm::vec3(-34.7906f, 189.426f, 29.4884f), 
+        glm::vec3(0.635413f, -1.81114f, -0.562167f), 
+        glm::vec3(0.0, 1.0, 0.0));
+    float height = 860.0f / 4;
+    float width = 1200.0f /4;
+    glm::mat4 lightProjection = glm::ortho(-(width / 2.0f), width / 2.0f, -height / 2.0f, height / 2.0f, -300.0f, 300.0f);
+    
 
     RenderShadowMap(lightView, lightProjection, scene);
 
@@ -164,6 +165,7 @@ void Renderer::Draw(Shader* shader, Scene const* scene) const
 
 void Renderer::ForwardRender(Shader* shader, Scene const* scene) const
 {
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // pass light source

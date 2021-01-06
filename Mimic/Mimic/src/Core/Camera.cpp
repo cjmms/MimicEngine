@@ -111,6 +111,12 @@ void Camera::cameraUpdateFrameTime()
 
 glm::mat4 Camera::getViewMatrix()
 {
+	std::cout << "Print View Matrix: pos " << cameraPos.x << ", " 
+		<< cameraPos.y << ", " << cameraPos.z << std::endl;
+
+	std::cout << "Des: " << (cameraFront + cameraFront).x << ", " 
+		<< (cameraFront + cameraFront).y << ", " 
+		<< (cameraFront + cameraFront).z << std::endl;
 	return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 }
 
@@ -159,7 +165,10 @@ void Camera::zoomIn(float yoffset)
 
 glm::mat4 Camera::getProjectionMatrix()
 {
-	return glm::perspective(glm::radians(fov), 1200.0f / 860.0f, 0.1f, 300.0f);
+	//return glm::perspective(glm::radians(fov), 1200.0f / 860.0f, 0.1f, 300.0f);
+	float height = 860.0f / 4;
+	float width = 1200.0f /4;
+	return glm::ortho(-(width / 2.0f), width / 2.0f, -height / 2.0f, height / 2.0f, -300.f, 300.0f);
 }
 
 
