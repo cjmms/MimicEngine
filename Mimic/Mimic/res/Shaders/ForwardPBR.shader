@@ -179,7 +179,7 @@ float calculateShadow(vec3 N)
     // get depth of current fragment from light's perspective
     float currentDepth = projCoord.z;
 
-    float bias = 0.01f;
+    float bias = 0.001f;
     // check whether current frag pos is in shadow
     float shadow = (currentDepth - bias) > closestDepth ? 1.0 : 0.0;
 
@@ -212,7 +212,7 @@ void main()
 
     // calcualte shadow at here    
     float shadow =  calculateShadow(N);
-    color *= (1 - shadow) + 0.1f;
+    color *= (1 - shadow) ;
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));
@@ -221,12 +221,5 @@ void main()
 
 
     FragColor = vec4(color, 1.0f);
-
-
-    
-
-    float z = (WorldPos.z + 300.0f) / 600.0f; // back to NDC 
-
-    FragColor = vec4(vec3(z), 1.0f);
     
 }
