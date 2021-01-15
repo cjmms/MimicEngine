@@ -30,7 +30,6 @@
 * TODO: bloom
 * TODO: Spot Light
 * TODO: HDR with adaptive exposure
-* TODO: Cascaded Shadow Mapping
 * TODO: soft shadow
 * TODO: light volume
 * 
@@ -73,8 +72,8 @@ void Engine::close()
 
 void Engine::run()
 {
-    //Renderer renderer(DEFERRED, false);
-    Renderer renderer(FORWARD, false);
+    Renderer renderer(DEFERRED, false);
+    //Renderer renderer(FORWARD, false);
 
     //UI_Mgr.enableCursor();
 

@@ -37,6 +37,10 @@ const int N_LIGHTS = 10;
 uniform vec3 lightPositions[N_LIGHTS];
 uniform vec3 lightColors[N_LIGHTS];
 
+uniform mat4 lightProjection;
+uniform mat4 lightView;
+uniform sampler2D shadowMap;
+
 
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -123,9 +127,30 @@ vec3 reflection(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, ve
     return Lo;
 }
 
+
 //----------------------------------------------------------------------
+float calculateShadow(vec3 N, vec4 lightSpaceFragPos)
+{
+    vec3 projCoord = lightSpaceFragPos.xyz / lightSpaceFragPos.w;
+    // transform to [0,1] range
+    projCoord = projCoord * 0.5 + 0.5;
 
+    if (projCoord.z > 1 || projCoord.z < 0) return 0;
+    if (projCoord.x > 1 || projCoord.x < 0) return 0;
+    if (projCoord.y > 1 || projCoord.y < 0) return 0;
 
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoord.xy).r;
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoord.z;
+
+    float bias = 0.001f;
+    // check whether current frag pos is in shadow
+    float shadow = (currentDepth - bias) > closestDepth ? 1.0 : 0.0;
+
+    //if (closestDepth > 0.0f) return 1.0;
+    return shadow;
+}
 
 
 
@@ -151,11 +176,18 @@ void main()
     // NO AO
     vec3 color = Lo;
 
+    // calculate light space position
+    vec4 lightSpaceFragPos = lightProjection * lightView * vec4(WorldPos, 1.0f);
+
+    float shadow = calculateShadow(N, lightSpaceFragPos);
+    color *= (1 - shadow);
+
+
     // HDR tonemapping
     color = color / (color + vec3(1.0));
     // gamma correct
     color = pow(color, vec3(1.0 / 2.2));
 
 
-    //FragColor = vec4(color, 1.0f);
+    FragColor = vec4(color, 1.0f);
 }

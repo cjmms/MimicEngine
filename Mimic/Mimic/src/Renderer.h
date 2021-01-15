@@ -80,6 +80,8 @@ private:
 
 	void DeferredRender(Scene const* scene) const;
 
+	void bindShadowMap(Shader* shader) const;
+
 
 
 	inline bool isDeferred() const { return DEFERRED == type; }

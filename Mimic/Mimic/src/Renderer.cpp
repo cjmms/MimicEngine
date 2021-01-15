@@ -99,6 +99,23 @@ void Renderer::RenderShadowMap(glm::mat4 view, glm::mat4 projection, Scene const
 }
 
 
+void Renderer::bindShadowMap(Shader* shader) const
+{
+    glm::mat4 lightView = glm::lookAt(
+        glm::vec3(-70.0f, 70.0f, -10.0f), glm::vec3(30.0f, 60.0f, 55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
+
+
+    // bind light matrix
+    shader->setMat4("lightProjection", lightProjection);
+    shader->setMat4("lightView", lightView);
+
+    // bind shadow map
+    shader->setTexture("shadowMap", depthBufferFBO->getDepthAttachment());
+}
+
+
 
 void Renderer::VisualizeDepthBuffer(unsigned int depthAttachment) const
 {
@@ -124,17 +141,11 @@ void Renderer::Render(Scene const* scene)
     RenderShadowMap(lightView, lightProjection, scene);
 
 
-    if (isDeferred()) DeferredRender(scene);
-    else {
-        // bind light matrix
-        PBR_Forward_Shader->setMat4("lightProjection", lightProjection);
-        PBR_Forward_Shader->setMat4("lightView", lightView);
-
-        // bind shadow map
-        PBR_Forward_Shader->setTexture("shadowMap", depthBufferFBO->getDepthAttachment());
-
+    if (isDeferred()) 
+        DeferredRender(scene);
+    else 
         ForwardRender(PBR_Forward_Shader, scene);
-    }
+    
     if (debugMode) {
         // For debugging purposes
         VisualizeDepthBuffer(depthBufferFBO->getDepthAttachment());
@@ -162,6 +173,8 @@ void Renderer::ForwardRender(Shader* shader, Scene const* scene) const
 
     // pass light source
     BindLightSources(shader, scene);
+
+    bindShadowMap(shader);
 
     // pass projection and view matrix
     shader->setMat4("projection", camera.getProjectionMatrix());
@@ -194,6 +207,8 @@ void Renderer::DeferredRender(Scene const* scene) const
     // Second Pass, Render to a Quad
     glBindFramebuffer(GL_FRAMEBUFFER, 0);           // Unbind G-Buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    bindShadowMap(DeferredShader);
 
     DeferredShader->setTexture("gPosition", gPosition);
     DeferredShader->setTexture("gAlbedoMetallic", gAlbedoMetallic);
