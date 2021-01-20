@@ -131,7 +131,6 @@ Renderer::~Renderer()
 
 void Renderer::Render(Scene const* scene)  
 {
-    
     glm::mat4 lightView = glm::lookAt(
         glm::vec3(-70.0f, 70.0f, -10.0f), glm::vec3(30.0f, 60.0f, 55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -141,10 +140,8 @@ void Renderer::Render(Scene const* scene)
     RenderShadowMap(lightView, lightProjection, scene);
 
 
-    if (isDeferred()) 
-        DeferredRender(scene);
-    else 
-        ForwardRender(PBR_Forward_Shader, scene);
+    if (isDeferred()) DeferredRender(scene);
+    else ForwardRender(PBR_Forward_Shader, scene);
     
     if (debugMode) {
         // For debugging purposes
