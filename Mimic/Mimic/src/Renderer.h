@@ -42,11 +42,13 @@ private:
 
 	// some shaders for debuging purposes
 	Shader* DepthQuadShader;
+	Shader* BilateralUpShader;
 
 
 	unsigned int gBuffer, gPosition, gNormalRoughness, gAlbedoMetallic;
 
 	FBO_Depth *depthBufferFBO;
+	FBO_Color* HalfResFBO;
 
 	bool debugMode;
 	

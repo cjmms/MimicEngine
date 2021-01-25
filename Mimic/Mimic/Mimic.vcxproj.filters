@@ -107,5 +107,6 @@
     <None Include="res\Shaders\FillG-Buffer.shader" />
     <None Include="res\Shaders\DeferredPBR.shader" />
     <None Include="res\Shaders\ForwardPBR.shader" />
+    <None Include="res\Shaders\BilateralUp.shader" />
   </ItemGroup>
 </Project>

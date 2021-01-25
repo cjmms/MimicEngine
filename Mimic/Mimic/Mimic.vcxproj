@@ -120,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\basic.shader" />
+    <None Include="res\Shaders\BilateralUp.shader" />
     <None Include="res\Shaders\DeferredPBR.shader" />
     <None Include="res\Shaders\DepthMap.shader" />
     <None Include="res\Shaders\DepthQuad.shader" />

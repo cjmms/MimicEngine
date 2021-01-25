@@ -27,6 +27,9 @@ Renderer::Renderer(RenderingType type, bool debugMode)
     ShadowMapShader = new Shader("res/Shaders/DepthMap.shader");
     depthBufferFBO = new FBO_Depth(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
 
+    BilateralUpShader = new Shader("res/Shaders/BilateralUp.shader");
+
+    HalfResFBO = new FBO_Color(UI_Mgr.getScreenWidth() / 2.0f, UI_Mgr.getScreenHeight() / 2.0f);
 
     if (debugMode) {
         DepthQuadShader = new Shader("res/Shaders/DepthQuad.shader");
@@ -214,6 +217,8 @@ void Renderer::DeferredRender(Scene const* scene) const
     FillG_Buffer(scene);
 
     // Second Pass, Render to a Quad
+    /*
+    // old code
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     bindShadowMap(DeferredShader);
@@ -224,6 +229,28 @@ void Renderer::DeferredRender(Scene const* scene) const
     DeferredShader->setVec3("camPos", camera.getCameraPos());
 
     Quad().Draw(*DeferredShader);
+    */
+
+    // half resolution ray marching
+    HalfResFBO->Bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    bindShadowMap(DeferredShader);
+
+    BindG_Buffer(DeferredShader);
+
+    BindLightSources(DeferredShader, scene);
+    DeferredShader->setVec3("camPos", camera.getCameraPos());
+
+    Quad().Draw(*DeferredShader);
+    HalfResFBO->Unbind();
+
+
+    // full resolution
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    Quad().Draw(*BilateralUpShader, HalfResFBO->getColorAttachment());
+
+
 }
 
 
