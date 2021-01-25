@@ -185,14 +185,8 @@ void Renderer::ForwardRender(Shader* shader, Scene const* scene) const
 
 
 
-
-
-
-
-
-void Renderer::DeferredRender(Scene const* scene) const
+void Renderer::FillG_Buffer(Scene const* scene) const
 {
-    // First Pass, fill G-Buffer
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);     // Bind to G-Buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -201,15 +195,30 @@ void Renderer::DeferredRender(Scene const* scene) const
 
     Draw(Fill_G_Buffer, scene);
 
-    // Second Pass, Render to a Quad
     glBindFramebuffer(GL_FRAMEBUFFER, 0);           // Unbind G-Buffer
+}
+
+
+
+void Renderer::BindG_Buffer(Shader* shader) const
+{
+    shader->setTexture("gPosition", gPosition);
+    shader->setTexture("gAlbedoMetallic", gAlbedoMetallic);
+    shader->setTexture("gNormalRoughness", gNormalRoughness);
+}
+
+
+void Renderer::DeferredRender(Scene const* scene) const
+{
+    // First Pass, fill G-Buffer
+    FillG_Buffer(scene);
+
+    // Second Pass, Render to a Quad
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     bindShadowMap(DeferredShader);
 
-    DeferredShader->setTexture("gPosition", gPosition);
-    DeferredShader->setTexture("gAlbedoMetallic", gAlbedoMetallic);
-    DeferredShader->setTexture("gNormalRoughness", gNormalRoughness);
+    BindG_Buffer(DeferredShader);
 
     BindLightSources(DeferredShader, scene);
     DeferredShader->setVec3("camPos", camera.getCameraPos());

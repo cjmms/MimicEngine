@@ -44,8 +44,8 @@ bool UI_Manager::init()
     }
 
     // default screen size
-    window_width = 1200;
-    window_height = 860;
+    window_width = 1280;
+    window_height = 960;
 
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(window_width, window_height, "Not a mimic!", NULL, NULL);

@@ -198,8 +198,9 @@ vec3 reflection(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, ve
 
 
 //----------------------------------------------------------------------
-float calculateShadow(vec3 N, vec4 lightSpaceFragPos)
+float calculateShadow(vec3 N, vec3 WorldPos)
 {
+    vec4 lightSpaceFragPos = lightProjection * lightView * vec4(WorldPos, 1.0f);
     vec3 projCoord = lightSpaceFragPos.xyz / lightSpaceFragPos.w;
     // transform to [0,1] range
     projCoord = projCoord * 0.5 + 0.5;
@@ -236,8 +237,7 @@ void main()
 
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
     // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
-    vec3 F0 = vec3(0.04);
-    F0 = mix(F0, albedo, metallic);
+    vec3 F0 = mix(vec3(0.04f), albedo, metallic);
 
     // reflectance equation
     vec3 Lo = reflection(N, V, albedo, metallic, roughness, F0, WorldPos);
@@ -245,27 +245,18 @@ void main()
     // NO AO
     vec3 color = Lo;
 
-
-
     // volumetric lighting 
-    vec3 VL = calculateVolumetricLighting(WorldPos);
+    //color += 0.05f * calculateVolumetricLighting(WorldPos);
+    color =  calculateVolumetricLighting(WorldPos);
 
-    color += VL * 0.1f;
-
-
-    // calculate light space position
-    vec4 lightSpaceFragPos = lightProjection * lightView * vec4(WorldPos, 1.0f);
-
-    float shadow = calculateShadow(N, lightSpaceFragPos);
-    color *= (1 - shadow);
-
+    // shadow
+    //color *= 1 - calculateShadow(N, WorldPos);
 
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));
     // gamma correct
     color = pow(color, vec3(1.0 / 2.2));
-
 
     FragColor = vec4(color, 1.0f);
 }

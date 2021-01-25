@@ -82,6 +82,9 @@ private:
 
 	void bindShadowMap(Shader* shader) const;
 
+	void FillG_Buffer(Scene const* scene) const;
+	void BindG_Buffer(Shader* shader) const;
+
 
 
 	inline bool isDeferred() const { return DEFERRED == type; }
