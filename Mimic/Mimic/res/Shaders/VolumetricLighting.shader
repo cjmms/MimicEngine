@@ -107,7 +107,7 @@ vec3 calculateVolumetricLighting(vec3 fragPos)
 
 void main()
 {
-    vec3 WorldPos = texture(gPosition, TexCoords).rgb;
+    vec3 WorldPos = texture(gPosition, TexCoords * 2).rgb;
 
     FragColor = vec4(calculateVolumetricLighting(WorldPos), 1.0f);
 }

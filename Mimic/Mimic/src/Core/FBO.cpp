@@ -21,15 +21,6 @@ FBO_Color::FBO_Color(unsigned int width, unsigned int height)
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorBuffer, 0);
 
-    /*
-    // generate FBO depth, stencil attachment(24 bits, 8 bits), bind to current FBO
-    glGenRenderbuffers(1, &RBO);
-    glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-    */
-
     glGenTextures(1, &depthBuffer);
     glBindTexture(GL_TEXTURE_2D, depthBuffer);  // bind texture
 

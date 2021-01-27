@@ -182,7 +182,6 @@ void main()
 
     // volumetric lighting
     color += 0.05f * texture(volumetricLightTexture, TexCoords).xyz;
-    color = texture(volumetricLightTexture, TexCoords).xyz;
 
     // shadow
     //color *= 1 - calculateShadow(N, WorldPos);

@@ -26,15 +26,17 @@ uniform int BilateralSwitch;
 
 void main()
 {
+	vec2 upScaledCoord = TextureCoord;
+	vec2 downScaledCoord = TextureCoord;	// half resolution
 
-	float upSampledDepth = texture(gPosition, TextureCoord).a;
+	float upSampledDepth = texture(gPosition, upScaledCoord).a;
 
 	vec3 color = vec3(0.0f);
 	float totalWeight = 0.0f;
 
 	// Select the closest downscaled pixels.
-	int xOffset = mod(TextureCoord.x, 2) == 0 ? -1 : 1;
-	int yOffset = mod(TextureCoord.y, 2) == 0 ? -1 : 1;
+	int xOffset = mod(upScaledCoord.x, 2) == 0 ? -1 : 1;
+	int yOffset = mod(upScaledCoord.y, 2) == 0 ? -1 : 1;
 
 	vec2 offsets[4];
 	offsets[0] = vec2(0.0);
@@ -48,14 +50,14 @@ void main()
 	for (int i = 0; i < 4; i++)
 	{
 		
-		vec3 downscaledColor = texture(volumetricLightTexture, TextureCoord + offsets[i] * colorTexOffset).xyz;
+		vec3 downscaledColor = texture(volumetricLightTexture, downScaledCoord + offsets[i] * colorTexOffset).xyz;
 
-		float downscaledDepth = texture(gPosition, TextureCoord + offsets[i] * depthTexOffset).a;
+		float downscaledDepth = texture(gPosition, downScaledCoord + offsets[i] * depthTexOffset).a;
 
 		float currentWeight = 1.0f;
 
 		float depthDiff = abs(downscaledDepth - upSampledDepth);
-		if (depthDiff < 0.5f) currentWeight *= 1.0f - depthDiff;
+		if (depthDiff < 0.05f) currentWeight *= 1.0f - depthDiff;
 		else currentWeight = 0;
 
 		color += downscaledColor * currentWeight;
@@ -72,5 +74,5 @@ void main()
 	FragColor = vec4(volumetricLight, 1.0f);
 	
 	// no bilateral upsampling
-	//FragColor = texture(volumetricLightTexture, TextureCoord);
+	if (BilateralSwitch == 0) FragColor = texture(volumetricLightTexture, TextureCoord);
 }

@@ -36,6 +36,8 @@ Renderer::Renderer(RenderingType type, bool debugMode)
 
     LightingFBO = new FBO_Color(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
 
+    ColorQuadShader = new Shader("res/Shaders/ColorQuad.shader");
+
     if (debugMode) {
         DepthQuadShader = new Shader("res/Shaders/DepthQuad.shader");
     }
@@ -220,23 +222,6 @@ void Renderer::DeferredRender(Scene const* scene) const
 {
     // First Pass, fill G-Buffer
     FillG_Buffer(scene);
-
-    // Second Pass, Render to a Quad
-    
-    // old code
-    /*
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    bindShadowMap(DeferredShader);
-
-    BindG_Buffer(DeferredShader);
-
-    BindLightSources(DeferredShader, scene);
-    DeferredShader->setVec3("camPos", camera.getCameraPos());
-
-    Quad().Draw(*DeferredShader);
-    */
-
     
     // half resolution ray marching
     HalfResFBO->Bind();
@@ -277,6 +262,7 @@ void Renderer::DeferredRender(Scene const* scene) const
     DeferredShader->setTexture("volumetricLightTexture", LightingFBO->getColorAttachment());
 
     Quad().Draw(*DeferredShader);
+    
 }
 
 

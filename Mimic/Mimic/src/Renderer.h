@@ -44,6 +44,7 @@ private:
 	Shader* DepthQuadShader;
 	Shader* BilateralUpShader;
 	Shader* VolumetricLightShader;
+	Shader* ColorQuadShader;
 
 
 	unsigned int gBuffer, gPosition, gNormalRoughness, gAlbedoMetallic;
