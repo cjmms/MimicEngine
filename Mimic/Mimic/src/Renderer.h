@@ -43,6 +43,7 @@ private:
 	// some shaders for debuging purposes
 	Shader* DepthQuadShader;
 	Shader* BilateralUpShader;
+	Shader* VolumetricLightShader;
 
 
 	unsigned int gBuffer, gPosition, gNormalRoughness, gAlbedoMetallic;

@@ -42,15 +42,22 @@ void main()
 	offsets[2] = vec2(xOffset, 0);
 	offsets[3] = vec2(xOffset, yOffset);
 
+	vec2 colorTexOffset = 1.0 / textureSize(volumetricLightTexture, 0);
+	vec2 depthTexOffset = 1.0 / textureSize(gPosition, 0);
 	
 	for (int i = 0; i < 4; i++)
 	{
-		vec3 downscaledColor = texture(volumetricLightTexture, TextureCoord + offsets[i]).xyz;
+		
+		vec3 downscaledColor = texture(volumetricLightTexture, TextureCoord + offsets[i] * colorTexOffset).xyz;
 
-		float downscaledDepth = texture(gPosition, TextureCoord + offsets[i]).a;
+		float downscaledDepth = texture(gPosition, TextureCoord + offsets[i] * depthTexOffset).a;
 
 		float currentWeight = 1.0f;
-		currentWeight *= max(0.0f, 1.0f - (0.05f) * abs(downscaledDepth - upSampledDepth));
+
+		float depthDiff = abs(downscaledDepth - upSampledDepth);
+		if (depthDiff < 0.05f) currentWeight *= 1.0f - depthDiff;
+		else currentWeight = 0;
+		
 
 		color += downscaledColor * currentWeight;
 		totalWeight += currentWeight;
@@ -58,11 +65,13 @@ void main()
 	
 	vec3 volumetricLight;
 	const float epsilon = 0.0001f;
+
+	totalWeight = 4;
+
 	volumetricLight = color / (totalWeight + epsilon);
 
 	FragColor = vec4(volumetricLight, 1.0f);
 	
 	// no bilateral upsampling
-	if (BilateralSwitch == 0) FragColor = texture(volumetricLightTexture, TextureCoord);
-	//if (BilateralSwitch == 0) FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	//if (BilateralSwitch == 0) FragColor = texture(volumetricLightTexture, TextureCoord);
 }

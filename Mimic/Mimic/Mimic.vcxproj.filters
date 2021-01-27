@@ -108,5 +108,6 @@
     <None Include="res\Shaders\DeferredPBR.shader" />
     <None Include="res\Shaders\ForwardPBR.shader" />
     <None Include="res\Shaders\BilateralUp.shader" />
+    <None Include="res\Shaders\VolumetricLighting.shader" />
   </ItemGroup>
 </Project>

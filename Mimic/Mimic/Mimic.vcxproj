@@ -127,6 +127,7 @@
     <None Include="res\Shaders\FillG-Buffer.shader" />
     <None Include="res\Shaders\ForwardPBR.shader" />
     <None Include="res\Shaders\ColorQuad.shader" />
+    <None Include="res\Shaders\VolumetricLighting.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
