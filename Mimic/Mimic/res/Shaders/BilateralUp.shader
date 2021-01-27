@@ -55,9 +55,8 @@ void main()
 		float currentWeight = 1.0f;
 
 		float depthDiff = abs(downscaledDepth - upSampledDepth);
-		if (depthDiff < 0.05f) currentWeight *= 1.0f - depthDiff;
+		if (depthDiff < 0.5f) currentWeight *= 1.0f - depthDiff;
 		else currentWeight = 0;
-		
 
 		color += downscaledColor * currentWeight;
 		totalWeight += currentWeight;
@@ -73,5 +72,5 @@ void main()
 	FragColor = vec4(volumetricLight, 1.0f);
 	
 	// no bilateral upsampling
-	//if (BilateralSwitch == 0) FragColor = texture(volumetricLightTexture, TextureCoord);
+	//FragColor = texture(volumetricLightTexture, TextureCoord);
 }

@@ -34,6 +34,8 @@ Renderer::Renderer(RenderingType type, bool debugMode)
 
     HalfResFBO = new FBO_Color(UI_Mgr.getScreenWidth() / 2.0f, UI_Mgr.getScreenHeight() / 2.0f);
 
+    LightingFBO = new FBO_Color(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
+
     if (debugMode) {
         DepthQuadShader = new Shader("res/Shaders/DepthQuad.shader");
     }
@@ -237,19 +239,9 @@ void Renderer::DeferredRender(Scene const* scene) const
 
     
     // half resolution ray marching
-    //HalfResFBO->Bind();
+    HalfResFBO->Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    /*
-    bindShadowMap(DeferredShader);
-
-    BindG_Buffer(DeferredShader);
-
-    BindLightSources(DeferredShader, scene);
-    DeferredShader->setVec3("camPos", camera.getCameraPos());
-
-    Quad().Draw(*DeferredShader);
-    */
     bindShadowMap(VolumetricLightShader);
 
     BindG_Buffer(VolumetricLightShader);
@@ -258,9 +250,10 @@ void Renderer::DeferredRender(Scene const* scene) const
 
     Quad().Draw(*VolumetricLightShader);
     
-    //HalfResFBO->Unbind();
+    HalfResFBO->Unbind();
 
-    /*
+    
+    LightingFBO->Bind();
     // Bilateral Upsampling to resolution
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -270,7 +263,20 @@ void Renderer::DeferredRender(Scene const* scene) const
     BilateralUpShader->setInt("BilateralSwitch", test);
 
     Quad().Draw(*BilateralUpShader);
-    */
+    LightingFBO->Unbind();
+
+    // Lighting Calculation
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    bindShadowMap(DeferredShader);
+
+    BindG_Buffer(DeferredShader);
+
+    BindLightSources(DeferredShader, scene);
+    DeferredShader->setVec3("camPos", camera.getCameraPos());
+    DeferredShader->setTexture("volumetricLightTexture", LightingFBO->getColorAttachment());
+
+    Quad().Draw(*DeferredShader);
 }
 
 

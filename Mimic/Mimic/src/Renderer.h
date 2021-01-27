@@ -49,6 +49,7 @@ private:
 	unsigned int gBuffer, gPosition, gNormalRoughness, gAlbedoMetallic;
 
 	FBO_Depth *depthBufferFBO;
+	FBO_Color* LightingFBO;
 	FBO_Color* HalfResFBO;
 
 	bool debugMode;
