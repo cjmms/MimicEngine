@@ -28,7 +28,7 @@ void main()
 #shader fragment
 #version 330 core
 layout(location = 0) out vec4 gAlbedoMetallic;
-layout(location = 1) out vec3 gPosition;
+layout(location = 1) out vec4 gPosition;
 layout(location = 2) out vec4 gNormalRoughness;
 
 in vec2 TexCoords;
@@ -73,8 +73,8 @@ void main()
     gAlbedoMetallic.a = texture(material.texture_metallic, TexCoords).r;
 
     // store fragment position vector in the G buffer
-    gPosition = WorldPos;
-
+    gPosition.rgb = WorldPos;
+    gPosition.a = gl_FragCoord.z;
 
     // store normal vector into G buffer
     gNormalRoughness.rgb = getNormalFromMap();

@@ -9,6 +9,7 @@ extern Camera camera;
 class UI_Manager
 {
 public:
+
 	bool init();
 	void update();
 

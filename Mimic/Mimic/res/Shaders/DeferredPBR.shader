@@ -231,6 +231,8 @@ void main()
     vec3 albedo = pow(texture(gAlbedoMetallic, TexCoords).rgb, vec3(2.2));
     float metallic = texture(gAlbedoMetallic, TexCoords).a;
     float roughness = texture(gNormalRoughness, TexCoords).a;
+    // from 0 to 1
+    float depth = texture(gPosition, TexCoords).a;
 
     vec3 N = texture(gNormalRoughness, TexCoords).rgb;
     vec3 V = normalize(camPos - WorldPos);
@@ -248,6 +250,8 @@ void main()
     // volumetric lighting 
     //color += 0.05f * calculateVolumetricLighting(WorldPos);
     color =  calculateVolumetricLighting(WorldPos);
+
+
 
     // shadow
     //color *= 1 - calculateShadow(N, WorldPos);

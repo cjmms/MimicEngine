@@ -88,6 +88,6 @@ void Engine::run()
         camera.cameraUpdateFrameTime();
 
         renderer.Render(scene);
-        renderer.RenderLightSources(scene);
+        //renderer.RenderLightSources(scene);
     }
 }

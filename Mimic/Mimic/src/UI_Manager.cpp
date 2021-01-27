@@ -2,11 +2,15 @@
 #include <iostream>
 #include <stb_image.h>
 
+bool test = true;
 
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    else if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+        test = !test;
+
     
     camera.setCameraKey(window);
 }

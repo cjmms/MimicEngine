@@ -5,6 +5,7 @@
 #include "ResourceManager.h"
 #include "Core/FBO.h"
 
+extern bool test;
 extern Camera camera;
 extern UI_Manager UI_Mgr;
 
@@ -248,9 +249,13 @@ void Renderer::DeferredRender(Scene const* scene) const
 
     // full resolution
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    Quad().Draw(*BilateralUpShader, HalfResFBO->getColorAttachment());
 
+    BilateralUpShader->setTexture("volumetricLightTexture", HalfResFBO->getColorAttachment());
+    BilateralUpShader->setTexture("gPosition", gPosition);
 
+    BilateralUpShader->setInt("BilateralSwitch", test);
+
+    Quad().Draw(*BilateralUpShader);
 }
 
 
