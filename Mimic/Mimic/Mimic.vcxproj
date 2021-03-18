@@ -90,6 +90,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Shadow\Shadow.cpp" />
     <ClCompile Include="src\Core\FBO.cpp" />
     <ClCompile Include="src\DeferredShading\DeferredRendering.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
@@ -107,6 +108,7 @@
     <ClCompile Include="src\UI_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Shadow\Shadow.h" />
     <ClInclude Include="src\Core\FBO.h" />
     <ClInclude Include="src\DeferredShading\DeferredRendering.h" />
     <ClInclude Include="src\Renderer.h" />

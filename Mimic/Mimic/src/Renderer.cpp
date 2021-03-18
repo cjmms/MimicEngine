@@ -16,11 +16,15 @@ Renderer::Renderer(RenderingType type, bool debugMode)
 {
 	glEnable(GL_DEPTH_TEST);
 
+    glm::mat4 lightView = glm::lookAt(
+        glm::vec3(-70.0f, 70.0f, -10.0f), glm::vec3(30.0f, 60.0f, 55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
+
+    shadow = new Shadow(lightView, lightProjection, 
+        UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
 
     // init shader and fbo for shadow mapping
-    ShadowMapShader = new Shader("res/Shaders/DepthMap.shader");
-    depthBufferFBO = new FBO_Depth(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
-
     BilateralUpShader = new Shader("res/Shaders/BilateralUp.shader");
 
     VolumetricLightShader = new Shader("res/Shaders/VolumetricLighting.shader");
@@ -40,38 +44,6 @@ Renderer::Renderer(RenderingType type, bool debugMode)
 
 
 
-
-void Renderer::RenderShadowMap(glm::mat4 view, glm::mat4 projection, Scene const* scene)
-{
-    depthBufferFBO->Bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    ShadowMapShader->setMat4("view", view);
-    ShadowMapShader->setMat4("projection", projection);
-
-    //Draw(ShadowMapShader, scene);
-    depthBufferFBO->Unbind();
-}
-
-
-void Renderer::bindShadowMap(Shader* shader) const
-{
-    glm::mat4 lightView = glm::lookAt(
-        glm::vec3(-70.0f, 70.0f, -10.0f), glm::vec3(30.0f, 60.0f, 55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
-
-
-    // bind light matrix
-    shader->setMat4("lightProjection", lightProjection);
-    shader->setMat4("lightView", lightView);
-
-    // bind shadow map
-    shader->setTexture("shadowMap", depthBufferFBO->getDepthAttachment());
-}
-
-
-
 void Renderer::VisualizeDepthBuffer(unsigned int depthAttachment) const
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -86,43 +58,30 @@ Renderer::~Renderer()
 
 void Renderer::Render(Scene const* scene)  
 {
-    glm::mat4 lightView = glm::lookAt(
-        glm::vec3(-70.0f, 70.0f, -10.0f), glm::vec3(30.0f, 60.0f, 55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    shadow->CalculateShadowMap(scene);
 
-    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
-    
-
-    RenderShadowMap(lightView, lightProjection, scene);
-
-
-    DeferredRender(scene);
-    
-    if (debugMode) {
-        // For debugging purposes
-        VisualizeDepthBuffer(depthBufferFBO->getDepthAttachment());
-    }
-}
-
-
-
-
-void Renderer::DeferredRender(Scene const* scene) const
-{
     // First Pass, fill G-Buffer
-    //FillG_Buffer(scene);
     DeferredRenderer.Fill_G_Buffer(scene);
 
     //VolumetricLight(LightingFBO);
 
     // bind shadow map 
-    //bindShadowMap(DeferredShader);
+    shadow->BindShadowMap(DeferredRenderer.GetDeferredShader());
 
     // bind volumetric texture
     //DeferredShader->setTexture("volumetricLightTexture", LightingFBO->getColorAttachment());
 
 
     DeferredRenderer.Render(scene);
+    
+    if (debugMode) {
+        // For debugging purposes
+        //VisualizeDepthBuffer(depthBufferFBO->getDepthAttachment());
+    }
 }
+
+
+
 
 
 void Renderer::VolumetricLight(FBO_Color* fbo) const
@@ -131,7 +90,7 @@ void Renderer::VolumetricLight(FBO_Color* fbo) const
     HalfResFBO->Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    bindShadowMap(VolumetricLightShader);
+    //bindShadowMap(VolumetricLightShader);
 
     //BindG_Buffer(VolumetricLightShader);
     //VolumetricLightShader->setTexture("gPosition", gPosition);

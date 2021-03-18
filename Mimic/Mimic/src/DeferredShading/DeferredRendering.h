@@ -31,4 +31,6 @@ public:
 	void Fill_G_Buffer(Scene const* scene) const;
 	void Bind_G_Buffer(Shader* shader) const;
 	void Render(Scene const* scene) const;
+
+	inline Shader* GetDeferredShader() const { return DeferredLightingShader; }
 };

@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include "Core/FBO.h"
 #include "DeferredShading/DeferredRendering.h"
+#include "Shadow/Shadow.h"
 
 
 /*
@@ -36,9 +37,6 @@ private:
 	RenderingType type;
 	Shader *lightShader;
 
-
-	Shader *ShadowMapShader;
-
 	// some shaders for debuging purposes
 	Shader* DepthQuadShader;
 	Shader* BilateralUpShader;
@@ -46,29 +44,18 @@ private:
 	Shader* ColorQuadShader;
 
 	DeferredRendering DeferredRenderer;
+	Shadow* shadow;
 
 
-	FBO_Depth *depthBufferFBO;
 	FBO_Color* LightingFBO;
 	FBO_Color* HalfResFBO;
 
 	bool debugMode;
 
 
-	void DeferredRender(Scene const* scene) const;
-
-	void bindShadowMap(Shader* shader) const;
-
 	void VolumetricLight(FBO_Color* fbo) const;
 
 	inline bool isDeferred() const { return DEFERRED == type; }
-
-
-	// Fill the depth map
-	// Draw a scene by using view and projection matrix provided
-	// the Shadow map will store inside depth attachment of depthBufferFBO
-	void RenderShadowMap(glm::mat4 view, glm::mat4 projection, Scene const* scene);
-
 
 
 	// some helper functions for debugging
