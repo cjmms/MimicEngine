@@ -91,6 +91,9 @@ private:
 	void BindG_Buffer(Shader* shader) const;
 
 
+	void VolumetricLight(FBO_Color* fbo) const;
+
+
 
 	inline bool isDeferred() const { return DEFERRED == type; }
 

@@ -57,7 +57,7 @@ void main()
 		float currentWeight = 1.0f;
 
 		float depthDiff = abs(downscaledDepth - upSampledDepth);
-		if (depthDiff < 0.05f) currentWeight *= 1.0f - depthDiff;
+		if (depthDiff < 0.01f) currentWeight *= 1.0f - depthDiff;
 		else currentWeight = 0;
 
 		color += downscaledColor * currentWeight;

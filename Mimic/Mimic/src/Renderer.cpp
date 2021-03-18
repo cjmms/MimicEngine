@@ -223,22 +223,44 @@ void Renderer::DeferredRender(Scene const* scene) const
     // First Pass, fill G-Buffer
     FillG_Buffer(scene);
     
+    VolumetricLight(LightingFBO);
+
+    // bind shadow map 
+    bindShadowMap(DeferredShader);
+
+    // bind volumetric texture
+    DeferredShader->setTexture("volumetricLightTexture", LightingFBO->getColorAttachment());
+
+    // Lighting Calculation
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    BindG_Buffer(DeferredShader);
+    BindLightSources(DeferredShader, scene);
+    DeferredShader->setVec3("camPos", camera.getCameraPos());
+    
+    Quad().Draw(*DeferredShader);
+}
+
+
+void Renderer::VolumetricLight(FBO_Color* fbo) const
+{
     // half resolution ray marching
     HalfResFBO->Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     bindShadowMap(VolumetricLightShader);
 
-    BindG_Buffer(VolumetricLightShader);
+    //BindG_Buffer(VolumetricLightShader);
+    VolumetricLightShader->setTexture("gPosition", gPosition);
 
     VolumetricLightShader->setVec3("camPos", camera.getCameraPos());
 
     Quad().Draw(*VolumetricLightShader);
-    
+
     HalfResFBO->Unbind();
 
-    
-    LightingFBO->Bind();
+
+    fbo->Bind();
     // Bilateral Upsampling to resolution
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -248,21 +270,7 @@ void Renderer::DeferredRender(Scene const* scene) const
     BilateralUpShader->setInt("BilateralSwitch", test);
 
     Quad().Draw(*BilateralUpShader);
-    LightingFBO->Unbind();
-
-    // Lighting Calculation
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    bindShadowMap(DeferredShader);
-
-    BindG_Buffer(DeferredShader);
-
-    BindLightSources(DeferredShader, scene);
-    DeferredShader->setVec3("camPos", camera.getCameraPos());
-    DeferredShader->setTexture("volumetricLightTexture", LightingFBO->getColorAttachment());
-
-    Quad().Draw(*DeferredShader);
-    
+    fbo->Unbind();
 }
 
 
