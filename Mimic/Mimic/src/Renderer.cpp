@@ -9,8 +9,8 @@ extern bool test;
 extern Camera camera;
 extern UI_Manager UI_Mgr;
 
-Renderer::Renderer(RenderingType type, bool debugMode)
-	:type(type), lightShader(new Shader("res/Shaders/basic.shader")),
+Renderer::Renderer(bool debugMode)
+	:lightShader(new Shader("res/Shaders/basic.shader")),
 	 debugMode(debugMode), 
     DeferredRenderer(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight())
 {
@@ -66,7 +66,7 @@ void Renderer::Render(Scene const* scene)
     //VolumetricLight(LightingFBO);
 
     // bind shadow map 
-    shadow->BindShadowMap(DeferredRenderer.GetDeferredShader());
+    DeferredRenderer.BindShadowMap(*shadow);
 
     // bind volumetric texture
     //DeferredShader->setTexture("volumetricLightTexture", LightingFBO->getColorAttachment());
@@ -119,7 +119,7 @@ void Renderer::VolumetricLight(FBO_Color* fbo) const
 
 void Renderer::RenderLightSources(Scene const* scene) const
 {
-	if (isDeferred()) glDisable(GL_DEPTH_TEST);
+	 glDisable(GL_DEPTH_TEST);
 
     lightShader->setMat4("projection", camera.getProjectionMatrix());
     lightShader->setMat4("view", camera.getViewMatrix());
@@ -133,5 +133,5 @@ void Renderer::RenderLightSources(Scene const* scene) const
         light->getModel()->Draw(*lightShader);
     }
 
-	if (isDeferred()) glEnable(GL_DEPTH_TEST);
+	 glEnable(GL_DEPTH_TEST);
 }

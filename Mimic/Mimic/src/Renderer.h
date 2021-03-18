@@ -23,18 +23,11 @@
 
 
 
-enum RenderingType
-{
-	DEFERRED,
-	FORWARD
-};
-
 
 
 class Renderer
 {
 private:
-	RenderingType type;
 	Shader *lightShader;
 
 	// some shaders for debuging purposes
@@ -55,8 +48,6 @@ private:
 
 	void VolumetricLight(FBO_Color* fbo) const;
 
-	inline bool isDeferred() const { return DEFERRED == type; }
-
 
 	// some helper functions for debugging
 
@@ -67,7 +58,7 @@ private:
 
 
 public:
-	Renderer(RenderingType type, bool debugMode = true);
+	Renderer(bool debugMode = true);
 
 	~Renderer();
 	

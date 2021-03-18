@@ -1,15 +1,6 @@
 #include "Shadow.h"
 
 
-void Shadow::BindShadowMap(Shader* shader) const
-{
-    // bind light matrix
-    shader->setMat4("lightProjection", Projection);
-    shader->setMat4("lightView", View);
-
-    // bind shadow map
-    shader->setTexture("shadowMap", depthBufferFBO->getDepthAttachment());
-}
 
 
 Shadow::Shadow(glm::mat4 View, glm::mat4 Projection, int width, int height)

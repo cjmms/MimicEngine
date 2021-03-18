@@ -23,9 +23,9 @@
 * DONE: Point Light
 * DONE: Model Loading
 * DONE: Texture Loading
+* DONE: Volumetric lighting
 * 
 * TODO: imGUI
-* TODO: Volumetric lighting
 * TODO: SSAO
 * TODO: bloom
 * TODO: Spot Light
@@ -72,8 +72,7 @@ void Engine::close()
 
 void Engine::run()
 {
-    Renderer renderer(DEFERRED, false);
-    //Renderer renderer(FORWARD, false);
+    Renderer renderer(false);
 
     //UI_Mgr.enableCursor();
 

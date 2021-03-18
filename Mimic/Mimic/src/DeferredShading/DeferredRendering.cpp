@@ -3,6 +3,7 @@
 #include "../Core/Camera.h"
 #include "../ResourceManager.h"
 #include "../Scene.h"
+#include "../Shadow/Shadow.h"
 
 extern Camera camera;
 
@@ -110,4 +111,17 @@ void DeferredRendering::Render(Scene const* scene) const
     DeferredLightingShader->setVec3("camPos", camera.getCameraPos());
 
     Quad().Draw(*DeferredLightingShader);
+}
+
+
+
+
+void DeferredRendering::BindShadowMap(const Shadow& shadow) const
+{
+    // bind light matrix
+    DeferredLightingShader->setMat4("lightProjection", shadow.GetProjection());
+    DeferredLightingShader->setMat4("lightView", shadow.GetLightView());
+
+    // bind shadow map
+    DeferredLightingShader->setTexture("shadowMap", shadow.GetShadowMap());
 }

@@ -5,6 +5,7 @@
 
 class Scene;
 class Shader;
+class Shadow;
 
 class DeferredRendering
 {
@@ -33,4 +34,6 @@ public:
 	void Render(Scene const* scene) const;
 
 	inline Shader* GetDeferredShader() const { return DeferredLightingShader; }
+
+	void BindShadowMap(const Shadow& shadow) const;
 };

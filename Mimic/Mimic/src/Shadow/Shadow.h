@@ -21,7 +21,8 @@ public:
 	inline glm::mat4 GetLightView() const { return View; }
 	inline glm::mat4 GetProjection() const { return Projection; }
 
-	void BindShadowMap(Shader* shader) const;
+	// returns a handle to a texture
+	inline unsigned int GetShadowMap() const { return depthBufferFBO->getDepthAttachment(); }
 	void CalculateShadowMap(Scene const* scene);
 };
 
