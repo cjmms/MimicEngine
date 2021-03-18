@@ -2,6 +2,7 @@
 #include "Core/Shader.h"
 #include "Scene.h"
 #include "Core/FBO.h"
+#include "DeferredShading/DeferredRendering.h"
 
 
 /*
@@ -33,10 +34,8 @@ class Renderer
 {
 private:
 	RenderingType type;
-	Shader *PBR_Forward_Shader;
 	Shader *lightShader;
-	Shader *Fill_G_Buffer;
-	Shader *DeferredShader;
+
 
 	Shader *ShadowMapShader;
 
@@ -46,54 +45,21 @@ private:
 	Shader* VolumetricLightShader;
 	Shader* ColorQuadShader;
 
+	DeferredRendering DeferredRenderer;
 
-	unsigned int gBuffer, gPosition, gNormalRoughness, gAlbedoMetallic;
 
 	FBO_Depth *depthBufferFBO;
 	FBO_Color* LightingFBO;
 	FBO_Color* HalfResFBO;
 
 	bool debugMode;
-	
-	void BindLightSources(Shader* shader, Scene const* scene) const;
-
-	/*
-	* G-Buffer has 3 Color Buffers
-	* Layout: 
-	*        |  Albedo.r  |  Albedo.g  |  Albedo.b  |  Metallic  |		Unsigned Byte
-	*		 | Position.x | Position.y | Position.z |    Empty   |		FLOAT 16 Bit
-	*		 |  Normal.x  |  Normal.y  |  Normal.z  |  Roughness |		FLOAT 16 Bit
-	*/
-	void init_G_Buffer(unsigned int width, unsigned int height);
-
-
-
-	// Draw the scene base on shader and model matrix inside scene
-	// !!! This function does NOT bind view and projection matrix !!!
-	// view and projection can be anything
-	// example: orthographic projection / perspective projection
-	// example: from camera point of view / from light point of view
-	void Draw(Shader *shader, Scene const* scene) const;
-
-
-	// Draw the scene base on perpective projection, base on camera position
-	// This function will bind the light before draw the scene
-	// Forward Rendering
-	void ForwardRender(Shader* shader, Scene const* scene) const;
-
 
 
 	void DeferredRender(Scene const* scene) const;
 
 	void bindShadowMap(Shader* shader) const;
 
-	void FillG_Buffer(Scene const* scene) const;
-	void BindG_Buffer(Shader* shader) const;
-
-
 	void VolumetricLight(FBO_Color* fbo) const;
-
-
 
 	inline bool isDeferred() const { return DEFERRED == type; }
 

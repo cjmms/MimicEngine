@@ -181,10 +181,10 @@ void main()
 
 
     // volumetric lighting
-    color += 0.02f * texture(volumetricLightTexture, TexCoords).xyz;
+    //color += 0.02f * texture(volumetricLightTexture, TexCoords).xyz;
 
     // shadow
-    color *= 1 - calculateShadow(N, WorldPos);
+    //color *= 1 - calculateShadow(N, WorldPos);
 
 
     // HDR tonemapping
