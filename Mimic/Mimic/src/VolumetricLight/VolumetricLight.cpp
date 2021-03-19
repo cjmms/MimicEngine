@@ -7,8 +7,8 @@
 extern Camera camera;
 
 VolumetricLight::VolumetricLight(unsigned int width, unsigned int height)
-	:BilateralUpShader("res/Shaders/BilateralUp.shader"),
-	VolumetricLightShader("res/Shaders/VolumetricLighting.shader"),
+	:BilateralUpShader("res/Shaders/VolumetricLight/BilateralUp.shader"),
+	VolumetricLightShader("res/Shaders/VolumetricLight/VolumetricLighting.shader"),
 	LightingFBO(width, height), HalfResFBO(width / 2, height / 2),
 	width(width), height(height)
 {

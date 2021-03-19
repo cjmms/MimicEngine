@@ -146,7 +146,7 @@ float calculateShadow(vec3 N, vec3 WorldPos)
     // get depth of current fragment from light's perspective
     float currentDepth = projCoord.z;
 
-    float bias = 0.001f;
+    float bias = 0.00078f;
     // check whether current frag pos is in shadow
     float shadow = (currentDepth - bias) > closestDepth ? 1.0 : 0.0;
 
@@ -181,7 +181,7 @@ void main()
 
 
     // volumetric lighting
-    color += 0.02f * texture(volumetricLightTexture, TexCoords).xyz;
+    color += 0.01f * texture(volumetricLightTexture, TexCoords).xyz;
 
     // shadow
     color *= 1 - calculateShadow(N, WorldPos);

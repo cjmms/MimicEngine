@@ -128,14 +128,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\basic.shader" />
-    <None Include="res\Shaders\BilateralUp.shader" />
+    <None Include="res\Shaders\VolumetricLight\BilateralUp.shader" />
     <None Include="res\Shaders\DeferredShading\DeferredPBR.shader" />
     <None Include="res\Shaders\Shadow\DepthMap.shader" />
     <None Include="res\Shaders\DepthQuad.shader" />
     <None Include="res\Shaders\DeferredShading\FillG-Buffer.shader" />
     <None Include="res\Shaders\ForwardPBR.shader" />
     <None Include="res\Shaders\ColorQuad.shader" />
-    <None Include="res\Shaders\VolumetricLighting.shader" />
+    <None Include="res\Shaders\VolumetricLight\VolumetricLighting.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

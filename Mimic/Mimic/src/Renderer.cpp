@@ -57,7 +57,9 @@ void Renderer::Render(Scene const* scene)
     // First Pass, fill G-Buffer
     DeferredRenderer.Fill_G_Buffer(scene);
 
+
     VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
+
 
     DeferredRenderer.BindShadowMap(*shadow);
     DeferredRenderer.BindVolumetricLight(VolumetricLight);
