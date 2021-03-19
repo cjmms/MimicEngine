@@ -1,8 +1,7 @@
 #pragma once
-#include "Core/Shader.h"
-#include "Scene.h"
-#include "Core/FBO.h"
+
 #include "DeferredShading/DeferredRendering.h"
+#include "VolumetricLight/VolumetricLight.h"
 #include "Shadow/Shadow.h"
 
 
@@ -32,24 +31,14 @@ private:
 
 	// some shaders for debuging purposes
 	Shader* DepthQuadShader;
-	Shader* BilateralUpShader;
-	Shader* VolumetricLightShader;
 	Shader* ColorQuadShader;
 
 	DeferredRendering DeferredRenderer;
 	Shadow* shadow;
-
-
-	FBO_Color* LightingFBO;
-	FBO_Color* HalfResFBO;
+	VolumetricLight VolumetricLight;
 
 	bool debugMode;
 
-
-	void VolumetricLight(FBO_Color* fbo) const;
-
-
-	// some helper functions for debugging
 
 	// Visualize depth buffer
 	// render depth buffer in a quad

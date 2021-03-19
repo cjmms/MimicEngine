@@ -4,15 +4,17 @@
 #include <iostream>
 #include "ResourceManager.h"
 #include "Core/FBO.h"
+#include "Scene.h"
 
 extern bool test;
 extern Camera camera;
 extern UI_Manager UI_Mgr;
 
 Renderer::Renderer(bool debugMode)
-	:lightShader(new Shader("res/Shaders/basic.shader")),
-	 debugMode(debugMode), 
-    DeferredRenderer(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight())
+    :lightShader(new Shader("res/Shaders/basic.shader")),
+    debugMode(debugMode),
+    DeferredRenderer(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
+    VolumetricLight(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight())
 {
 	glEnable(GL_DEPTH_TEST);
 
@@ -23,15 +25,7 @@ Renderer::Renderer(bool debugMode)
 
     shadow = new Shadow(lightView, lightProjection, 
         UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
-
-    // init shader and fbo for shadow mapping
-    BilateralUpShader = new Shader("res/Shaders/BilateralUp.shader");
-
-    VolumetricLightShader = new Shader("res/Shaders/VolumetricLighting.shader");
-
-    HalfResFBO = new FBO_Color(UI_Mgr.getScreenWidth() / 2.0f, UI_Mgr.getScreenHeight() / 2.0f);
-
-    LightingFBO = new FBO_Color(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
+  
 
     ColorQuadShader = new Shader("res/Shaders/ColorQuad.shader");
 
@@ -63,57 +57,19 @@ void Renderer::Render(Scene const* scene)
     // First Pass, fill G-Buffer
     DeferredRenderer.Fill_G_Buffer(scene);
 
-    //VolumetricLight(LightingFBO);
+    VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
-    // bind shadow map 
     DeferredRenderer.BindShadowMap(*shadow);
-
-    // bind volumetric texture
-    //DeferredShader->setTexture("volumetricLightTexture", LightingFBO->getColorAttachment());
-
-
+    DeferredRenderer.BindVolumetricLight(VolumetricLight);
     DeferredRenderer.Render(scene);
     
-    if (debugMode) {
+    //if (debugMode) {
         // For debugging purposes
         //VisualizeDepthBuffer(depthBufferFBO->getDepthAttachment());
-    }
+    //}
 }
 
 
-
-
-
-void Renderer::VolumetricLight(FBO_Color* fbo) const
-{
-    // half resolution ray marching
-    HalfResFBO->Bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    //bindShadowMap(VolumetricLightShader);
-
-    //BindG_Buffer(VolumetricLightShader);
-    //VolumetricLightShader->setTexture("gPosition", gPosition);
-
-    VolumetricLightShader->setVec3("camPos", camera.getCameraPos());
-
-    Quad().Draw(*VolumetricLightShader);
-
-    HalfResFBO->Unbind();
-
-
-    fbo->Bind();
-    // Bilateral Upsampling to resolution
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    BilateralUpShader->setTexture("volumetricLightTexture", HalfResFBO->getColorAttachment());
-    //BilateralUpShader->setTexture("gPosition", gPosition);
-
-    BilateralUpShader->setInt("BilateralSwitch", test);
-
-    Quad().Draw(*BilateralUpShader);
-    fbo->Unbind();
-}
 
 
 

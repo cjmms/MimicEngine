@@ -4,14 +4,15 @@
 #include "../ResourceManager.h"
 #include "../Scene.h"
 #include "../Shadow/Shadow.h"
+#include "../VolumetricLight/VolumetricLight.h"
 
 extern Camera camera;
 
 
 DeferredRendering::DeferredRendering(unsigned int width, unsigned int height)
 {
-    Fill_G_BufferShader = new Shader("res/Shaders/FillG-Buffer.shader");
-    DeferredLightingShader = new Shader("res/Shaders/DeferredPBR.shader");
+    Fill_G_BufferShader = new Shader("res/Shaders/DeferredShading/FillG-Buffer.shader");
+    DeferredLightingShader = new Shader("res/Shaders/DeferredShading/DeferredPBR.shader");
 	init_G_Buffer(width, height);
 }
 
@@ -124,4 +125,12 @@ void DeferredRendering::BindShadowMap(const Shadow& shadow) const
 
     // bind shadow map
     DeferredLightingShader->setTexture("shadowMap", shadow.GetShadowMap());
+}
+
+
+
+void DeferredRendering::BindVolumetricLight(const VolumetricLight& vl) const
+{
+    DeferredLightingShader->setTexture(
+        "volumetricLightTexture", vl.GetVolumetricLight());
 }

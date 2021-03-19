@@ -106,6 +106,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Core\VertexBuffer.cpp" />
     <ClCompile Include="src\UI_Manager.cpp" />
+    <ClCompile Include="src\VolumetricLight\VolumetricLight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shadow\Shadow.h" />
@@ -123,14 +124,15 @@
     <ClInclude Include="src\Core\IndexBuffer.h" />
     <ClInclude Include="src\Core\VertexBuffer.h" />
     <ClInclude Include="src\UI_Manager.h" />
+    <ClInclude Include="src\VolumetricLight\VolumetricLight.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\basic.shader" />
     <None Include="res\Shaders\BilateralUp.shader" />
-    <None Include="res\Shaders\DeferredPBR.shader" />
-    <None Include="res\Shaders\DepthMap.shader" />
+    <None Include="res\Shaders\DeferredShading\DeferredPBR.shader" />
+    <None Include="res\Shaders\Shadow\DepthMap.shader" />
     <None Include="res\Shaders\DepthQuad.shader" />
-    <None Include="res\Shaders\FillG-Buffer.shader" />
+    <None Include="res\Shaders\DeferredShading\FillG-Buffer.shader" />
     <None Include="res\Shaders\ForwardPBR.shader" />
     <None Include="res\Shaders\ColorQuad.shader" />
     <None Include="res\Shaders\VolumetricLighting.shader" />

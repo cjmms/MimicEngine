@@ -1,11 +1,13 @@
 #include "Shadow.h"
 
+#include "../Scene.h"
+
 
 
 
 Shadow::Shadow(glm::mat4 View, glm::mat4 Projection, int width, int height)
     :View(View), Projection(Projection),
-    ShadowMapShader("res/Shaders/DepthMap.shader") 
+    ShadowMapShader("res/Shaders/Shadow/DepthMap.shader") 
 {
     depthBufferFBO = new FBO_Depth(width, height);
 }

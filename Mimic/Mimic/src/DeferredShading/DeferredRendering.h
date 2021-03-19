@@ -1,11 +1,9 @@
 #pragma once
 
-//#include "../Core/Shader.h"
-
-
 class Scene;
 class Shader;
 class Shadow;
+class VolumetricLight;
 
 class DeferredRendering
 {
@@ -34,6 +32,8 @@ public:
 	void Render(Scene const* scene) const;
 
 	inline Shader* GetDeferredShader() const { return DeferredLightingShader; }
+	inline unsigned int Get_G_Position() const { return gPosition; }
 
 	void BindShadowMap(const Shadow& shadow) const;
+	void BindVolumetricLight(const VolumetricLight& vl) const;
 };

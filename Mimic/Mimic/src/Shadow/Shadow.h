@@ -2,8 +2,9 @@
 
 #include "../Core/Shader.h"
 #include <glm/glm.hpp>
-#include "../Scene.h"
 #include "../Core/FBO.h"
+
+class Scene;
 
 
 class Shadow
