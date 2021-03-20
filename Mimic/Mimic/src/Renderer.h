@@ -32,6 +32,7 @@ private:
 	// some shaders for debuging purposes
 	Shader* DepthQuadShader;
 	Shader* ColorQuadShader;
+	Shader* ForwardShader;
 
 	DeferredRendering DeferredRenderer;
 	Shadow* shadow;
@@ -49,9 +50,12 @@ private:
 public:
 	Renderer(bool debugMode = true);
 
+
 	~Renderer();
 	
 	void Render(Scene const* scene);
+
+	void ForwardRendering(Scene const* scene);
 
 	// shader is always fixed for light source
 	// the purpose of rendering light is for testing

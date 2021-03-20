@@ -26,13 +26,11 @@ Renderer::Renderer(bool debugMode)
     shadow = new Shadow(lightView, lightProjection, 
         UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
   
-
     ColorQuadShader = new Shader("res/Shaders/ColorQuad.shader");
 
-    
-        DepthQuadShader = new Shader("res/Shaders/DepthQuad.shader");
-    
+    DepthQuadShader = new Shader("res/Shaders/DepthQuad.shader");
 
+    ForwardShader = new Shader("res/Shaders/ForwardPBR.shader");
 }
 
 
@@ -53,7 +51,7 @@ Renderer::~Renderer()
 void Renderer::Render(Scene const* scene)  
 {
     //shadow->CalculateShadowMap(scene);
-    shadow->CalculateMSM(scene);
+    //shadow->CalculateMSM(scene);
 
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -62,18 +60,20 @@ void Renderer::Render(Scene const* scene)
 
     
     // First Pass, fill G-Buffer
-    DeferredRenderer.Fill_G_Buffer(scene);
+    //DeferredRenderer.Fill_G_Buffer(scene);
 
 
-    VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
+    //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
 
     //DeferredRenderer.BindShadowMap(*shadow);
-    DeferredRenderer.BindMSM(*shadow);
+    //DeferredRenderer.BindMSM(*shadow);
 
-    DeferredRenderer.BindVolumetricLight(VolumetricLight);
-    DeferredRenderer.Render(scene);
+    //DeferredRenderer.BindVolumetricLight(VolumetricLight);
+    //DeferredRenderer.Render(scene);
     
+
+    ForwardRendering(scene);
     
    // if (debugMode) {
          //For debugging purposes
@@ -81,7 +81,29 @@ void Renderer::Render(Scene const* scene)
     //}
 }
 
+void Renderer::ForwardRendering(Scene const* scene)
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    const std::vector<Light* > lights = scene->getLightSources();
+
+    for (unsigned int i = 0; i < lights.size(); i++)
+    {
+        ForwardShader->setVec3("lightPositions[" + std::to_string(i) + "]", lights[i]->getPos());
+        ForwardShader->setVec3("lightColors[" + std::to_string(i) + "]", lights[i]->getIntensity());
+    }
+
+    ForwardShader->setVec3("camPos", camera.getCameraPos());
+
+    ForwardShader->setMat4("view", camera.getViewMatrix());
+    ForwardShader->setMat4("projection", camera.getProjectionMatrix());
+
+    for (auto obj : scene->getObjects())
+    {
+        ForwardShader->setMat4("model", obj->getModelMatrix());
+        obj->getModel()->Draw(*ForwardShader);
+    }
+}
 
 
 

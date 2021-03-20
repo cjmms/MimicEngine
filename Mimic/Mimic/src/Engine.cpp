@@ -8,6 +8,7 @@
 #include "Core/Shader.h"
 #include "Core//FBO.h"
 #include "ResourceManager.h"
+#include <sstream>
 
 
 #define SHADOW_MAP_DEBUG 0
@@ -54,11 +55,21 @@ void Engine::init()
     // init scene
     scene = new Scene();
     scene->addLightSource(glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
-    scene->addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
-    scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
-    scene->addLightSource(glm::vec3(-70.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    //scene->addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    //scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    //scene->addLightSource(glm::vec3(-70.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
 
-    scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
+    //scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
+    //scene->addObjects("res/objects/lion/lion.obj", glm::vec3(1.0));
+    //scene->addObjects("res/objects/backpack/backpack.obj", glm::vec3(1.0));
+
+
+    for (int i = 0; i < 16; ++i) {
+        std::stringstream ss;
+        ss << "res/objects/Dragon/models/Mesh00" << i << ".obj";
+        scene->addObjects(ss.str().c_str(), glm::vec3(0.1f));
+    }
+
     //Model backpack("res/objects/backpack/backpack.obj");
     
 }

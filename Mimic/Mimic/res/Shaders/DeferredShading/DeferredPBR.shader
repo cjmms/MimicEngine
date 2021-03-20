@@ -189,6 +189,7 @@ float calculateShadowIntensity(vec3 N, vec3 WorldPos)
 {
     vec4 lightSpaceFragPos = lightProjection * lightView * vec4(WorldPos, 1.0f);
     vec3 projCoord = lightSpaceFragPos.xyz / lightSpaceFragPos.w;
+    float FragDepth = projCoord.z;
     // transform to [0,1] range
     projCoord = projCoord * 0.5 + 0.5;
 
@@ -198,9 +199,15 @@ float calculateShadowIntensity(vec3 N, vec3 WorldPos)
 
     // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
     vec4 b =  texture(shadowMap, projCoord.xy);
-    float FragDepth = projCoord.z;
 
-    float shadow = FragDepth > (b.x *0.5 + 0.5) ? 0.01 : 1.0;
+    float intensity = compute_msm_shadow_intensity(  b, FragDepth);
+
+    float shadow = FragDepth > (b.x ) ? 0.01 : 1.0;
+
+    //if (FragDepth > intensity) return intensity;
+    //else return 0.0;
+
+    //float shadow = FragDepth > (intensity * 0.5 + 0.5) ? 0.01 : 1.0;
 
     return shadow;
     //return compute_msm_shadow_intensity(0.98 * b, FragDepth);
@@ -258,20 +265,31 @@ void main()
     // NO AO
     vec3 color = Lo;
 
+    // diffuse shading
+    vec3 lightDir = normalize(lightPositions[0] - WorldPos);
+    float diff = max(dot(lightDir, N), 0.0);
+    color = lightColors[0] * diff;
+
+    float distance = length(WorldPos - lightPositions[0]);
+    color *= 1.0 / (distance * distance);
+
+    color += vec3(0.01f);    // ambient
+
 
     // volumetric lighting
-    color += 0.01f * texture(volumetricLightTexture, TexCoords).xyz;
+    //color += 0.01f * texture(volumetricLightTexture, TexCoords).xyz;
 
     // shadow
     //color *= 1 - calculateShadow(N, WorldPos);
-    float shadowIntensity = calculateShadowIntensity(N, WorldPos);
-    if (shadowIntensity != 0) color *= shadowIntensity;
+    //float shadowIntensity = calculateShadowIntensity(N, WorldPos);
+    //if (shadowIntensity != 0) color *= shadowIntensity;
 
 
     // HDR tonemapping
-    color = color / (color + vec3(1.0));
+    //color = color / (color + vec3(1.0));
     // gamma correct
-    color = pow(color, vec3(1.0 / 2.2));
+    //color = pow(color, vec3(1.0 / 2.2));
 
     FragColor = vec4(color, 1.0f);
+    //FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }
