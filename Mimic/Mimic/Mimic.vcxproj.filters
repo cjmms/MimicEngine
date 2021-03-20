@@ -127,5 +127,6 @@
     <None Include="res\Shaders\DeferredShading\DeferredPBR.shader" />
     <None Include="res\Shaders\VolumetricLight\BilateralUp.shader" />
     <None Include="res\Shaders\VolumetricLight\VolumetricLighting.shader" />
+    <None Include="res\Shaders\Shadow\MomentMap.shader" />
   </ItemGroup>
 </Project>

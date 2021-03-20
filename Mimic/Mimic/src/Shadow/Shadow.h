@@ -11,7 +11,13 @@ class Shadow
 {
 private:
 	Shader ShadowMapShader;
+	Shader MSMShader;
+
 	FBO_Depth* depthBufferFBO;
+	FBO_Color Fbo;
+
+	unsigned int MomentShadowMapFBO, Moments;
+
 	glm::mat4 View;
 	glm::mat4 Projection;
 
@@ -24,6 +30,9 @@ public:
 
 	// returns a handle to a texture
 	inline unsigned int GetShadowMap() const { return depthBufferFBO->getDepthAttachment(); }
+	inline unsigned int GetMSM() const { return Fbo.getColorAttachment(); }
+
 	void CalculateShadowMap(Scene const* scene);
+	void CalculateMSM(Scene const* scene);
 };
 
