@@ -60,5 +60,6 @@ public:
 	// shader is always fixed for light source
 	// the purpose of rendering light is for testing
 	void RenderLightSources(Scene const* scene) const;
+	void RenderPlane() const;
 };
 

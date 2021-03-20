@@ -5,6 +5,7 @@
 #include "ResourceManager.h"
 #include "Core/FBO.h"
 #include "Scene.h"
+#include "glm/gtc/matrix_transform.hpp"
 
 extern bool test;
 extern Camera camera;
@@ -109,7 +110,7 @@ void Renderer::ForwardRendering(Scene const* scene)
 
 void Renderer::RenderLightSources(Scene const* scene) const
 {
-	 glDisable(GL_DEPTH_TEST);
+	 //glDisable(GL_DEPTH_TEST);
 
     lightShader->setMat4("projection", camera.getProjectionMatrix());
     lightShader->setMat4("view", camera.getViewMatrix());
@@ -123,5 +124,55 @@ void Renderer::RenderLightSources(Scene const* scene) const
         light->getModel()->Draw(*lightShader);
     }
 
-	 glEnable(GL_DEPTH_TEST);
+	 //glEnable(GL_DEPTH_TEST);
+}
+
+
+
+
+void Renderer::RenderPlane() const
+{
+    float quadVertices[] = {
+        // positions        // texture Coords
+        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+         1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+    };
+
+    unsigned int quadVBO, quadVAO;
+
+    glGenBuffers(1, &quadVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+
+    glGenVertexArrays(1, &quadVAO);
+    glBindVertexArray(quadVAO);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+
+    lightShader->setMat4("projection", camera.getProjectionMatrix());
+    lightShader->setMat4("view", camera.getViewMatrix());
+
+    glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(20));
+    model = glm::rotate(model, 3.14f / 2.0f, glm::vec3(1.0, 0.0, 0.0));
+    //model = glm::translate(model, glm::vec3(0.0, 0.0, 0.1));
+    lightShader->setMat4("model", model);
+
+
+    lightShader->Bind();
+
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+
+    lightShader->unBind();
 }

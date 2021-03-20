@@ -54,7 +54,7 @@ void Engine::init()
     
     // init scene
     scene = new Scene();
-    scene->addLightSource(glm::vec3(-5.0f, 15.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
+    scene->addLightSource(glm::vec3(-15.0f, 15.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
     //scene->addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
     //scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
     //scene->addLightSource(glm::vec3(-70.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
@@ -63,11 +63,12 @@ void Engine::init()
     //scene->addObjects("res/objects/lion/lion.obj", glm::vec3(1.0));
     //scene->addObjects("res/objects/backpack/backpack.obj", glm::vec3(1.0));
 
-
+    // dragon
     for (int i = 0; i < 16; ++i) {
         std::stringstream ss;
-        ss << "res/objects/Dragon/models/Mesh00" << i << ".obj";
-        scene->addObjects(ss.str().c_str(), glm::vec3(0.1f));
+        if (i < 10) ss << "res/objects/Dragon/models/Mesh00" << i << ".obj";
+        else  ss << "res/objects/Dragon/models/Mesh0" << i << ".obj";
+        scene->addObjects(ss.str().c_str(), glm::vec3(0.2f));
     }
 
     //Model backpack("res/objects/backpack/backpack.obj");
@@ -98,6 +99,7 @@ void Engine::run()
         camera.cameraUpdateFrameTime();
 
         renderer.Render(scene);
-        //renderer.RenderLightSources(scene);
+        renderer.RenderLightSources(scene);
+        renderer.RenderPlane();
     }
 }

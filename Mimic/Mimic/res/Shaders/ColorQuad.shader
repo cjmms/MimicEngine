@@ -24,17 +24,11 @@ uniform sampler2D map;
 
 void main()
 {
-	FragColor = texture(map, TextureCoord);
+	//FragColor = texture(map, TextureCoord);
 
 	// visualize depth
 	//FragColor = vec4(vec3(texture(map, TextureCoord).r ), 1.0);
 
-	float sampleZ = texture(map, TextureCoord).b;
-	float near = 0.1;
-	float far = 300.0;
-	float z = sampleZ / 2.0 + 0.5; // back to NDC 
-	float depth = (2.0 * near * far) / (far + near - z * (far - near)) / far;
-
-	FragColor = vec4(vec3(depth), 1.0f);
-
+	
+	FragColor = vec4(1.0f);
 }
