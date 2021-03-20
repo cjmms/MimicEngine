@@ -49,7 +49,9 @@ uniform vec3 lightPositions[N_LIGHTS];
 uniform vec3 lightColors[N_LIGHTS];
 uniform vec3 camPos;
 
+
 out vec4 FragColor;
+
 
 vec3 calculateLighting(vec3 normal, int i, vec3 color)
 {
@@ -76,6 +78,7 @@ void main()
 	{
 		lighting += calculateLighting(normal, i, color);
 	}
+
 
 	FragColor = vec4(ambient + lighting, 1.0f);
 }

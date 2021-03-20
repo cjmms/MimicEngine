@@ -18,11 +18,17 @@ Renderer::Renderer(bool debugMode)
     VolumetricLight(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight())
 {
 	glEnable(GL_DEPTH_TEST);
-
+    /*
     glm::mat4 lightView = glm::lookAt(
         glm::vec3(-70.0f, 70.0f, -10.0f), glm::vec3(30.0f, 60.0f, 55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
+    */
+
+    glm::mat4 lightView = glm::lookAt(
+        glm::vec3(-15.0f, 15.0f, 10.0f), glm::vec3(0.0), glm::vec3(0.0, 1.0, 0.0));
+
+    glm::mat4 lightProjection = camera.getProjectionMatrix();
 
     shadow = new Shadow(lightView, lightProjection, 
         UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
@@ -51,18 +57,11 @@ Renderer::~Renderer()
 
 void Renderer::Render(Scene const* scene)  
 {
-    //shadow->CalculateShadowMap(scene);
+    shadow->CalculateShadowMap(scene);
     //shadow->CalculateMSM(scene);
-
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    //Quad().Draw(*ColorQuadShader, shadow->GetMSM());
-    //Quad().Draw(*ColorQuadShader, shadow->GetShadowMap());
-
     
     // First Pass, fill G-Buffer
     //DeferredRenderer.Fill_G_Buffer(scene);
-
 
     //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
@@ -73,13 +72,8 @@ void Renderer::Render(Scene const* scene)
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
     //DeferredRenderer.Render(scene);
     
-
-    ForwardRendering(scene);
     
-   // if (debugMode) {
-         //For debugging purposes
-        //VisualizeDepthBuffer(shadow->GetShadowMap());
-    //}
+    ForwardRendering(scene);
 }
 
 void Renderer::ForwardRendering(Scene const* scene)
@@ -158,14 +152,16 @@ void Renderer::RenderPlane() const
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-
     lightShader->setMat4("projection", camera.getProjectionMatrix());
     lightShader->setMat4("view", camera.getViewMatrix());
 
     glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(20));
     model = glm::rotate(model, 3.14f / 2.0f, glm::vec3(1.0, 0.0, 0.0));
-    //model = glm::translate(model, glm::vec3(0.0, 0.0, 0.1));
     lightShader->setMat4("model", model);
+
+    lightShader->setTexture("ShadowMap", shadow->GetShadowMap());
+    lightShader->setMat4("lightProjection", shadow->GetProjection());
+    lightShader->setMat4("lightView", shadow->GetLightView());
 
 
     lightShader->Bind();
