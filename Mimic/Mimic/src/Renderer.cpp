@@ -52,16 +52,14 @@ Renderer::~Renderer()
 
 void Renderer::Render(Scene const* scene)  
 {
-    shadow->CalculateShadowMap(scene);
-    //shadow->CalculateMSM(scene);
+    //shadow->CalculateShadowMap(scene);
+    shadow->CalculateMSM(scene);
 
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //Quad().Draw(*ColorQuadShader, shadow->GetShadowMap());
 
-    VisualizeDepthBuffer(shadow->GetShadowMap());
 
-    /*
     // First Pass, fill G-Buffer
     DeferredRenderer.Fill_G_Buffer(scene);
 
@@ -69,10 +67,12 @@ void Renderer::Render(Scene const* scene)
     VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
 
-    DeferredRenderer.BindShadowMap(*shadow);
+    //DeferredRenderer.BindShadowMap(*shadow);
+    DeferredRenderer.BindMSM(*shadow);
+
     DeferredRenderer.BindVolumetricLight(VolumetricLight);
     DeferredRenderer.Render(scene);
-    */
+    
     
    // if (debugMode) {
          //For debugging purposes

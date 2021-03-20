@@ -35,5 +35,6 @@ public:
 	inline unsigned int Get_G_Position() const { return gPosition; }
 
 	void BindShadowMap(const Shadow& shadow) const;
+	void BindMSM(const Shadow& shadow) const;
 	void BindVolumetricLight(const VolumetricLight& vl) const;
 };

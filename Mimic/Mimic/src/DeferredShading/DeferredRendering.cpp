@@ -127,6 +127,16 @@ void DeferredRendering::BindShadowMap(const Shadow& shadow) const
     DeferredLightingShader->setTexture("shadowMap", shadow.GetShadowMap());
 }
 
+void DeferredRendering::BindMSM(const Shadow& shadow) const
+{
+    // bind light matrix
+    DeferredLightingShader->setMat4("lightProjection", shadow.GetProjection());
+    DeferredLightingShader->setMat4("lightView", shadow.GetLightView());
+
+    // bind shadow map
+    DeferredLightingShader->setTexture("shadowMap", shadow.GetMSM());
+}
+
 
 
 void DeferredRendering::BindVolumetricLight(const VolumetricLight& vl) const

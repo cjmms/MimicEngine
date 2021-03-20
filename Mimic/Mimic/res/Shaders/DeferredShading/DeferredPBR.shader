@@ -129,6 +129,24 @@ vec3 reflection(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, ve
 }
 
 
+
+float calculateShadowIntensity(vec3 N, vec3 WorldPos)
+{
+    vec4 lightSpaceFragPos = lightProjection * lightView * vec4(WorldPos, 1.0f);
+    vec3 projCoord = lightSpaceFragPos.xyz / lightSpaceFragPos.w;
+    // transform to [0,1] range
+    projCoord = projCoord * 0.5 + 0.5;
+
+    if (projCoord.z > 1 || projCoord.z < 0) return 0;
+    if (projCoord.x > 1 || projCoord.x < 0) return 0;
+    if (projCoord.y > 1 || projCoord.y < 0) return 0;
+
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    return texture(shadowMap, projCoord.xy).r;
+}
+
+
+
 //----------------------------------------------------------------------
 float calculateShadow(vec3 N, vec3 WorldPos)
 {
@@ -184,7 +202,8 @@ void main()
     color += 0.01f * texture(volumetricLightTexture, TexCoords).xyz;
 
     // shadow
-    color *= 1 - calculateShadow(N, WorldPos);
+    //color *= 1 - calculateShadow(N, WorldPos);
+    color *= calculateShadowIntensity(N, WorldPos);
 
 
     // HDR tonemapping

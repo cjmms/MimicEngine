@@ -1,4 +1,5 @@
 #include "Shadow.h"
+#include "../ResourceManager.h"
 
 #include "../Scene.h"
 #include <iostream>
@@ -63,17 +64,13 @@ void Shadow::CalculateShadowMap(Scene const* scene)
 
 void Shadow::CalculateMSM(Scene const* scene)
 {
+    // fill depth buffer
+    CalculateShadowMap(scene);
+
     Fbo.Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    MSMShader.setMat4("view", View);
-    MSMShader.setMat4("projection", Projection);
-
-    for (auto obj : scene->getObjects())
-    {
-        MSMShader.setMat4("model", obj->getModelMatrix());
-        obj->getModel()->Draw(MSMShader);
-    }
+    Quad().Draw(MSMShader, GetShadowMap());
 
     Fbo.Unbind();
 }

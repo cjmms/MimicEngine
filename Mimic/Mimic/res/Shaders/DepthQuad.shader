@@ -33,4 +33,5 @@ void main()
 	float depth = (2.0 * near * far) / (far + near - z * (far - near)) / far;
 
 	FragColor = vec4(vec3(depth), 1.0f);
+
 }
