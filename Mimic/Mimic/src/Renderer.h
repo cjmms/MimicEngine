@@ -50,7 +50,7 @@ private:
 	// This function will not check if depthAttachment is a depth buffer or not
 	void VisualizeDepthBuffer(unsigned int depthAttachment) const;
 
-	void GaussianBlur(unsigned int texture);
+	void GaussianBlur(unsigned int texture, int level);
 
 
 public:

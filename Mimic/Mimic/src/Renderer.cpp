@@ -87,23 +87,8 @@ void Renderer::Render(Scene const* scene)
     ForwardRendering(scene);
     PingBufferFBO.Unbind();
 
-    for (int i = 0; i < 10; i++)
-    {
+    GaussianBlur(PingBufferFBO.getColorAttachment(), 10);
 
-        PongBufferFBO.Bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GaussianBlurShader->setInt("horizontal", true);
-        Quad().Draw(*GaussianBlurShader, PingBufferFBO.getColorAttachment());
-        PongBufferFBO.Unbind();
-
-
-        PingBufferFBO.Bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GaussianBlurShader->setInt("horizontal", false);
-        Quad().Draw(*GaussianBlurShader, PongBufferFBO.getColorAttachment());
-        PingBufferFBO.Unbind();
-
-    }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     Quad().Draw(*ColorQuadShader, PingBufferFBO.getColorAttachment());
@@ -211,59 +196,32 @@ void Renderer::RenderPlane() const
 
 
 
-void Renderer::GaussianBlur(unsigned int texture)
+void Renderer::GaussianBlur(unsigned int texture, int level)
 {
-    /*
-    int iterations = 20;
-
-    for (unsigned int i = 0; i < iterations; ++i)
+    // check if current FBO is as same as the input texture
+    if (texture != PingBufferFBO.getColorAttachment())
     {
-        // render horizontally
         PingBufferFBO.Bind();
-        GaussianBlurShader->setInt("horizontal", true);
-
-        // The first iteration will use colorBuffer as texture
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        if (i == 0)  Quad().Draw(*GaussianBlurShader, texture);
-        else Quad().Draw(*GaussianBlurShader, PongBufferFBO.getColorAttachment());
-
-        // render vertically
-        PongBufferFBO.Bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GaussianBlurShader->setInt("horizontal", false);
-        Quad().Draw(*GaussianBlurShader, PingBufferFBO.getColorAttachment());
+        Quad().Draw(*ColorQuadShader, texture);
+        PingBufferFBO.Unbind();
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    */
-    
- 
-        PongBufferFBO.Bind();
 
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    for (int i = 0; i < level; i++)
+    {
+
+        PongBufferFBO.Bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GaussianBlurShader->setInt("horizontal", true);
-        Quad().Draw(*GaussianBlurShader, texture);
-       
+        Quad().Draw(*GaussianBlurShader, PingBufferFBO.getColorAttachment());
         PongBufferFBO.Unbind();
 
-        //--------------------------------------------
-        /*
+
         PingBufferFBO.Bind();
-    
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GaussianBlurShader->setInt("horizontal", false);
         Quad().Draw(*GaussianBlurShader, PongBufferFBO.getColorAttachment());
-
         PingBufferFBO.Unbind();
-        */
-        //--------------------------------------------
 
-        /*
-        PongBufferFBO.Bind();
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GaussianBlurShader->setInt("horizontal", true);
-        Quad().Draw(*GaussianBlurShader, PingBufferFBO.getColorAttachment());
-
-        PongBufferFBO.Unbind();
-        */
+    }
 }
