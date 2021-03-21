@@ -27,7 +27,7 @@ void main()
 {
 	// convert z from [0, 1] to [-1, 1]
     float FragDepth = texture(map, TextureCoord).r;
-	float z = FragDepth * 2.0f - 1.0f;
+	float z = FragDepth * 2 - 1;
 
 	vec4 b = vec4(z, z*z, z*z*z, z*z*z*z);
 
@@ -38,12 +38,8 @@ void main()
 	// undo quantization
 
 	// invalidate rounding errors
+	float alpha = 6 * pow(10, -5);
+	b = (1.0f - alpha) * b + alpha * (0.0, 0.63, 0.0, 0.63);
 
-    // compute intensity
-   // float intensity = compute_msm_shadow_intensity(b * 0.98f, FragDepth);
-
-	//FragColor = vec4(vec3(intensity), 1.0);
     FragColor = b;
-    //FragColor = vec4(1.0f);
-
 }

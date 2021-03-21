@@ -33,6 +33,10 @@ private:
 	Shader* DepthQuadShader;
 	Shader* ColorQuadShader;
 	Shader* ForwardShader;
+	Shader* GaussianBlurShader;
+
+	FBO_Color PingBufferFBO;
+	FBO_Color PongBufferFBO;
 
 	DeferredRendering DeferredRenderer;
 	Shadow* shadow;
@@ -45,6 +49,8 @@ private:
 	// render depth buffer in a quad
 	// This function will not check if depthAttachment is a depth buffer or not
 	void VisualizeDepthBuffer(unsigned int depthAttachment) const;
+
+	void GaussianBlur(unsigned int texture);
 
 
 public:

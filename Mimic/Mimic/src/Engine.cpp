@@ -61,15 +61,16 @@ void Engine::init()
 
     //scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
     //scene->addObjects("res/objects/lion/lion.obj", glm::vec3(1.0));
-    //scene->addObjects("res/objects/backpack/backpack.obj", glm::vec3(1.0));
+    scene->addObjects("res/objects/backpack/backpack.obj", glm::vec3(1.0));
 
+    /*
     // dragon
     for (int i = 0; i < 16; ++i) {
         std::stringstream ss;
         if (i < 10) ss << "res/objects/Dragon/models/Mesh00" << i << ".obj";
         else  ss << "res/objects/Dragon/models/Mesh0" << i << ".obj";
         scene->addObjects(ss.str().c_str(), glm::vec3(0.2f));
-    }
+    }*/
 
     //Model backpack("res/objects/backpack/backpack.obj");
     

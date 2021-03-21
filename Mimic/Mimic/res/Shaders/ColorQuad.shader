@@ -24,11 +24,11 @@ uniform sampler2D map;
 
 void main()
 {
-	//FragColor = texture(map, TextureCoord);
+	FragColor = texture(map, TextureCoord);
 
 	// visualize depth
 	//FragColor = vec4(vec3(texture(map, TextureCoord).r ), 1.0);
 
 	
-	FragColor = vec4(1.0f);
+	//FragColor = vec4(1.0f);
 }

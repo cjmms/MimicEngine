@@ -15,7 +15,9 @@ Renderer::Renderer(bool debugMode)
     :lightShader(new Shader("res/Shaders/basic.shader")),
     debugMode(debugMode),
     DeferredRenderer(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
-    VolumetricLight(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight())
+    VolumetricLight(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
+    PingBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
+    PongBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight())
 {
 	glEnable(GL_DEPTH_TEST);
     /*
@@ -38,6 +40,8 @@ Renderer::Renderer(bool debugMode)
     DepthQuadShader = new Shader("res/Shaders/DepthQuad.shader");
 
     ForwardShader = new Shader("res/Shaders/ForwardPBR.shader");
+
+    GaussianBlurShader = new Shader("res/Shaders/GaussianBlur.shader");
 }
 
 
@@ -57,8 +61,14 @@ Renderer::~Renderer()
 
 void Renderer::Render(Scene const* scene)  
 {
-    shadow->CalculateShadowMap(scene);
-    //shadow->CalculateMSM(scene);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //shadow->CalculateShadowMap(scene);
+    shadow->CalculateMSM(scene);
+
+    GaussianBlur(shadow->GetShadowMap());
+
+    Quad::Quad().Draw(*ColorQuadShader, PongBufferFBO.getColorAttachment());
     
     // First Pass, fill G-Buffer
     //DeferredRenderer.Fill_G_Buffer(scene);
@@ -73,7 +83,7 @@ void Renderer::Render(Scene const* scene)
     //DeferredRenderer.Render(scene);
     
     
-    ForwardRendering(scene);
+    //ForwardRendering(scene);
 }
 
 void Renderer::ForwardRendering(Scene const* scene)
@@ -160,6 +170,8 @@ void Renderer::RenderPlane() const
     lightShader->setMat4("model", model);
 
     lightShader->setTexture("ShadowMap", shadow->GetShadowMap());
+    lightShader->setTexture("MSM", shadow->GetMSM());
+
     lightShader->setMat4("lightProjection", shadow->GetProjection());
     lightShader->setMat4("lightView", shadow->GetLightView());
 
@@ -171,4 +183,42 @@ void Renderer::RenderPlane() const
     glBindVertexArray(0);
 
     lightShader->unBind();
+}
+
+
+
+
+void Renderer::GaussianBlur(unsigned int texture)
+{
+    /*
+    int iterations = 20;
+
+    for (unsigned int i = 0; i < iterations; ++i)
+    {
+        // render horizontally
+        PingBufferFBO.Bind();
+        GaussianBlurShader->setInt("horizontal", true);
+
+        // The first iteration will use colorBuffer as texture
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        if (i == 0)  Quad().Draw(*GaussianBlurShader, texture);
+        else Quad().Draw(*GaussianBlurShader, PongBufferFBO.getColorAttachment());
+
+        // render vertically
+        PongBufferFBO.Bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        GaussianBlurShader->setInt("horizontal", false);
+        Quad().Draw(*GaussianBlurShader, PingBufferFBO.getColorAttachment());
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    */
+    
+    
+    PongBufferFBO.Bind();
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    Quad().Draw(*GaussianBlurShader, texture);
+
+    PongBufferFBO.Unbind();
+    
 }

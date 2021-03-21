@@ -128,5 +128,6 @@
     <None Include="res\Shaders\VolumetricLight\BilateralUp.shader" />
     <None Include="res\Shaders\VolumetricLight\VolumetricLighting.shader" />
     <None Include="res\Shaders\Shadow\MomentMap.shader" />
+    <None Include="res\Shaders\GaussianBlur.shader" />
   </ItemGroup>
 </Project>
