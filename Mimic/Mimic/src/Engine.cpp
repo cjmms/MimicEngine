@@ -61,7 +61,7 @@ void Engine::init()
 
     //scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
     //scene->addObjects("res/objects/lion/lion.obj", glm::vec3(1.0));
-    scene->addObjects("res/objects/backpack/backpack.obj", glm::vec3(1.0));
+    scene->addObjects("res/objects/backpack/backpack.obj", glm::vec3(3.0));
 
     /*
     // dragon
@@ -99,9 +99,7 @@ void Engine::run()
 
         camera.cameraUpdateFrameTime();
 
-        //renderer.RenderPlane();
         renderer.Render(scene);
         renderer.RenderLightSources(scene);
-        renderer.RenderPlane();
     }
 }

@@ -42,6 +42,8 @@ Renderer::Renderer(bool debugMode)
     ForwardShader = new Shader("res/Shaders/ForwardPBR.shader");
 
     GaussianBlurShader = new Shader("res/Shaders/GaussianBlur.shader");
+
+    initPlane();
 }
 
 
@@ -105,7 +107,6 @@ void Renderer::ForwardRendering(Scene const* scene)
     }
 
     ForwardShader->setVec3("camPos", camera.getCameraPos());
-
     ForwardShader->setMat4("view", camera.getViewMatrix());
     ForwardShader->setMat4("projection", camera.getProjectionMatrix());
 
@@ -114,7 +115,47 @@ void Renderer::ForwardRendering(Scene const* scene)
         ForwardShader->setMat4("model", obj->getModelMatrix());
         obj->getModel()->Draw(*ForwardShader);
     }
+
+    RenderPlane();
 }
+
+
+
+void Renderer::initPlane()
+{
+    float planeVertices[] = {
+        // positions            // normals         // texcoords
+         10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
+        -10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
+        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
+
+         10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
+        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
+         10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,  10.0f, 10.0f
+    };
+
+    unsigned int VBO;
+
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
+
+    glGenVertexArrays(1, &quadVAO);
+    glBindVertexArray(quadVAO);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+}
+
+
 
 
 
@@ -142,54 +183,14 @@ void Renderer::RenderLightSources(Scene const* scene) const
 
 void Renderer::RenderPlane() const
 {
-    float quadVertices[] = {
-        // positions        // texture Coords
-        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-         1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-    };
+    glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(10));
+    ForwardShader->setMat4("model", model);
 
-    unsigned int quadVBO, quadVAO;
-
-    glGenBuffers(1, &quadVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
-
-    glGenVertexArrays(1, &quadVAO);
+    ForwardShader->Bind();
     glBindVertexArray(quadVAO);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
-
-    lightShader->setMat4("projection", camera.getProjectionMatrix());
-    lightShader->setMat4("view", camera.getViewMatrix());
-
-    glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(20));
-    model = glm::rotate(model, 3.14f / 2.0f, glm::vec3(1.0, 0.0, 0.0));
-    lightShader->setMat4("model", model);
-
-
-    lightShader->setTexture("ShadowMap", GaussianBlur(shadow->GetShadowMap(), 0));
-    lightShader->setTexture("MSM", GaussianBlur(shadow->GetMSM(), 0));
-
-    lightShader->setMat4("lightProjection", shadow->GetProjection());
-    lightShader->setMat4("lightView", shadow->GetLightView());
-
-
-    lightShader->Bind();
-
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-
-    lightShader->unBind();
+    ForwardShader->unBind();
 }
 
 

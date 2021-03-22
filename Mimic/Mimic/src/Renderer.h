@@ -44,6 +44,7 @@ private:
 
 	bool debugMode;
 
+	unsigned int quadVAO;
 
 	// Visualize depth buffer
 	// render depth buffer in a quad
@@ -51,7 +52,8 @@ private:
 	void VisualizeDepthBuffer(unsigned int depthAttachment) const;
 
 	unsigned int GaussianBlur(unsigned int texture, int level) const;
-
+	void initPlane();
+	void RenderPlane() const;
 
 public:
 	Renderer(bool debugMode = true);
@@ -66,6 +68,5 @@ public:
 	// shader is always fixed for light source
 	// the purpose of rendering light is for testing
 	void RenderLightSources(Scene const* scene) const;
-	void RenderPlane() const;
 };
 
