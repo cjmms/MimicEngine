@@ -16,8 +16,6 @@ private:
 	FBO_Depth* depthBufferFBO;
 	FBO_Color Fbo;
 
-	unsigned int MomentShadowMapFBO, Moments;
-
 	glm::mat4 View;
 	glm::mat4 Projection;
 

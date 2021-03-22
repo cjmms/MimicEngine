@@ -87,7 +87,7 @@ void Engine::run()
 {
     Renderer renderer(false);
 
-    UI_Mgr.enableCursor();
+    //UI_Mgr.enableCursor();
 
 
 
@@ -99,8 +99,9 @@ void Engine::run()
 
         camera.cameraUpdateFrameTime();
 
-        renderer.Render(scene);
-        //renderer.RenderLightSources(scene);
         //renderer.RenderPlane();
+        renderer.Render(scene);
+        renderer.RenderLightSources(scene);
+        renderer.RenderPlane();
     }
 }

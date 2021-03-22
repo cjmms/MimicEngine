@@ -61,15 +61,12 @@ Renderer::~Renderer()
 
 void Renderer::Render(Scene const* scene)  
 {
-    
-
     //shadow->CalculateShadowMap(scene);
-    //shadow->CalculateMSM(scene);
+    shadow->CalculateMSM(scene);
   
+    //unsigned int blurred = GaussianBlur(shadow->GetMSM(), 5);
 
-    //GaussianBlur(shadow->GetShadowMap());
-
-    //Quad::Quad().Draw(*ColorQuadShader, PingBufferFBO.getColorAttachment());
+    //VisualizeDepthBuffer(blurred);
     
     // First Pass, fill G-Buffer
     //DeferredRenderer.Fill_G_Buffer(scene);
@@ -83,15 +80,16 @@ void Renderer::Render(Scene const* scene)
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
     //DeferredRenderer.Render(scene);
     
-    PingBufferFBO.Bind();
+    
+    //PingBufferFBO.Bind();
     ForwardRendering(scene);
-    PingBufferFBO.Unbind();
+    //PingBufferFBO.Unbind();
 
-    GaussianBlur(PingBufferFBO.getColorAttachment(), 10);
+    //unsigned int blurredTex = GaussianBlur(PingBufferFBO.getColorAttachment(), 10);
 
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    Quad().Draw(*ColorQuadShader, PingBufferFBO.getColorAttachment());
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //Quad().Draw(*ColorQuadShader, blurredTex);
+    
 }
 
 void Renderer::ForwardRendering(Scene const* scene)
@@ -177,8 +175,9 @@ void Renderer::RenderPlane() const
     model = glm::rotate(model, 3.14f / 2.0f, glm::vec3(1.0, 0.0, 0.0));
     lightShader->setMat4("model", model);
 
-    lightShader->setTexture("ShadowMap", shadow->GetShadowMap());
-    lightShader->setTexture("MSM", shadow->GetMSM());
+
+    lightShader->setTexture("ShadowMap", GaussianBlur(shadow->GetShadowMap(), 0));
+    lightShader->setTexture("MSM", GaussianBlur(shadow->GetMSM(), 0));
 
     lightShader->setMat4("lightProjection", shadow->GetProjection());
     lightShader->setMat4("lightView", shadow->GetLightView());
@@ -196,7 +195,7 @@ void Renderer::RenderPlane() const
 
 
 
-void Renderer::GaussianBlur(unsigned int texture, int level)
+unsigned int Renderer::GaussianBlur(unsigned int texture, int level) const
 {
     // check if current FBO is as same as the input texture
     if (texture != PingBufferFBO.getColorAttachment())
@@ -222,6 +221,7 @@ void Renderer::GaussianBlur(unsigned int texture, int level)
         GaussianBlurShader->setInt("horizontal", false);
         Quad().Draw(*GaussianBlurShader, PongBufferFBO.getColorAttachment());
         PingBufferFBO.Unbind();
-
     }
+
+    return PingBufferFBO.getColorAttachment();
 }

@@ -23,23 +23,31 @@ out vec4 FragColor;
 
 uniform sampler2D map;
 
+
+vec4 Quan(vec4 b)
+{
+	b += vec4(0.5, 0.0, 0.5, 0.0);
+
+	// quantization
+	vec4 result;
+
+	result.r = dot(vec4(1.5, 0.0, -2.0, 0.0), b);
+	result.g = dot(vec4(0.0, 4.0, 0.0, -4.0), b);
+	result.b = dot(vec4(sqrt(3) / 2, 0, -sqrt(12) / 9, 0), b);
+	result.a = dot(vec4(0, 0.5, 0, 0.5), b);
+
+	return result;
+}
+
+
+
 void main()
 {
-	// convert z from [0, 1] to [-1, 1]
-    float FragDepth = texture(map, TextureCoord).r;
-	float z = FragDepth * 2 - 1;
+    float z = texture(map, TextureCoord).r;
 
 	vec4 b = vec4(z, z*z, z*z*z, z*z*z*z);
 
-	// quantization
-
-	// blur
-
-	// undo quantization
-
-	// invalidate rounding errors
-	float alpha = 6 * pow(10, -5);
-	b = (1.0f - alpha) * b + alpha * (0.0, 0.63, 0.0, 0.63);
+	//b = Quan(b);
 
     FragColor = b;
 }

@@ -55,7 +55,7 @@ float calculateShadow(vec3 WorldPos)
 	float shadow = currentDepth  > closestDepth ? 1.0 : 0.0;
 
 	//if (closestDepth > 0.0f) return 1.0;
-	return shadow;
+	return 1 - shadow;
 }
 
 
@@ -110,7 +110,26 @@ float MSM_Intensity(vec4 b, float fragment_depth)
 
 
 
+vec4 UndoQuantization(vec4 b)
+{
+    b -= vec4(0.5, 0.0, 0.5, 0.0);
 
+    vec4 result;
+
+    result.r = dot( vec4(-(1 / 3), 0.0,   sqrt(3),        0.0),  b);
+    result.g = dot( vec4( 0.0,     0.125, 0.0,            1.0),  b);
+    result.b = dot( vec4(-0.75,    0.0,   0.75 * sqrt(3), 0.0),  b);
+    result.a = dot( vec4( 0.0,    -0.125, 0.0,            1.0),  b);
+
+    return result;
+}
+
+vec4 Invalidate(vec4 b)
+{
+    float alpha = 1 * pow(10, -5);
+    //float alpha = 0.00001;
+    return (1.0f - alpha) * b + alpha * (0.0, 0.5, 0.0, 0.5);
+}
 
 
 
@@ -122,10 +141,17 @@ float calculateMSM(vec3 WorldPos)
     // transform to [0,1] range
     vec2 UV = projCoord.xy * 0.5 + 0.5;
 
-    float intensity = MSM_Intensity(texture(MSM, UV)  , lightSpaceFragPos.z);
+    vec4 b = texture(MSM, UV);
+
+    //b = UndoQuantization(b);
+
+    b = Invalidate(b);
+
+
+    float intensity = MSM_Intensity(b , lightSpaceFragPos.z);
 
     // check whether current frag pos is in shadow
-    return intensity;
+    return 1 - intensity;
 }
 
 
@@ -137,9 +163,9 @@ float calculateMSM(vec3 WorldPos)
 void main()
 {
 
-	//float shadowIntensity = 1 - calculateShadow(FragPos);
+	//float shadowIntensity = calculateShadow(FragPos);
 
-    float shadowIntensity = 1- calculateMSM(FragPos);
+    float shadowIntensity = calculateMSM(FragPos);
 
 	vec3 lighting = vec3(0.8f);
 
