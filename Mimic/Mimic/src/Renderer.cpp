@@ -63,13 +63,12 @@ Renderer::~Renderer()
 
 void Renderer::Render(Scene const* scene)  
 {
-    shadow->CalculateMSM(scene);
-    unsigned int blurred = GaussianBlur(shadow->GetMSM(), 0);
-     blurred = GaussianBlur(shadow->GetShadowMap(), 0);
+    //shadow->CalculateMSM(scene);
+
     //VisualizeDepthBuffer(blurred);
     
     // First Pass, fill G-Buffer
-    //DeferredRenderer.Fill_G_Buffer(scene);
+    DeferredRenderer.Fill_G_Buffer(scene);
 
     //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
@@ -78,19 +77,15 @@ void Renderer::Render(Scene const* scene)
     //DeferredRenderer.BindMSM(*shadow);
 
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
-    //DeferredRenderer.Render(scene);
+    DeferredRenderer.Render(scene);
     
     
-    //PingBufferFBO.Bind();
-    ForwardRendering(scene);
-    //PingBufferFBO.Unbind();
-
-    //unsigned int blurredTex = GaussianBlur(PingBufferFBO.getColorAttachment(), 10);
-
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //Quad().Draw(*ColorQuadShader, blurredTex);
-    
+    //ForwardRendering(scene);    
 }
+
+
+
+
 
 void Renderer::ForwardRendering(Scene const* scene)
 {
@@ -111,7 +106,7 @@ void Renderer::ForwardRendering(Scene const* scene)
     ForwardShader->setMat4("lightProjection", shadow->GetProjection());
     ForwardShader->setMat4("lightView", shadow->GetLightView());
 
-    ForwardShader->setTexture("MSM", GaussianBlur(shadow->GetMSM(), 0));
+    ForwardShader->setTexture("MSM", GaussianBlur(shadow->GetMSM(), 10));
     //ForwardShader->setTexture("MSM", shadow->GetMSM());
     ForwardShader->setTexture("ShadowMap", shadow->GetShadowMap());
 

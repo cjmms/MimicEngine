@@ -93,6 +93,83 @@ float calculateShadow(vec3 WorldPos)
 }
 
 
+vec3 solveCramers(vec4 bPrime, vec3 result)
+{
+    mat3 m0 =
+        mat3(1, bPrime.x, bPrime.y,
+            bPrime.x, bPrime.y, bPrime.z,
+            bPrime.y, bPrime.z, bPrime.w);
+    mat3 m1 =
+        mat3(result.x, bPrime.x, bPrime.y,
+            result.y, bPrime.y, bPrime.z,
+            result.z, bPrime.z, bPrime.w);
+    mat3 m2 =
+        mat3(1, result.x, bPrime.y,
+            bPrime.x, result.y, bPrime.z,
+            bPrime.y, result.z, bPrime.w);
+    mat3 m3 =
+        mat3(1, bPrime.x, result.x,
+            bPrime.x, bPrime.y, result.y,
+            bPrime.y, bPrime.z, result.z);
+
+    float det0 = determinant(m0);
+    float det1 = determinant(m1);
+    float det2 = determinant(m2);
+    float det3 = determinant(m3);
+
+    float x = det1 / det0;
+    float y = det2 / det0;
+    float z = det3 / det0;
+
+    return vec3(x, y, z);
+}
+
+
+float momentShadowFactor(vec4 shadowSample, float depth)
+{
+    vec4 bPrime = shadowSample;
+    vec3 depthVec = vec3(1.f, depth, depth * depth);
+
+    //-- Calc C. decomp = M, depthVec = D
+    vec3 c = solveCramers(bPrime, depthVec);
+
+    //-- Calc roots
+    //solve c3 * z^2 + c2 * z + c1 = 0 for z using quadratic formula 
+    // -c2 +- sqrt(c2^2 - 4 * c3 * c1) / (2 * c3)
+    //Let z2 <= z3 denote solutions 
+    float sqrtTerm = sqrt(c.y * c.y - 4 * c.z * c.x);
+    float z2 = (-c.y - sqrtTerm) / (2 * c.z);
+    float z3 = (-c.y + sqrtTerm) / (2 * c.z);
+
+    if (z2 > z3)
+    {
+        float temp = z2;
+        z2 = z3;
+        z3 = temp;
+    }
+
+    //-- If depth <= z2
+    if (depth <= z2) return 0;
+
+    //-- If depth <= z3
+    //  g = (depth * z3 - b'1(depth + z3) + b'2) / ((z3 - z2) * (depth - z2))
+    //  return g
+    if (depth <= z3)
+    {
+        return (depth * z3 - bPrime.x * (depth + z3) + bPrime.y) / ((z3 - z2) * (depth - z2));
+    }
+    //-- if depth > z3
+    //  g = (z2 * z3 - b'1(z2 + z3) + b'2) / ((depth - z2) * (depth - z3))
+    //  return 1 - g
+    else
+    {
+        return 1 - (z2 * z3 - bPrime.x * (z2 + z3) + bPrime.y) / ((depth - z2) * (depth - z3));
+    }
+}
+
+
+
+
 float MSM_Intensity(vec4 b, float fragment_depth)
 {
     float l32_d22 = -b.x * b.y + b.z;
@@ -156,8 +233,7 @@ vec4 UndoQuantization(vec4 b)
 vec4 Invalidate(vec4 b)
 {
     float alpha = 1 * pow(10, -5);
-    //float alpha = 0.00001;
-    return (1.0f - alpha) * b + alpha * (0.0, 0.5, 0.0, 0.5);
+    return (1.0f - alpha) * b + alpha * 0.5;
 }
 
 
@@ -170,13 +246,15 @@ float calculateMSM(vec3 WorldPos)
     // transform to [0,1] range
     projCoord = projCoord * 0.5 + 0.5;
 
+    if (projCoord.z > 1 || projCoord.z < 0) return 1;
+    if (projCoord.x > 1 || projCoord.x < 0) return 1;
+    if (projCoord.y > 1 || projCoord.y < 0) return 1;
+
     vec4 b = texture(MSM, projCoord.xy);
 
     //b = UndoQuantization(b);
 
-    b = Invalidate(b);
-
-    return 1 - MSM_Intensity(b, lightSpaceFragPos.z);
+    return 1 - MSM_Intensity(Invalidate(b), lightSpaceFragPos.z);
 }
 
 
@@ -185,9 +263,9 @@ float calculateMSM(vec3 WorldPos)
 
 void main()
 {
-    float shadowIntensity = calculateShadow(fs_in.FragPos);
+    //float shadowIntensity = calculateShadow(fs_in.FragPos);
 
-    //float shadowIntensity = calculateMSM(fs_in.FragPos);
+    float shadowIntensity = calculateMSM(fs_in.FragPos);
 
 	vec3 color = vec3(1.0f);
 	vec3 normal = normalize(fs_in.Normal);

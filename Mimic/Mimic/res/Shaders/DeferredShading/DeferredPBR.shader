@@ -265,16 +265,6 @@ void main()
     // NO AO
     vec3 color = Lo;
 
-    // diffuse shading
-    vec3 lightDir = normalize(lightPositions[0] - WorldPos);
-    float diff = max(dot(lightDir, N), 0.0);
-    color = lightColors[0] * diff;
-
-    float distance = length(WorldPos - lightPositions[0]);
-    color *= 1.0 / (distance * distance);
-
-    color += vec3(0.01f);    // ambient
-
 
     // volumetric lighting
     //color += 0.01f * texture(volumetricLightTexture, TexCoords).xyz;
@@ -286,10 +276,18 @@ void main()
 
 
     // HDR tonemapping
-    //color = color / (color + vec3(1.0));
+    color = color / (color + vec3(1.0));
     // gamma correct
-    //color = pow(color, vec3(1.0 / 2.2));
+    color = pow(color, vec3(1.0 / 2.2));
+
+    // Debuging purposes
+    FragColor = vec4(albedo, 1.0f);
+    FragColor = vec4(N, 1.0f);
+    FragColor = vec4(WorldPos, 1.0f);
+    //FragColor = vec4(depth, depth, depth, 1.0f);
+    FragColor = vec4(vec3(metallic), 1.0f);
+    FragColor = vec4(vec3(roughness), 1.0f);
+
 
     FragColor = vec4(color, 1.0f);
-    //FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }
