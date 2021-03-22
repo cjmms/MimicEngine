@@ -139,9 +139,20 @@ float calculateMSM(vec3 WorldPos)
     vec4 lightSpaceFragPos = lightProjection * lightView * vec4(WorldPos, 1.0f);
     vec3 projCoord = lightSpaceFragPos.xyz / lightSpaceFragPos.w;
     // transform to [0,1] range
-    vec2 UV = projCoord.xy * 0.5 + 0.5;
+    projCoord = projCoord * 0.5 + 0.5;
 
-    vec4 b = texture(MSM, UV);
+
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(MSM, projCoord.xy).x;
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoord.z;
+
+
+    // check whether current frag pos is in shadow
+    float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
+
+
+    vec4 b = texture(MSM, projCoord.xy);
 
     //b = UndoQuantization(b);
 
@@ -163,9 +174,9 @@ float calculateMSM(vec3 WorldPos)
 void main()
 {
 
-	//float shadowIntensity = calculateShadow(FragPos);
+	float shadowIntensity = calculateShadow(FragPos);
 
-    float shadowIntensity = calculateMSM(FragPos);
+    //float shadowIntensity = calculateMSM(FragPos);
 
 	vec3 lighting = vec3(0.8f);
 

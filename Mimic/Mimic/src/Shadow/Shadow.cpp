@@ -10,11 +10,10 @@
 Shadow::Shadow(glm::mat4 View, glm::mat4 Projection, int width, int height)
     :View(View), Projection(Projection),
     ShadowMapShader("res/Shaders/Shadow/DepthMap.shader"),
-    MSMShader("res/Shaders/Shadow/MomentMap.shader"),
-    Fbo(width, height)
+    MSMShader("res/Shaders/Shadow/MomentMap.shader")
 {
     depthBufferFBO = new FBO_Depth(width, height);
-
+    Fbo = new FBO_Color(width, height);
 
 }
 
@@ -43,10 +42,10 @@ void Shadow::CalculateMSM(Scene const* scene)
     // fill depth buffer
     CalculateShadowMap(scene);
 
-    Fbo.Bind();
+    Fbo->Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     Quad().Draw(MSMShader, GetShadowMap());
 
-    Fbo.Unbind();
+    Fbo->Unbind();
 }
