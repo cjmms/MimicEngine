@@ -31,7 +31,7 @@ public:
 
 	inline const std::vector<Light* >& getLightSources() const { return lightSources; }
 	inline const std::vector<Object* >& getObjects() const { return objects; }
-	void InitLionTextures();
+	void InitTextures(std::string str);
 	void BindTextures(Shader* shader) const;
 
 private:
