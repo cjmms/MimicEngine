@@ -31,11 +31,13 @@ public:
 
 	inline const std::vector<Light* >& getLightSources() const { return lightSources; }
 	inline const std::vector<Object* >& getObjects() const { return objects; }
+	void InitLionTextures();
+	void BindTextures(Shader* shader) const;
 
 private:
 	std::vector<Light* > lightSources;
 	std::vector<Object* > objects;
 
-
+	unsigned int albedo, normal, roughness, metallic;
 };
 

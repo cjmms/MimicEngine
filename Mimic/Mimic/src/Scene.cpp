@@ -1,6 +1,6 @@
 #include "Scene.h"
 #include "Core/Model.h"
-
+#include "ResourceManager.h"
 
 
 Scene::Scene()
@@ -57,4 +57,23 @@ Object::~Object()
 glm::mat4 Object::getModelMatrix() const
 {
     return glm::scale(glm::mat4(1.0), scale);
+}
+
+
+
+void Scene::InitLionTextures()
+{
+    albedo = ResourceManager::loadTexture("res/objects/lion/albedo.jpg");
+    normal = ResourceManager::loadTexture("res/objects/lion/normal.jpg");
+    roughness = ResourceManager::loadTexture("res/objects/lion/roughness.jpg");
+    metallic = ResourceManager::loadTexture("res/objects/lion/metallic.jpg");
+}
+
+
+void Scene::BindTextures(Shader* shader) const
+{
+    shader->setTexture("material.texture_albedo", albedo);
+    shader->setTexture("material.texture_normal", normal);
+    shader->setTexture("material.texture_metallic", metallic);
+    shader->setTexture("material.texture_roughness", roughness);
 }

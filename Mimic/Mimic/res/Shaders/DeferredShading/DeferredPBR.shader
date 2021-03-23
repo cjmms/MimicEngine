@@ -281,12 +281,12 @@ void main()
     color = pow(color, vec3(1.0 / 2.2));
 
     // Debuging purposes
-    FragColor = vec4(albedo, 1.0f);
-    FragColor = vec4(N, 1.0f);
-    FragColor = vec4(WorldPos, 1.0f);
+    //FragColor = vec4(albedo, 1.0f);
+    //FragColor = vec4(N, 1.0f);
+    //FragColor = vec4(WorldPos, 1.0f);
     //FragColor = vec4(depth, depth, depth, 1.0f);
-    FragColor = vec4(vec3(metallic), 1.0f);
-    FragColor = vec4(vec3(roughness), 1.0f);
+    //FragColor = vec4(vec3(metallic), 1.0f);
+    //FragColor = vec4(vec3(roughness), 1.0f);
 
 
     FragColor = vec4(color, 1.0f);

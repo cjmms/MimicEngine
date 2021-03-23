@@ -68,6 +68,8 @@ void Renderer::Render(Scene const* scene)
     //VisualizeDepthBuffer(blurred);
     
     // First Pass, fill G-Buffer
+    scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
+
     DeferredRenderer.Fill_G_Buffer(scene);
 
     //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());

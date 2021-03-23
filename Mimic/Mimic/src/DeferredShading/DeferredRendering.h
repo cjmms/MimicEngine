@@ -37,4 +37,5 @@ public:
 	void BindShadowMap(const Shadow& shadow) const;
 	void BindMSM(const Shadow& shadow) const;
 	void BindVolumetricLight(const VolumetricLight& vl) const;
+	inline Shader* GetFillBufferShader() const { return Fill_G_BufferShader; }
 };
