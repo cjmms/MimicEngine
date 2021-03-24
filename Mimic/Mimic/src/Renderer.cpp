@@ -11,7 +11,7 @@ extern bool test;
 extern Camera camera;
 extern UI_Manager UI_Mgr;
 
-Renderer::Renderer(bool debugMode)
+Renderer::Renderer(Scene const* scene)
     :lightShader(new Shader("res/Shaders/basic.shader")),
     debugMode(debugMode),
     DeferredRenderer(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
@@ -19,6 +19,8 @@ Renderer::Renderer(bool debugMode)
     PingBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     PongBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight())
 {
+
+    //std::cout <<  "Renderer Constructor" << std::endl;
 	glEnable(GL_DEPTH_TEST);
     /*
     glm::mat4 lightView = glm::lookAt(
@@ -32,6 +34,8 @@ Renderer::Renderer(bool debugMode)
 
     glm::mat4 lightProjection = camera.getProjectionMatrix();
 
+    //glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
+
     shadow = new Shadow(lightView, lightProjection, 
         UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
   
@@ -43,7 +47,8 @@ Renderer::Renderer(bool debugMode)
 
     GaussianBlurShader = new Shader("res/Shaders/GaussianBlur.shader");
 
-    //initPlane();
+    shadow->CalculateShadowMap(scene);
+    shadow->ComputeVSM(scene);
 }
 
 
@@ -63,10 +68,6 @@ Renderer::~Renderer()
 
 void Renderer::Render(Scene const* scene)  
 {
-    shadow->CalculateMSM(scene);
-    shadow->CalculateShadowMap(scene);
-    shadow->ComputeVSM(scene);
-
     //VisualizeDepthBuffer(shadow->GetShadowMap());
     //VisualizeDepthBuffer(shadow->GetShadowMap());
     //VisualizeDepthBuffer(shadow->GetVSM());
@@ -113,10 +114,11 @@ void Renderer::ForwardRendering(Scene const* scene)
     ForwardShader->setMat4("lightView", shadow->GetLightView());
 
     //ForwardShader->setTexture("MSM", GaussianBlur(shadow->GetMSM(), 0));
-    ForwardShader->setTexture("MSM", shadow->GetMSM());
+    //ForwardShader->setTexture("MSM", shadow->GetMSM());
     //ForwardShader->setTexture("ShadowMap", GaussianBlur(shadow->GetShadowMap(), 0));
     ForwardShader->setTexture("ShadowMap", shadow->GetShadowMap());
     ForwardShader->setTexture("VSM", shadow->GetVSM());
+    //ForwardShader->setTexture("VSM", GaussianBlur(shadow->GetVSM(), 5));
 
     for (auto obj : scene->getObjects())
     {

@@ -93,7 +93,7 @@ void Engine::close()
 
 void Engine::run()
 {
-    Renderer renderer(false);
+    Renderer renderer(scene);
 
     //UI_Mgr.enableCursor();
 

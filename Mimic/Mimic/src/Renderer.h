@@ -55,7 +55,7 @@ private:
 
 
 public:
-	Renderer(bool debugMode = true);
+	Renderer(Scene const* scene);
 
 
 	~Renderer();

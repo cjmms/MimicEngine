@@ -36,4 +36,5 @@ void main()
 
 	// VSM
 	FragColor = vec4(depth, moment2, 0.0, 1.0);
+	//FragColor = vec4(vec3(depth / 30), 1.0);
 }
