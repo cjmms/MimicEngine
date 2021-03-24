@@ -34,10 +34,15 @@ public:
 	void InitTextures(std::string str);
 	void BindTextures(Shader* shader) const;
 
+	void initPlane();
+	void RenderPlane(Shader* shader) const;
+
 private:
 	std::vector<Light* > lightSources;
 	std::vector<Object* > objects;
 
 	unsigned int albedo, normal, roughness, metallic;
+
+	unsigned int planeVAO;
 };
 

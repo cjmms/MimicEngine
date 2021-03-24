@@ -9,6 +9,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+
 out VS_OUT
 {
 	vec3 FragPos;
@@ -52,6 +53,7 @@ uniform vec3 camPos;
 
 uniform sampler2D ShadowMap;
 uniform sampler2D MSM;
+uniform sampler2D VSM;
 uniform mat4 lightProjection;
 uniform mat4 lightView;
 
@@ -71,26 +73,7 @@ vec3 calculateLighting(vec3 normal, int i, vec3 color)
 }
 
 
-float calculateShadow(vec3 WorldPos)
-{
-    vec4 lightSpaceFragPos = lightProjection * lightView * vec4(WorldPos, 1.0f);
-    vec3 projCoord = lightSpaceFragPos.xyz / lightSpaceFragPos.w;
-    // transform to [0,1] range
-    projCoord = projCoord * 0.5 + 0.5;
 
-    if (projCoord.z > 1 || projCoord.z < 0) return 1;
-    if (projCoord.x > 1 || projCoord.x < 0) return 1;
-    if (projCoord.y > 1 || projCoord.y < 0) return 1;
-
-    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(ShadowMap, projCoord.xy).r;
-    // get depth of current fragment from light's perspective
-    float currentDepth = projCoord.z;
-
-    float bias = 0.000078f;
-    // check whether current frag pos is in shadow
-    return (currentDepth - bias) > closestDepth ? 0.0 : 1.0;
-}
 
 
 vec3 solveCramers(vec4 bPrime, vec3 result)
@@ -238,6 +221,28 @@ vec4 Invalidate(vec4 b)
 
 
 
+float calculateShadow(vec3 WorldPos)
+{
+    vec4 lightSpaceFragPos = lightProjection * lightView * vec4(WorldPos, 1.0f);
+    vec3 projCoord = lightSpaceFragPos.xyz / lightSpaceFragPos.w;
+    // transform to [0,1] range
+    projCoord = projCoord * 0.5 + 0.5;
+
+    if (projCoord.z > 1 || projCoord.z < 0) return 1;
+    if (projCoord.x > 1 || projCoord.x < 0) return 1;
+    if (projCoord.y > 1 || projCoord.y < 0) return 1;
+
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(ShadowMap, projCoord.xy).r;
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoord.z;
+
+    float bias = 0.000078f;
+    // check whether current frag pos is in shadow
+    return (currentDepth - bias) > closestDepth ? 0.0 : 1.0;
+}
+
+
 
 float calculateMSM(vec3 WorldPos)
 {
@@ -250,13 +255,39 @@ float calculateMSM(vec3 WorldPos)
     if (projCoord.x > 1 || projCoord.x < 0) return 1;
     if (projCoord.y > 1 || projCoord.y < 0) return 1;
 
-    //vec4 b = texture(MSM, projCoord.xy);
-    vec4 b = vec4(texture(ShadowMap, projCoord.xy).x);
+    vec4 b = texture(MSM, projCoord.xy);
+    //vec4 b = vec4(texture(ShadowMap, projCoord.xy).x);
     //b = UndoQuantization(b);
 
-    return 1 - MSM_Intensity(Invalidate(b), lightSpaceFragPos.z);
+    return 1 - MSM_Intensity(Invalidate(b), lightSpaceFragPos.w);
 }
 
+
+float linstep(const float low, const float high, const float value) {
+    return clamp((value - low) / (high - low), 0.0, 1.0);
+}
+
+// ----------------------------------------------------------------------------
+// Variance shadow mapping
+float calculateVSM(vec3 WorldPos) {
+
+    vec4 lightSpaceFragPos = lightProjection * lightView * vec4(WorldPos, 1.0f);
+    vec2 screenCoords = lightSpaceFragPos.xy / lightSpaceFragPos.w;
+    screenCoords = screenCoords * 0.5 + 0.5; // [0, 1]
+
+    float distance = lightSpaceFragPos.z; // Use raw distance instead of linear junk
+    vec2 moments = texture2D(VSM, screenCoords.xy).rg;
+
+    float p = step(distance, moments.x);
+    float variance = max(moments.y - (moments.x * moments.x), 0.00002);
+    float d = distance - moments.x;
+    float pMax = linstep(0.2, 1.0, variance / (variance + d * d)); // Solve light bleeding
+
+   // return (distance ) > moments.x ? 0.0 : 1.0;
+
+
+    return  min(max(p, pMax), 1.0);
+}
 
 
 
@@ -265,7 +296,10 @@ void main()
 {
     //float shadowIntensity = calculateShadow(fs_in.FragPos);
 
-    float shadowIntensity = calculateMSM(fs_in.FragPos);
+    //float shadowIntensity = calculateMSM(fs_in.FragPos);
+
+    float shadowIntensity = calculateVSM(fs_in.FragPos);
+
 
 	vec3 color = vec3(1.0f);
 	vec3 normal = normalize(fs_in.Normal);

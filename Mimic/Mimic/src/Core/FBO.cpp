@@ -7,8 +7,6 @@ FBO_Color::FBO_Color(unsigned int width, unsigned int height)
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-    unsigned int RBO;
-
     // generate FBO color attachment, bind to current FBO
     glGenTextures(1, &colorBuffer);
     glBindTexture(GL_TEXTURE_2D, colorBuffer);  // bind texture

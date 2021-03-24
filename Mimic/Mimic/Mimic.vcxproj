@@ -130,6 +130,7 @@
     <None Include="res\Shaders\basic.shader" />
     <None Include="res\Shaders\GaussianBlur.shader" />
     <None Include="res\Shaders\Shadow\MomentMap.shader" />
+    <None Include="res\Shaders\Shadow\VSM.shader" />
     <None Include="res\Shaders\VolumetricLight\BilateralUp.shader" />
     <None Include="res\Shaders\DeferredShading\DeferredPBR.shader" />
     <None Include="res\Shaders\Shadow\DepthMap.shader" />

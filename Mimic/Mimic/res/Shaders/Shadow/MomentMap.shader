@@ -1,15 +1,22 @@
 #shader vertex
 #version 330 core
-layout(Location = 0) in vec2 aPos;
-layout(Location = 1) in vec2 aTextureCoord;
+layout(Location = 0) in vec3 aPos;
 
-out vec2 TextureCoord;
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
 
-void main() {
-	gl_Position = vec4(aPos.x, aPos.y, 0.0f, 1.0f);
-	TextureCoord = aTextureCoord;
+out float VertexDepth;
+
+// This shader is used to fill depth buffer 
+// mvp is from the perspective of light source
+// This shader should have no output
+
+void main()
+{
+	gl_Position = projection * view * model * vec4(aPos, 1.0f);
+	VertexDepth = vec4(view * model * vec4(aPos, 1.0f)).z;
 }
-
 
 
 
@@ -18,11 +25,8 @@ void main() {
 #shader fragment
 #version 330 core
 
-in vec2 TextureCoord;
+in float VertexDepth;
 out vec4 FragColor;
-
-uniform sampler2D map;
-
 
 vec4 Quan(vec4 b)
 {
@@ -43,11 +47,15 @@ vec4 Quan(vec4 b)
 
 void main()
 {
-    float z = texture(map, TextureCoord).r;
+    float depth = VertexDepth;
 
-	vec4 b = vec4(z, z*z, z*z*z, z*z*z*z);
+	float dx = dFdx(depth);
+	float dy = dFdy(depth);
+	float moment2 = depth * depth + 0.25 * (dx * dx + dy * dy);
 
-	//b = Quan(b);
+	// VSM
+	FragColor = vec4(depth, moment2, 0.0, 1.0);
 
-    FragColor = b;
+	// MSM
+	//FragColor = vec4(depth, depth * depth, depth * depth * depth, depth * depth * depth * depth);
 }

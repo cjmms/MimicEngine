@@ -43,7 +43,7 @@ Renderer::Renderer(bool debugMode)
 
     GaussianBlurShader = new Shader("res/Shaders/GaussianBlur.shader");
 
-    initPlane();
+    //initPlane();
 }
 
 
@@ -64,8 +64,12 @@ Renderer::~Renderer()
 void Renderer::Render(Scene const* scene)  
 {
     shadow->CalculateMSM(scene);
+    shadow->CalculateShadowMap(scene);
+    shadow->ComputeVSM(scene);
 
-    //VisualizeDepthBuffer(blurred);
+    //VisualizeDepthBuffer(shadow->GetShadowMap());
+    //VisualizeDepthBuffer(shadow->GetShadowMap());
+    //VisualizeDepthBuffer(shadow->GetVSM());
     
     // First Pass, fill G-Buffer
     //scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
@@ -112,6 +116,7 @@ void Renderer::ForwardRendering(Scene const* scene)
     ForwardShader->setTexture("MSM", shadow->GetMSM());
     //ForwardShader->setTexture("ShadowMap", GaussianBlur(shadow->GetShadowMap(), 0));
     ForwardShader->setTexture("ShadowMap", shadow->GetShadowMap());
+    ForwardShader->setTexture("VSM", shadow->GetVSM());
 
     for (auto obj : scene->getObjects())
     {
@@ -119,44 +124,10 @@ void Renderer::ForwardRendering(Scene const* scene)
         obj->getModel()->Draw(*ForwardShader);
     }
 
-    RenderPlane();
+    scene->RenderPlane(ForwardShader);
 }
 
 
-
-void Renderer::initPlane()
-{
-    float planeVertices[] = {
-        // positions            // normals         // texcoords
-         10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
-        -10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
-
-         10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
-        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
-         10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,  10.0f, 10.0f
-    };
-
-    unsigned int VBO;
-
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
-
-    glGenVertexArrays(1, &quadVAO);
-    glBindVertexArray(quadVAO);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    glBindVertexArray(0);
-}
 
 
 
@@ -182,19 +153,6 @@ void Renderer::RenderLightSources(Scene const* scene) const
 }
 
 
-
-
-void Renderer::RenderPlane() const
-{
-    glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(10));
-    ForwardShader->setMat4("model", model);
-
-    ForwardShader->Bind();
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
-    ForwardShader->unBind();
-}
 
 
 

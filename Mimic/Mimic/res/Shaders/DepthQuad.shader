@@ -28,10 +28,12 @@ void main()
 {
 	float sampleZ = texture(map, TextureCoord).r;
 
+
 	float near = 0.1;
 	float far = 20.0;
 	float z = sampleZ * 2.0 - 1.0; // back to NDC 
 	float depth = (2.0 * near * far) / (far + near - z * (far - near)) / far;
 
 	FragColor = vec4(vec3(depth), 1.0f);
+	//FragColor = vec4(texture(map, TextureCoord).rg, 0.0, 1.0f);
 }

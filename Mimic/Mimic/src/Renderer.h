@@ -44,7 +44,7 @@ private:
 
 	bool debugMode;
 
-	unsigned int quadVAO;
+
 
 	// Visualize depth buffer
 	// render depth buffer in a quad
@@ -52,8 +52,7 @@ private:
 	void VisualizeDepthBuffer(unsigned int depthAttachment) const;
 
 	unsigned int GaussianBlur(unsigned int texture, int level) const;
-	void initPlane();
-	void RenderPlane() const;
+
 
 public:
 	Renderer(bool debugMode = true);
