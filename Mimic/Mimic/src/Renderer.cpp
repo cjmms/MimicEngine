@@ -63,14 +63,14 @@ Renderer::~Renderer()
 
 void Renderer::Render(Scene const* scene)  
 {
-    //shadow->CalculateMSM(scene);
+    shadow->CalculateMSM(scene);
 
     //VisualizeDepthBuffer(blurred);
     
     // First Pass, fill G-Buffer
-    scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
+    //scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
 
-    DeferredRenderer.Fill_G_Buffer(scene);
+    //DeferredRenderer.Fill_G_Buffer(scene);
 
     //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
@@ -79,10 +79,10 @@ void Renderer::Render(Scene const* scene)
     //DeferredRenderer.BindMSM(*shadow);
 
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
-    DeferredRenderer.Render(scene);
+    //DeferredRenderer.Render(scene);
     
     
-    //ForwardRendering(scene);    
+    ForwardRendering(scene);    
 }
 
 
@@ -108,10 +108,10 @@ void Renderer::ForwardRendering(Scene const* scene)
     ForwardShader->setMat4("lightProjection", shadow->GetProjection());
     ForwardShader->setMat4("lightView", shadow->GetLightView());
 
-    ForwardShader->setTexture("MSM", GaussianBlur(shadow->GetMSM(), 10));
-    //ForwardShader->setTexture("MSM", shadow->GetMSM());
+    //ForwardShader->setTexture("MSM", GaussianBlur(shadow->GetMSM(), 0));
+    ForwardShader->setTexture("MSM", shadow->GetMSM());
+    //ForwardShader->setTexture("ShadowMap", GaussianBlur(shadow->GetShadowMap(), 0));
     ForwardShader->setTexture("ShadowMap", shadow->GetShadowMap());
-
 
     for (auto obj : scene->getObjects())
     {

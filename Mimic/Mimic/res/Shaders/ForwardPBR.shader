@@ -250,8 +250,8 @@ float calculateMSM(vec3 WorldPos)
     if (projCoord.x > 1 || projCoord.x < 0) return 1;
     if (projCoord.y > 1 || projCoord.y < 0) return 1;
 
-    vec4 b = texture(MSM, projCoord.xy);
-
+    //vec4 b = texture(MSM, projCoord.xy);
+    vec4 b = vec4(texture(ShadowMap, projCoord.xy).x);
     //b = UndoQuantization(b);
 
     return 1 - MSM_Intensity(Invalidate(b), lightSpaceFragPos.z);
