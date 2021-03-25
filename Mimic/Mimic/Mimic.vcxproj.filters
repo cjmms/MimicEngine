@@ -66,6 +66,9 @@
     <ClCompile Include="src\VolumetricLight\VolumetricLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\IBL\IBL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\VertexBuffer.h">
@@ -116,6 +119,9 @@
     <ClInclude Include="src\VolumetricLight\VolumetricLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\IBL\IBL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\basic.shader" />
@@ -130,6 +136,7 @@
     <None Include="res\Shaders\Shadow\MomentMap.shader" />
     <None Include="res\Shaders\GaussianBlur.shader" />
     <None Include="res\Shaders\Shadow\VSM.shader" />
-    <None Include="res\Shaders\equirectangular.shader" />
+    <None Include="res\Shaders\IBL\equirectangular.shader" />
+    <None Include="res\Shaders\IBL\Cubemap.shader" />
   </ItemGroup>
 </Project>

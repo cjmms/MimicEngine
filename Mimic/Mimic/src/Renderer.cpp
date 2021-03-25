@@ -17,7 +17,8 @@ Renderer::Renderer(Scene const* scene)
     DeferredRenderer(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     VolumetricLight(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     PingBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
-    PongBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight())
+    PongBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
+    IBL("res/Barce_Rooftop_C_3k.hdr", 4096)
 {
 
     //std::cout <<  "Renderer Constructor" << std::endl;
@@ -37,8 +38,7 @@ Renderer::Renderer(Scene const* scene)
     glm::mat4 lightProjection = glm::perspective(
         glm::radians(45.0f), (float)UI_Mgr.getScreenWidth() / UI_Mgr.getScreenHeight(), 0.1f, 60.0f);
 
-    shadow = new Shadow(lightView, lightProjection, 
-        UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
+    shadow = new Shadow(lightView, lightProjection, UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
   
     ColorQuadShader = new Shader("res/Shaders/ColorQuad.shader");
 
@@ -48,13 +48,11 @@ Renderer::Renderer(Scene const* scene)
 
     GaussianBlurShader = new Shader("res/Shaders/GaussianBlur.shader");
 
-    // used to render HDR Equirectangular map to a cube
-    Equirectangular2CubemapShader = new Shader("res/Shaders/equirectangular.shader");
-
     shadow->CalculateShadowMap(scene);
     shadow->ComputeVSM(scene);
-    //EquirectangularHDRTex = ResourceManager::loadHDRTexture("res/Barce_Rooftop_C_Env.hdr");
-    EquirectangularHDRTex = ResourceManager::loadHDRTexture("res/Barce_Rooftop_C_3k.hdr");
+
+    IBL.RenderCubemap(scene);
+    glViewport(0, 0, UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
 }
 
 
@@ -94,8 +92,11 @@ void Renderer::Render(Scene const* scene)
     
     //ForwardRendering(scene);    
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    RenderEquirectangular2Cube(scene);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //IBL.RenderEquirectangular2Cube(scene);
+
+    IBL.RenderSkybox(scene);
 }
 
 
@@ -200,12 +201,3 @@ unsigned int Renderer::GaussianBlur(unsigned int texture, int level) const
 }
 
 
-
-void Renderer::RenderEquirectangular2Cube(Scene const* scene) const
-{
-    Equirectangular2CubemapShader->setMat4("view", camera.getViewMatrix());
-    Equirectangular2CubemapShader->setMat4("projection", camera.getProjectionMatrix());
-
-    Equirectangular2CubemapShader->setTexture("equirectangularMap", EquirectangularHDRTex);
-    scene->RenderCube(Equirectangular2CubemapShader);
-}

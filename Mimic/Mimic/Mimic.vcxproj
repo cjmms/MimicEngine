@@ -90,6 +90,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\IBL\IBL.cpp" />
     <ClCompile Include="src\Shadow\Shadow.cpp" />
     <ClCompile Include="src\Core\FBO.cpp" />
     <ClCompile Include="src\DeferredShading\DeferredRendering.cpp" />
@@ -109,6 +110,7 @@
     <ClCompile Include="src\VolumetricLight\VolumetricLight.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\IBL\IBL.h" />
     <ClInclude Include="src\Shadow\Shadow.h" />
     <ClInclude Include="src\Core\FBO.h" />
     <ClInclude Include="src\DeferredShading\DeferredRendering.h" />
@@ -128,7 +130,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\basic.shader" />
-    <None Include="res\Shaders\equirectangular.shader" />
+    <None Include="res\Shaders\IBL\Cubemap.shader" />
+    <None Include="res\Shaders\IBL\equirectangular.shader" />
     <None Include="res\Shaders\GaussianBlur.shader" />
     <None Include="res\Shaders\Shadow\MomentMap.shader" />
     <None Include="res\Shaders\Shadow\VSM.shader" />

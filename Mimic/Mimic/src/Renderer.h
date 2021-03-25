@@ -3,7 +3,7 @@
 #include "DeferredShading/DeferredRendering.h"
 #include "VolumetricLight/VolumetricLight.h"
 #include "Shadow/Shadow.h"
-
+#include "IBL/IBL.h"
 
 /*
 * Purpose of Renderer: render object base on input, hide all details of how rendering works
@@ -34,7 +34,6 @@ private:
 	Shader* ColorQuadShader;
 	Shader* ForwardShader;
 	Shader* GaussianBlurShader;
-	Shader* Equirectangular2CubemapShader;
 
 	FBO_Color PingBufferFBO;
 	FBO_Color PongBufferFBO;
@@ -42,6 +41,7 @@ private:
 	DeferredRendering DeferredRenderer;
 	Shadow* shadow;
 	VolumetricLight VolumetricLight;
+	IBL IBL;
 
 	bool debugMode;
 
@@ -54,7 +54,7 @@ private:
 
 	unsigned int GaussianBlur(unsigned int texture, int level) const;
 
-	void RenderEquirectangular2Cube(Scene const* scene) const;
+	
 
 public:
 	Renderer(Scene const* scene);
@@ -69,7 +69,5 @@ public:
 	// shader is always fixed for light source
 	// the purpose of rendering light is for testing
 	void RenderLightSources(Scene const* scene) const;
-
-	unsigned int EquirectangularHDRTex;
 };
 
