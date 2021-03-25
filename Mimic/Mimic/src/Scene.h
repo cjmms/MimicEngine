@@ -33,6 +33,8 @@ public:
 	void BindTextures(Shader* shader) const;
 
 	void initPlane();
+	void initCube();
+	void RenderCube(Shader* shader) const;
 	void RenderPlane(Shader* shader) const;
 
 private:
@@ -42,5 +44,6 @@ private:
 	unsigned int albedo, normal, roughness, metallic;
 
 	unsigned int planeVAO;
+	unsigned int cubeVAO;
 };
 

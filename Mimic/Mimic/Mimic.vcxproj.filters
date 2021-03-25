@@ -130,5 +130,6 @@
     <None Include="res\Shaders\Shadow\MomentMap.shader" />
     <None Include="res\Shaders\GaussianBlur.shader" />
     <None Include="res\Shaders\Shadow\VSM.shader" />
+    <None Include="res\Shaders\equirectangular.shader" />
   </ItemGroup>
 </Project>

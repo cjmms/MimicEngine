@@ -48,8 +48,13 @@ Renderer::Renderer(Scene const* scene)
 
     GaussianBlurShader = new Shader("res/Shaders/GaussianBlur.shader");
 
+    // used to render HDR Equirectangular map to a cube
+    Equirectangular2CubemapShader = new Shader("res/Shaders/equirectangular.shader");
+
     shadow->CalculateShadowMap(scene);
     shadow->ComputeVSM(scene);
+    //EquirectangularHDRTex = ResourceManager::loadHDRTexture("res/Barce_Rooftop_C_Env.hdr");
+    EquirectangularHDRTex = ResourceManager::loadHDRTexture("res/Barce_Rooftop_C_3k.hdr");
 }
 
 
@@ -74,9 +79,9 @@ void Renderer::Render(Scene const* scene)
     //VisualizeDepthBuffer(shadow->GetVSM());
     
     // First Pass, fill G-Buffer
-    scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
+    //scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
 
-    DeferredRenderer.Fill_G_Buffer(scene);
+    //DeferredRenderer.Fill_G_Buffer(scene);
 
     //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
@@ -85,9 +90,12 @@ void Renderer::Render(Scene const* scene)
     //DeferredRenderer.BindMSM(*shadow);
 
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
-    DeferredRenderer.Render(scene);
+    //DeferredRenderer.Render(scene);
     
     //ForwardRendering(scene);    
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    RenderEquirectangular2Cube(scene);
 }
 
 
@@ -189,4 +197,15 @@ unsigned int Renderer::GaussianBlur(unsigned int texture, int level) const
     }
 
     return PingBufferFBO.getColorAttachment();
+}
+
+
+
+void Renderer::RenderEquirectangular2Cube(Scene const* scene) const
+{
+    Equirectangular2CubemapShader->setMat4("view", camera.getViewMatrix());
+    Equirectangular2CubemapShader->setMat4("projection", camera.getProjectionMatrix());
+
+    Equirectangular2CubemapShader->setTexture("equirectangularMap", EquirectangularHDRTex);
+    scene->RenderCube(Equirectangular2CubemapShader);
 }

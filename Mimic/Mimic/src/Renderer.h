@@ -34,6 +34,7 @@ private:
 	Shader* ColorQuadShader;
 	Shader* ForwardShader;
 	Shader* GaussianBlurShader;
+	Shader* Equirectangular2CubemapShader;
 
 	FBO_Color PingBufferFBO;
 	FBO_Color PongBufferFBO;
@@ -53,6 +54,7 @@ private:
 
 	unsigned int GaussianBlur(unsigned int texture, int level) const;
 
+	void RenderEquirectangular2Cube(Scene const* scene) const;
 
 public:
 	Renderer(Scene const* scene);
@@ -67,5 +69,7 @@ public:
 	// shader is always fixed for light source
 	// the purpose of rendering light is for testing
 	void RenderLightSources(Scene const* scene) const;
+
+	unsigned int EquirectangularHDRTex;
 };
 
