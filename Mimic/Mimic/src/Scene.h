@@ -27,8 +27,6 @@ public:
 
 	void addObjects(const char* address, glm::vec3 scale);
 
-	void RenderShadowMap(glm::mat4 lightView, glm::mat4 lightProjection, Shader& shader) const;
-
 	inline const std::vector<Light* >& getLightSources() const { return lightSources; }
 	inline const std::vector<Object* >& getObjects() const { return objects; }
 	void InitTextures(std::string str);

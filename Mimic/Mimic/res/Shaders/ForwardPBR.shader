@@ -31,7 +31,7 @@ void main()
 	vs_out.Normal = transpose(inverse(mat3(model))) * aNormal;
 	vs_out.TexCoord = aTexCoord;
     vs_out.FragPosLightSpace = lightProjection * lightView * model * vec4(aPos, 1.0f);
-
+    //vs_out.FragPosLightSpace =  lightView * model * vec4(aPos, 1.0f);
 }
 
 
@@ -320,6 +320,8 @@ void main()
 	}
 
 
+    //FragColor = vec4((ambient + diffuse) , 1.0f);   // testing, no shadow
+
 	FragColor = vec4((ambient + diffuse) * shadowIntensity, 1.0f);
 
 
@@ -329,11 +331,10 @@ void main()
     float distance = fs_in.FragPosLightSpace.z; // Use raw distance instead of linear junk
     vec2 moments = texture2D(VSM, screenCoords.xy).rg;
 
-    FragColor = vec4(vec3(moments.x / 30), 1.0);
+    //FragColor = vec4(vec3(moments.x / 30), 1.0);
     //FragColor = vec4(vec3(distance / 30), 1.0);
+    //FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+
     //FragColor = vec4(fs_in.FragPosLightSpace.xyz, 1.0f);
-
     //FragColor = vec4(vec3(texture(ShadowMap, screenCoords).r) / 2, 1.0f);
-
-    //vec4(FragPos,1.0)
 }

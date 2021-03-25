@@ -32,9 +32,10 @@ Renderer::Renderer(Scene const* scene)
     glm::mat4 lightView = glm::lookAt(
         glm::vec3(-15.0f, 15.0f, 10.0f), glm::vec3(0.0), glm::vec3(0.0, 1.0, 0.0));
 
-    glm::mat4 lightProjection = camera.getProjectionMatrix();
+    //glm::mat4 lightProjection = camera.getProjectionMatrix();
 
-    //glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
+    glm::mat4 lightProjection = glm::perspective(
+        glm::radians(45.0f), (float)UI_Mgr.getScreenWidth() / UI_Mgr.getScreenHeight(), 0.1f, 60.0f);
 
     shadow = new Shadow(lightView, lightProjection, 
         UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
@@ -73,9 +74,9 @@ void Renderer::Render(Scene const* scene)
     //VisualizeDepthBuffer(shadow->GetVSM());
     
     // First Pass, fill G-Buffer
-    //scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
+    scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
 
-    //DeferredRenderer.Fill_G_Buffer(scene);
+    DeferredRenderer.Fill_G_Buffer(scene);
 
     //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
@@ -84,10 +85,9 @@ void Renderer::Render(Scene const* scene)
     //DeferredRenderer.BindMSM(*shadow);
 
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
-    //DeferredRenderer.Render(scene);
+    DeferredRenderer.Render(scene);
     
-    
-    ForwardRendering(scene);    
+    //ForwardRendering(scene);    
 }
 
 
@@ -138,6 +138,7 @@ void Renderer::ForwardRendering(Scene const* scene)
 void Renderer::RenderLightSources(Scene const* scene) const
 {
 	 //glDisable(GL_DEPTH_TEST);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     lightShader->setMat4("projection", camera.getProjectionMatrix());
     lightShader->setMat4("view", camera.getViewMatrix());

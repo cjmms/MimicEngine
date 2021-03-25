@@ -1,5 +1,5 @@
 #shader vertex
-#version 440 core
+#version 330 core
 layout(Location = 0) in vec3 aPos;
 
 uniform mat4 projection;
@@ -20,7 +20,7 @@ void main()
 //  This shader is designed to show color buffer
 
 #shader fragment
-#version 440 core
+#version 330 core
 
 in float VertexDepth;
 out vec4 FragColor;

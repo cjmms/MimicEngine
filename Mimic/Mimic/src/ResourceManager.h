@@ -15,6 +15,8 @@ public:
 	// maybe use sth to  keep track of loaded textures?
 	static unsigned int loadTexture(char const* path, bool gamma = false);
 
+	static unsigned int loadHDRTexture(char const* path);
+
 	static unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma = false);
 
 };

@@ -17,8 +17,8 @@ private:
 	FBO_Depth* depthBufferFBO;
 	FBO_Color* Fbo;
 
-	glm::mat4 View;
-	glm::mat4 Projection;
+	const glm::mat4 View;
+	const glm::mat4 Projection;
 
 	unsigned int VSM_FBO, VSMDepthTexture, VSMColorTexture;
 

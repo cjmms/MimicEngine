@@ -112,10 +112,7 @@ void Shadow::SetupVSM(unsigned int shadowMapRes_w, unsigned int shadowMapRes_h)
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, VSMDepthTexture, 0);
 
-    // Colour texture for Variance Shadow Mapping (VSM)
-    if (VSMColorTexture) {
-        glDeleteTextures(1, &VSMColorTexture);
-    }
+
     glGenTextures(1, &VSMColorTexture);
     glBindTexture(GL_TEXTURE_2D, VSMColorTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RG32F, shadowMapRes_w, shadowMapRes_h, 0, GL_RGBA, GL_FLOAT, nullptr);
