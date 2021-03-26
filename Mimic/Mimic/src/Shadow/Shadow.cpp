@@ -78,6 +78,7 @@ void Shadow::ComputeVSM(Scene const* scene)
     glBindFramebuffer(GL_FRAMEBUFFER, VSM_FBO);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
     VSMShader.setMat4("view", View);
     VSMShader.setMat4("projection", Projection);
 
@@ -86,6 +87,8 @@ void Shadow::ComputeVSM(Scene const* scene)
         VSMShader.setMat4("model", obj->getModelMatrix());
         obj->getModel()->Draw(VSMShader);
     }
+
+    //VSMShader.setMat4("model", glm::mat4(1.0f));
     scene->RenderPlane(&VSMShader);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -115,7 +118,7 @@ void Shadow::SetupVSM(unsigned int shadowMapRes_w, unsigned int shadowMapRes_h)
 
     glGenTextures(1, &VSMColorTexture);
     glBindTexture(GL_TEXTURE_2D, VSMColorTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG32F, shadowMapRes_w, shadowMapRes_h, 0, GL_RGBA, GL_FLOAT, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, shadowMapRes_w, shadowMapRes_h, 0, GL_RGBA, GL_FLOAT, nullptr);
     glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Hardware linear filtering gives us soft shadows for free!
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

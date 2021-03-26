@@ -31,12 +31,12 @@ Renderer::Renderer(Scene const* scene)
     */
 
     glm::mat4 lightView = glm::lookAt(
-        glm::vec3(-15.0f, 15.0f, 10.0f), glm::vec3(0.0), glm::vec3(0.0, 1.0, 0.0));
+        glm::vec3(-20.0f, 35.0f, 10.0),glm::vec3(0.0f, 0.0f, 00.0f), glm::vec3(0.0, 1.0, 0.0));
 
-    //glm::mat4 lightProjection = camera.getProjectionMatrix();
+
 
     glm::mat4 lightProjection = glm::perspective(
-        glm::radians(45.0f), (float)UI_Mgr.getScreenWidth() / UI_Mgr.getScreenHeight(), 0.1f, 60.0f);
+        glm::radians(90.0f), (float)UI_Mgr.getScreenWidth() / UI_Mgr.getScreenHeight(), 0.1f, 60.0f);
 
     shadow = new Shadow(lightView, lightProjection, UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
   
@@ -113,6 +113,10 @@ void Renderer::ForwardRendering(Scene const* scene)
     ForwardShader->setMat4("view", camera.getViewMatrix());
     ForwardShader->setMat4("projection", camera.getProjectionMatrix());
 
+    //ForwardShader->setMat4("view", shadow->GetLightView());
+    //ForwardShader->setMat4("projection", shadow->GetProjection());
+
+
     ForwardShader->setMat4("lightProjection", shadow->GetProjection());
     ForwardShader->setMat4("lightView", shadow->GetLightView());
 
@@ -129,6 +133,9 @@ void Renderer::ForwardRendering(Scene const* scene)
         obj->getModel()->Draw(*ForwardShader);
     }
 
+    //ForwardShader->setMat4("model", glm::mat4(1.0f));
+    //ForwardShader->setMat4("view", shadow->GetLightView());
+    //ForwardShader->setMat4("projection", shadow->GetProjection());
     scene->RenderPlane(ForwardShader);
 }
 

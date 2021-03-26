@@ -199,9 +199,9 @@ void Camera::Print() const
 									 << cameraPos.y << ", " 
 									 << cameraPos.z << std::endl;
 
-	std::cout << "Camera Front: " << cameraFront.x << ", "
-		<< cameraFront.y << ", "
-		<< cameraFront.z << std::endl;
+	std::cout << "Camera Center: " << cameraFront.x + cameraPos.x << ", "
+		<< cameraFront.y + cameraPos.y << ", "
+		<< cameraFront.z + cameraPos.z << std::endl;
 
 	std::cout << "Camera Up: " << cameraUp.x << ", "
 		<< cameraUp.y << ", "

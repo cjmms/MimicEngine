@@ -242,7 +242,6 @@ float calculateShadow(vec4 fragPosLightSpace)
     // get depth of current fragment from light's perspective
     float currentDepth = projCoord.z;
 
-
     //float closestDepth = texture(VSM, projCoord.xy).r;
     // get depth of current fragment from light's perspective
     //float currentDepth = fragPosLightSpace.z;
@@ -289,15 +288,24 @@ float calculateVSM(vec4 fragPosLightSpace) {
     if (screenCoords.x > 1.0 || screenCoords.x < 0.0) return 1.0;
     if (screenCoords.y > 1.0 || screenCoords.y < 0.0) return 1.0;
 
-     float distance = fragPosLightSpace.w; // Use raw distance instead of linear junk
+     float FragLightSpaceDepth = fragPosLightSpace.w; // Use raw distance instead of linear junk
      vec2 moments = texture2D(VSM, screenCoords.xy).rg;
 
-     float p = step(distance, moments.x);
-     float variance = max(moments.y - (moments.x * moments.x), 0.00002);
-     float d = distance - moments.x;
-     float pMax = linstep(0.2, 1.0, variance / (variance + d * d)); // Solve light bleeding
+     float mean = moments.x;
+     float variance = moments.y - mean * mean;
 
-    return min(max(p, pMax), 1.0);
+     if (FragLightSpaceDepth <= mean) return 1.0;    // not under shadow
+
+     // Chebychev’s inequality
+     return variance / (variance + pow(FragLightSpaceDepth - mean, 2.0));
+
+     
+     //float p = step(distance, moments.x);
+     //float variance = max(moments.y - (moments.x * moments.x), 0.00002);
+     //float d = distance - moments.x;
+     //float pMax = linstep(0.2, 1.0, variance / (variance + d * d)); // Solve light bleeding
+
+    //return min(max(p, pMax), 1.0);
 }
 
 
@@ -333,10 +341,12 @@ void main()
     screenCoords = screenCoords * 0.5 + 0.5; // [0, 1]
 
     float distance = fs_in.FragPosLightSpace.w; // Use raw distance instead of linear junk
-    vec2 moments = texture2D(VSM, screenCoords.xy).rg;
+    vec2 moments = texture(VSM, screenCoords.xy).rg;
 
     //FragColor = vec4(vec3(moments.x / 30), 1.0);
-    //FragColor = vec4(vec3(distance / 30), 1.0);
+    //FragColor = vec4(screenCoords.xy, 0, 1);
+    //FragColor = vec4(vec3(fs_in.FragPosLightSpace.w / 30), 1.0);
+    //FragColor = vec4(vec3(fs_in.FragPosLightSpace.z / 30), 1.0);
     //FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 
     //FragColor = vec4(fs_in.FragPosLightSpace.xyz, 1.0f);

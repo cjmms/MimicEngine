@@ -1,5 +1,6 @@
 #shader vertex
 #version 330 core
+
 layout(Location = 0) in vec3 aPos;
 
 uniform mat4 projection;
@@ -28,13 +29,6 @@ out vec4 FragColor;
 
 void main()
 {
-	float depth = VertexDepth;
-
-	float dx = dFdx(depth);
-	float dy = dFdy(depth);
-	float moment2 = depth * depth + 0.25 * (dx * dx + dy * dy);
-
 	// VSM
-	FragColor = vec4(depth, moment2, 0.0, 1.0);
-	//FragColor = vec4(vec3(depth / 30), 1.0);
+	FragColor = vec4(VertexDepth, VertexDepth * VertexDepth, 0.0, 1.0);
 }

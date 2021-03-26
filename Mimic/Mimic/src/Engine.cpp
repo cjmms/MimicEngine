@@ -54,7 +54,7 @@ void Engine::init()
     
     // init scene
     scene = new Scene();
-    scene->addLightSource(glm::vec3(-15.0f, 15.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
+    scene->addLightSource(glm::vec3(-20.0f, 35.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
     //scene->addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
     //scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
     //scene->addLightSource(glm::vec3(-70.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
@@ -101,7 +101,7 @@ void Engine::run()
     {
         UI_Mgr.update();
 
-        //camera.Print();
+        camera.Print();
 
         camera.cameraUpdateFrameTime();
 
