@@ -101,7 +101,7 @@ void Engine::run()
     {
         UI_Mgr.update();
 
-        camera.Print();
+        //camera.Print();
 
         camera.cameraUpdateFrameTime();
 

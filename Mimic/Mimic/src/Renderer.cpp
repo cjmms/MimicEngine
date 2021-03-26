@@ -90,7 +90,7 @@ void Renderer::Render(Scene const* scene)
 
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //IBL.RenderEquirectangular2Cube();
-    //IBL.RenderSkybox();
+    IBL.RenderSkybox();
 }
 
 
@@ -136,7 +136,7 @@ void Renderer::ForwardRendering(Scene const* scene)
     //ForwardShader->setMat4("model", glm::mat4(1.0f));
     //ForwardShader->setMat4("view", shadow->GetLightView());
     //ForwardShader->setMat4("projection", shadow->GetProjection());
-    scene->RenderPlane(ForwardShader);
+    //scene->RenderPlane(ForwardShader);
 }
 
 

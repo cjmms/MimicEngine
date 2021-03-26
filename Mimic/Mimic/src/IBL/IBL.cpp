@@ -14,12 +14,17 @@ IBL::IBL(const char* address, unsigned int res)
 	// used to render HDR Equirectangular map to a cube
 	Equirectangular2CubemapShader = new Shader("res/Shaders/IBL/equirectangular.shader");
 	CubemapShader = new Shader("res/Shaders/IBL/Cubemap.shader");
+	IrradianceShader = new Shader("res/Shaders/IBL/Convolution.shader");
+
 	HDR_Env = ResourceManager::loadHDRTexture(address);
 
 	initCube();
 	InitCubemapTexture(res);
 	InitCubemapFBO(res);
-	RenderCubemap();
+	Equirectangular2Cubemap();
+
+	InitIrradianceMapTexture(32);
+	RenderIrradianceMap(32);
 }
 
 
@@ -39,14 +44,13 @@ void IBL::RenderEquirectangular2Cube() const
 
 void IBL::InitCubemapFBO(unsigned int res)
 {
-	unsigned int captureRBO;
 	glGenFramebuffers(1, &CubemapFBO);
-	glGenRenderbuffers(1, &captureRBO);
+	glGenRenderbuffers(1, &CubemapRBO);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, CubemapFBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, CubemapRBO);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, res, res);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, CubemapRBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -72,7 +76,7 @@ void IBL::InitCubemapTexture(unsigned int res)
 
 
 
-void IBL::RenderCubemap()
+void IBL::RenderCubemap(Shader* shader, unsigned int res, unsigned int outputCubemapTex)
 {
 	glm::mat4 captureViews[] =
 	{
@@ -85,19 +89,18 @@ void IBL::RenderCubemap()
 	};
 
 	// convert HDR equirectangular environment map to cubemap equivalent
-	Equirectangular2CubemapShader->setMat4("projection", glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f));
-	Equirectangular2CubemapShader->setTexture("equirectangularMap", HDR_Env);
+	shader->setMat4("projection", glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f));
 
 	glDepthFunc(GL_LEQUAL);
 	glViewport(0, 0, res, res); // don't forget to configure the viewport to the capture dimensions.
 	glBindFramebuffer(GL_FRAMEBUFFER, CubemapFBO);
 	for (unsigned int i = 0; i < 6; ++i)
 	{
-		Equirectangular2CubemapShader->setMat4("view", captureViews[i]);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, EnvCubemapTex, 0);
+		shader->setMat4("view", captureViews[i]);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, outputCubemapTex, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		RenderCube(Equirectangular2CubemapShader);
+		RenderCube(shader);
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -112,7 +115,11 @@ void IBL::RenderSkybox() const
 
 	CubemapShader->Bind();
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, EnvCubemapTex);
+	//glBindTexture(GL_TEXTURE_CUBE_MAP, EnvCubemapTex);
+
+	// testing purpose, test if irradiance map is generated correctly
+	glBindTexture(GL_TEXTURE_CUBE_MAP, IrradianceMapTex);
+
 	CubemapShader->setInt("environmentMap", 0);
 	CubemapShader->unBind();
 
@@ -202,4 +209,48 @@ void IBL::RenderCube(Shader* shader) const
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 	shader->unBind();
+}
+
+
+
+
+void IBL::InitIrradianceMapTexture(unsigned int lowRes)
+{
+	glGenTextures(1, &IrradianceMapTex);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, IrradianceMapTex);
+	for (unsigned int i = 0; i < 6; ++i)
+	{
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, lowRes, lowRes, 0,
+			GL_RGB, GL_FLOAT, nullptr);
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
+
+
+
+void IBL::RenderIrradianceMap(unsigned int lowRes)
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, CubemapFBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, CubemapRBO);
+	// bind low resolution RBO
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, lowRes, lowRes);
+
+	IrradianceShader->setInt("environmentMap", 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, EnvCubemapTex);
+
+	RenderCubemap(IrradianceShader, lowRes, IrradianceMapTex);
+}
+
+
+
+void IBL::Equirectangular2Cubemap()
+{
+	Equirectangular2CubemapShader->setTexture("equirectangularMap", HDR_Env);
+	RenderCubemap(Equirectangular2CubemapShader, res, EnvCubemapTex);
 }

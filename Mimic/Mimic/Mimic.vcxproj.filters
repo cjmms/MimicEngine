@@ -138,5 +138,6 @@
     <None Include="res\Shaders\Shadow\VSM.shader" />
     <None Include="res\Shaders\IBL\equirectangular.shader" />
     <None Include="res\Shaders\IBL\Cubemap.shader" />
+    <None Include="res\Shaders\IBL\Convolution.shader" />
   </ItemGroup>
 </Project>
