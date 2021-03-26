@@ -14,7 +14,7 @@ void main()
     mat4 rotView = mat4(mat3(view)); // remove translation from the view matrix
     vec4 clipPos = projection * rotView * vec4(localPos, 1.0);
 
-    gl_Position = clipPos.xyww;
+    gl_Position = clipPos.xyww; //make sure depth always 1.0
 }
 
 
@@ -29,7 +29,7 @@ uniform samplerCube environmentMap;
 
 void main()
 {
-    vec3 envColor = texture(environmentMap, localPos).rgb;
+    vec3 envColor = texture(environmentMap, localPos).rgb;  // sampling cubemap
 
     envColor = envColor / (envColor + vec3(1.0));   // tone mapping
     envColor = pow(envColor, vec3(1.0 / 2.2));      // gamma correction

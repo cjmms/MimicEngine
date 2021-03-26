@@ -285,7 +285,11 @@ float calculateVSM(vec4 fragPosLightSpace) {
     vec2 screenCoords = fragPosLightSpace.xy / fragPosLightSpace.w;
     screenCoords = screenCoords * 0.5 + 0.5; // [0, 1]
 
-     float distance = fragPosLightSpace.z; // Use raw distance instead of linear junk
+    if (fragPosLightSpace.w < 0.0) return 1.0;
+    if (screenCoords.x > 1.0 || screenCoords.x < 0.0) return 1.0;
+    if (screenCoords.y > 1.0 || screenCoords.y < 0.0) return 1.0;
+
+     float distance = fragPosLightSpace.w; // Use raw distance instead of linear junk
      vec2 moments = texture2D(VSM, screenCoords.xy).rg;
 
      float p = step(distance, moments.x);
@@ -305,7 +309,7 @@ void main()
 
     //float shadowIntensity = calculateMSM(fs_in.FragPosLightSpace);
 
-    //float shadowIntensity = calculateVSM(fs_in.FragPosLightSpace);
+    float shadowIntensity = calculateVSM(fs_in.FragPosLightSpace);
 
 
 	vec3 color = vec3(1.0f);
@@ -322,13 +326,13 @@ void main()
 
     FragColor = vec4((ambient + diffuse) , 1.0f);   // testing, no shadow
 
-	//FragColor = vec4((ambient + diffuse) * shadowIntensity, 1.0f);
+	FragColor = vec4(ambient + diffuse * shadowIntensity, 1.0f);
 
 
     vec2 screenCoords = fs_in.FragPosLightSpace.xy / fs_in.FragPosLightSpace.w;
     screenCoords = screenCoords * 0.5 + 0.5; // [0, 1]
 
-    float distance = fs_in.FragPosLightSpace.z; // Use raw distance instead of linear junk
+    float distance = fs_in.FragPosLightSpace.w; // Use raw distance instead of linear junk
     vec2 moments = texture2D(VSM, screenCoords.xy).rg;
 
     //FragColor = vec4(vec3(moments.x / 30), 1.0);

@@ -16,6 +16,8 @@ private:
 
 	unsigned int res;
 
+	unsigned int cubeVAO;
+
 	// render Equirectangular HDR texture to a cube
 	Shader* Equirectangular2CubemapShader;
 	Shader* CubemapShader;
@@ -24,6 +26,11 @@ private:
 	void InitCubemapFBO(unsigned int res);
 	void InitCubemapTexture(unsigned int res);
 
+	void initCube();
+	void RenderCube(Shader* shader) const;
+
+	// using Equirectangular to render 6 faces of cubemap
+	void RenderCubemap();
 
 public:
 	IBL(const char* , unsigned int res);
@@ -31,11 +38,8 @@ public:
 	IBL(std::string& address, unsigned int res) : IBL(address.c_str(), res) {}
 
 
-	//void Setup();
+	void RenderEquirectangular2Cube() const;
 
-	void RenderEquirectangular2Cube(Scene const* scene) const;
-
-	void RenderSkybox(Scene const* scene) const;
-	void RenderCubemap(Scene const* scene);
+	void RenderSkybox() const;
 };
 

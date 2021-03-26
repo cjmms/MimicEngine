@@ -1,4 +1,5 @@
 #pragma once
+#include "../IBL/IBL.h"
 
 class Scene;
 class Shader;
@@ -23,6 +24,7 @@ private:
 
 	unsigned int gBuffer, gPosition, gNormalRoughness, gAlbedoMetallic;
 
+	//IBL IBL;
 
 public:
 	DeferredRendering(unsigned int width, unsigned int height);
