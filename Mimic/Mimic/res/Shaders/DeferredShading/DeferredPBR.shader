@@ -247,10 +247,17 @@ void main()
     vec3 WorldPos = texture(gPosition, TexCoords).rgb;
 
     vec3 albedo = pow(texture(gAlbedoMetallic, TexCoords).rgb, vec3(2.2));
+
+    float visibility = texture(gPosition, TexCoords).a;
+
+    if (visibility != 2.0) // 2.0 is PBR, if it's not PBR, return albedo directly
+    {
+        FragColor = vec4(pow(albedo, vec3(1.0 / 2.2)), 1.0f);
+        return;
+    }
+
     float metallic = texture(gAlbedoMetallic, TexCoords).a;
     float roughness = texture(gNormalRoughness, TexCoords).a;
-    // from 0 to 1
-    float depth = texture(gPosition, TexCoords).a;
 
     vec3 N = texture(gNormalRoughness, TexCoords).rgb;
     vec3 V = normalize(camPos - WorldPos);

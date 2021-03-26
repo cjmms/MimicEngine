@@ -10,6 +10,7 @@ extern Camera camera;
 
 
 DeferredRendering::DeferredRendering(unsigned int width, unsigned int height)
+    :IBL("res/Barce_Rooftop_C_3k.hdr", 4096)
 {
     Fill_G_BufferShader = new Shader("res/Shaders/DeferredShading/FillG-Buffer.shader");
     DeferredLightingShader = new Shader("res/Shaders/DeferredShading/DeferredPBR.shader");
@@ -80,7 +81,7 @@ void DeferredRendering::Fill_G_Buffer(Scene const* scene) const
         obj->getModel()->Draw(*Fill_G_BufferShader);
     }
 
-    //IBL.RenderSkybox();
+    IBL.RenderSkybox();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

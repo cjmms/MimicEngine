@@ -75,7 +75,7 @@ void main()
 
     // store fragment position vector in the G buffer
     gPosition.rgb = WorldPos;
-    gPosition.a = gl_FragCoord.z;
+    gPosition.a = 2.0;      // 2.0 means PBR
 
     // store normal vector into G buffer
     gNormalRoughness.rgb = getNormalFromMap();

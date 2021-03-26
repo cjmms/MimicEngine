@@ -115,10 +115,10 @@ void IBL::RenderSkybox() const
 
 	CubemapShader->Bind();
 	glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_CUBE_MAP, EnvCubemapTex);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, EnvCubemapTex);
 
 	// testing purpose, test if irradiance map is generated correctly
-	glBindTexture(GL_TEXTURE_CUBE_MAP, IrradianceMapTex);
+	//glBindTexture(GL_TEXTURE_CUBE_MAP, IrradianceMapTex);
 
 	CubemapShader->setInt("environmentMap", 0);
 	CubemapShader->unBind();

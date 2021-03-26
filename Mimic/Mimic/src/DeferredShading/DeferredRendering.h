@@ -14,7 +14,7 @@ private:
 	* G-Buffer has 3 Color Buffers
 	* Layout:
 	*        |  Albedo.r  |  Albedo.g  |  Albedo.b  |  Metallic  |		Unsigned Byte
-	*		 | Position.x | Position.y | Position.z |    Empty   |		FLOAT 16 Bit
+	*		 | Position.x | Position.y | Position.z | Visibility |		FLOAT 16 Bit
 	*		 |  Normal.x  |  Normal.y  |  Normal.z  |  Roughness |		FLOAT 16 Bit
 	*/
 	void init_G_Buffer(unsigned int width, unsigned int height);
@@ -24,7 +24,7 @@ private:
 
 	unsigned int gBuffer, gPosition, gNormalRoughness, gAlbedoMetallic;
 
-	//IBL IBL;
+	IBL IBL;
 
 public:
 	DeferredRendering(unsigned int width, unsigned int height);
