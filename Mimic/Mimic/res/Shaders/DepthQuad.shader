@@ -34,6 +34,6 @@ void main()
 	float z = sampleZ * 2.0 - 1.0; // back to NDC 
 	float depth = (2.0 * near * far) / (far + near - z * (far - near)) / far;
 
-	FragColor = vec4(vec3(depth), 1.0f);
-	//FragColor = vec4(vec3(texture(map, TextureCoord).r / 30), 1.0f);
+	//FragColor = vec4(vec3(depth), 1.0f);
+	FragColor = vec4(vec3(texture(map, TextureCoord).r / 30), 1.0f);
 }

@@ -13,32 +13,12 @@ Shadow::Shadow(glm::mat4 View, glm::mat4 Projection, int width, int height)
     MSMShader("res/Shaders/Shadow/MomentMap.shader"),
     VSMShader("res/Shaders/Shadow/VSM.shader")
 {
-    depthBufferFBO = new FBO_Depth(width, height);
     //Fbo = new FBO_Color(width, height);
-    //VSMFBO = new FBO_Color(width, height);
 
     SetupVSM(width, height);
 }
 
 
-
-void Shadow::CalculateShadowMap(Scene const* scene)
-{
-    depthBufferFBO->Bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    ShadowMapShader.setMat4("view", View);
-    ShadowMapShader.setMat4("projection", Projection);
-
-    for (auto obj : scene->getObjects())
-    {
-        ShadowMapShader.setMat4("model", obj->getModelMatrix());
-        obj->getModel()->Draw(ShadowMapShader);
-    }
-    scene->RenderPlane(&ShadowMapShader);
-
-    depthBufferFBO->Unbind();
-}
 
 
 void Shadow::CalculateMSM(Scene const* scene)
@@ -77,7 +57,6 @@ void Shadow::CalculateMSM(Scene const* scene)
 void Shadow::ComputeVSM(Scene const* scene)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, VSM_FBO);
-    //VSMFBO->Bind();
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -93,7 +72,6 @@ void Shadow::ComputeVSM(Scene const* scene)
 
     scene->RenderPlane(&VSMShader);
 
-    //VSMFBO->Unbind();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

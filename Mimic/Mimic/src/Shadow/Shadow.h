@@ -14,14 +14,12 @@ private:
 	Shader MSMShader;
 	Shader VSMShader;
 
-	FBO_Depth* depthBufferFBO;
 	FBO_Color* Fbo;
 
 	const glm::mat4 View;
 	const glm::mat4 Projection;
 
 	unsigned int VSM_FBO, VSMDepthTexture, VSMColorTexture;
-	FBO_Color* VSMFBO;
 
 
 public:
@@ -31,11 +29,10 @@ public:
 	inline glm::mat4 GetProjection() const { return Projection; }
 
 	// returns a handle to a texture
-	inline unsigned int GetShadowMap() const { return depthBufferFBO->getDepthAttachment(); }
+	inline unsigned int GetShadowMap() const { return VSMColorTexture; }
 	inline unsigned int GetMSM() const { return Fbo->getColorAttachment(); }
 	inline unsigned int GetVSM() const { return VSMColorTexture; }
 
-	void CalculateShadowMap(Scene const* scene);
 	void CalculateMSM(Scene const* scene);
 	void ComputeVSM(Scene const* scene);
 

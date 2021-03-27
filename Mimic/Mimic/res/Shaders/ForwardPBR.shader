@@ -228,28 +228,16 @@ vec4 Invalidate(vec4 b)
 
 float calculateShadow(vec4 fragPosLightSpace)
 {
-    vec3 projCoord = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    // transform to [0,1] range
-    projCoord = projCoord * 0.5 + 0.5;
+    vec2 screenCoords = fragPosLightSpace.xy / fragPosLightSpace.w;
+    screenCoords = screenCoords * 0.5 + 0.5; // [0, 1]
 
-    if (projCoord.z > 1 || projCoord.z < 0) return 1;
-    if (projCoord.x > 1 || projCoord.x < 0) return 1;
-    if (projCoord.y > 1 || projCoord.y < 0) return 1;
+    if (fragPosLightSpace.w < 0.0) return 1.0;
+    if (screenCoords.x > 1.0 || screenCoords.x < 0.0) return 1.0;
+    if (screenCoords.y > 1.0 || screenCoords.y < 0.0) return 1.0;
 
-    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(ShadowMap, projCoord.xy).r;
-    // get depth of current fragment from light's perspective
-    float currentDepth = projCoord.z;
-
-    //float closestDepth = texture(VSM, projCoord.xy).r;
-    // get depth of current fragment from light's perspective
-    //float currentDepth = fragPosLightSpace.z;
-
-
-
-    float bias = 0.000078f;
+    float bias = 0.078f;
     // check whether current frag pos is in shadow
-    return (currentDepth - bias) > closestDepth ? 0.0 : 1.0;
+    return (fragPosLightSpace.w - bias) > texture(ShadowMap, screenCoords).r ? 0.0 : 1.0;
 }
 
 
@@ -272,9 +260,6 @@ float calculateMSM(vec4 fragPosLightSpace)
 }
 
 
-float linstep(const float low, const float high, const float value) {
-    return clamp((value - low) / (high - low), 0.0, 1.0);
-}
 
 // ----------------------------------------------------------------------------
 // Variance shadow mapping

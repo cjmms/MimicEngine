@@ -48,7 +48,6 @@ Renderer::Renderer(Scene const* scene)
 
     GaussianBlurShader = new Shader("res/Shaders/GaussianBlur.shader");
 
-    shadow->CalculateShadowMap(scene);
     shadow->ComputeVSM(scene);
 }
 
@@ -112,19 +111,13 @@ void Renderer::ForwardRendering(Scene const* scene)
     ForwardShader->setMat4("view", camera.getViewMatrix());
     ForwardShader->setMat4("projection", camera.getProjectionMatrix());
 
-    //ForwardShader->setMat4("view", shadow->GetLightView());
-    //ForwardShader->setMat4("projection", shadow->GetProjection());
-
-
     ForwardShader->setMat4("lightProjection", shadow->GetProjection());
     ForwardShader->setMat4("lightView", shadow->GetLightView());
 
     //ForwardShader->setTexture("MSM", GaussianBlur(shadow->GetMSM(), 0));
     //ForwardShader->setTexture("MSM", shadow->GetMSM());
-    //ForwardShader->setTexture("ShadowMap", GaussianBlur(shadow->GetShadowMap(), 0));
-    ForwardShader->setTexture("ShadowMap", shadow->GetShadowMap());
-    ForwardShader->setTexture("VSM", shadow->GetVSM());
-    //ForwardShader->setTexture("VSM", GaussianBlur(shadow->GetVSM(), 5));
+    ForwardShader->setTexture("ShadowMap", shadow->GetVSM());
+    ForwardShader->setTexture("VSM", GaussianBlur(shadow->GetVSM(), 5));
 
     for (auto obj : scene->getObjects())
     {
