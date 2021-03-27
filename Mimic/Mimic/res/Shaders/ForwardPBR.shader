@@ -31,7 +31,6 @@ void main()
 	vs_out.Normal = transpose(inverse(mat3(model))) * aNormal;
 	vs_out.TexCoord = aTexCoord;
     vs_out.FragPosLightSpace = lightProjection * lightView * model * vec4(aPos, 1.0f);
-    //vs_out.FragPosLightSpace =  lightView * model * vec4(aPos, 1.0f);
 }
 
 
@@ -298,14 +297,6 @@ float calculateVSM(vec4 fragPosLightSpace) {
 
      // Chebychev’s inequality
      return variance / (variance + pow(FragLightSpaceDepth - mean, 2.0));
-
-     
-     //float p = step(distance, moments.x);
-     //float variance = max(moments.y - (moments.x * moments.x), 0.00002);
-     //float d = distance - moments.x;
-     //float pMax = linstep(0.2, 1.0, variance / (variance + d * d)); // Solve light bleeding
-
-    //return min(max(p, pMax), 1.0);
 }
 
 
@@ -343,7 +334,8 @@ void main()
     float distance = fs_in.FragPosLightSpace.w; // Use raw distance instead of linear junk
     vec2 moments = texture(VSM, screenCoords.xy).rg;
 
-    //FragColor = vec4(vec3(moments.x / 30), 1.0);
+
+    //FragColor = vec4(vec3(moments.x /50 ), 1.0);
     //FragColor = vec4(screenCoords.xy, 0, 1);
     //FragColor = vec4(vec3(fs_in.FragPosLightSpace.w / 30), 1.0);
     //FragColor = vec4(vec3(fs_in.FragPosLightSpace.z / 30), 1.0);

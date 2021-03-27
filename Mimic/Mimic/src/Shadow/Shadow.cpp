@@ -14,7 +14,8 @@ Shadow::Shadow(glm::mat4 View, glm::mat4 Projection, int width, int height)
     VSMShader("res/Shaders/Shadow/VSM.shader")
 {
     depthBufferFBO = new FBO_Depth(width, height);
-    Fbo = new FBO_Color(width, height);
+    //Fbo = new FBO_Color(width, height);
+    //VSMFBO = new FBO_Color(width, height);
 
     SetupVSM(width, height);
 }
@@ -76,6 +77,8 @@ void Shadow::CalculateMSM(Scene const* scene)
 void Shadow::ComputeVSM(Scene const* scene)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, VSM_FBO);
+    //VSMFBO->Bind();
+    glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
@@ -88,9 +91,9 @@ void Shadow::ComputeVSM(Scene const* scene)
         obj->getModel()->Draw(VSMShader);
     }
 
-    //VSMShader.setMat4("model", glm::mat4(1.0f));
     scene->RenderPlane(&VSMShader);
 
+    //VSMFBO->Unbind();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -112,20 +115,22 @@ void Shadow::SetupVSM(unsigned int shadowMapRes_w, unsigned int shadowMapRes_h)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); // Clamp to border to fix over-sampling
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, VSMDepthTexture, 0);
 
 
     glGenTextures(1, &VSMColorTexture);
     glBindTexture(GL_TEXTURE_2D, VSMColorTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, shadowMapRes_w, shadowMapRes_h, 0, GL_RGBA, GL_FLOAT, nullptr);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Hardware linear filtering gives us soft shadows for free!
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, shadowMapRes_w, shadowMapRes_h, 0, GL_RGBA, GL_FLOAT, nullptr);
+    //glGenerateMipmap(GL_TEXTURE_2D);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Hardware linear filtering gives us soft shadows for free!
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); // Clamp to border to fix over-sampling
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, m_caps.MaxAnisotropy); // Anisotropic filtering for sharper angles
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, VSMColorTexture, 0);
     

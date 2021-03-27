@@ -21,6 +21,7 @@ private:
 	const glm::mat4 Projection;
 
 	unsigned int VSM_FBO, VSMDepthTexture, VSMColorTexture;
+	FBO_Color* VSMFBO;
 
 
 public:
