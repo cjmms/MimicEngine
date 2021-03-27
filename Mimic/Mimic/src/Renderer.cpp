@@ -74,8 +74,8 @@ void Renderer::Render(Scene const* scene)
     //VisualizeDepthBuffer(shadow->GetVSM());
     
     // First Pass, fill G-Buffer
-    scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
-    DeferredRenderer.Fill_G_Buffer(scene);
+    //scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
+    //DeferredRenderer.Fill_G_Buffer(scene);
 
     //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
@@ -84,9 +84,9 @@ void Renderer::Render(Scene const* scene)
     //DeferredRenderer.BindMSM(*shadow);
 
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
-    DeferredRenderer.Render(scene);
+    //DeferredRenderer.Render(scene);
     
-    //ForwardRendering(scene);    
+    ForwardRendering(scene);    
 
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //IBL.RenderSkybox();
@@ -112,8 +112,8 @@ void Renderer::ForwardRendering(Scene const* scene)
     ForwardShader->setMat4("view", camera.getViewMatrix());
     ForwardShader->setMat4("projection", camera.getProjectionMatrix());
 
-    //ForwardShader->setMat4("view", shadow->GetLightView());
-    //ForwardShader->setMat4("projection", shadow->GetProjection());
+    ForwardShader->setMat4("view", shadow->GetLightView());
+    ForwardShader->setMat4("projection", shadow->GetProjection());
 
 
     ForwardShader->setMat4("lightProjection", shadow->GetProjection());
@@ -135,7 +135,7 @@ void Renderer::ForwardRendering(Scene const* scene)
     //ForwardShader->setMat4("model", glm::mat4(1.0f));
     //ForwardShader->setMat4("view", shadow->GetLightView());
     //ForwardShader->setMat4("projection", shadow->GetProjection());
-    //scene->RenderPlane(ForwardShader);
+    scene->RenderPlane(ForwardShader);
 }
 
 

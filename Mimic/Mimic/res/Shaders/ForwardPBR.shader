@@ -334,7 +334,7 @@ void main()
 
     FragColor = vec4((ambient + diffuse) , 1.0f);   // testing, no shadow
 
-	//FragColor = vec4(ambient + diffuse * shadowIntensity, 1.0f);
+	FragColor = vec4(ambient + diffuse * shadowIntensity, 1.0f);
 
 
     vec2 screenCoords = fs_in.FragPosLightSpace.xy / fs_in.FragPosLightSpace.w;
