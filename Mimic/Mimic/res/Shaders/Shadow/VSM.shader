@@ -30,5 +30,8 @@ out vec4 FragColor;
 void main()
 {
 	// VSM
-	FragColor = vec4(VertexDepth, VertexDepth * VertexDepth, 0.0, 1.0);
+	FragColor = vec4( VertexDepth, 
+					  VertexDepth * VertexDepth,
+					  VertexDepth * VertexDepth * VertexDepth, 
+					  VertexDepth * VertexDepth * VertexDepth * VertexDepth );
 }

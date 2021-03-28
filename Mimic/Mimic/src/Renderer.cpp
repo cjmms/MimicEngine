@@ -117,7 +117,7 @@ void Renderer::ForwardRendering(Scene const* scene)
     //ForwardShader->setTexture("MSM", GaussianBlur(shadow->GetMSM(), 0));
     //ForwardShader->setTexture("MSM", shadow->GetMSM());
     ForwardShader->setTexture("ShadowMap", shadow->GetVSM());
-    ForwardShader->setTexture("VSM", GaussianBlur(shadow->GetVSM(), 5));
+    ForwardShader->setTexture("VSM", GaussianBlur(shadow->GetVSM(), 0));
 
     for (auto obj : scene->getObjects())
     {

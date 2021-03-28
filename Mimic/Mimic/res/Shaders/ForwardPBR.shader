@@ -220,8 +220,11 @@ vec4 UndoQuantization(vec4 b)
 
 vec4 Invalidate(vec4 b)
 {
-    float alpha = 1 * pow(10, -5);
-    return (1.0f - alpha) * b + alpha * 0.5;
+    //float alpha = 0.00015;
+    //return (1.0f - alpha) * b + alpha * 20;
+    //float alpha = 0.0008;
+    float alpha = 0.08;
+    return (1.0f - alpha) * b + alpha * 30;
 }
 
 
@@ -244,19 +247,18 @@ float calculateShadow(vec4 fragPosLightSpace)
 
 float calculateMSM(vec4 fragPosLightSpace)
 {
-    vec3 projCoord = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    // transform to [0,1] range
-    projCoord = projCoord * 0.5 + 0.5;
+    // Perspective divide
+    vec2 screenCoords = fragPosLightSpace.xy / fragPosLightSpace.w;
+    screenCoords = screenCoords * 0.5 + 0.5; // [0, 1]
 
-    if (projCoord.z > 1 || projCoord.z < 0) return 1;
-    if (projCoord.x > 1 || projCoord.x < 0) return 1;
-    if (projCoord.y > 1 || projCoord.y < 0) return 1;
+    if (fragPosLightSpace.w < 0.0) return 1.0;
+    if (screenCoords.x > 1.0 || screenCoords.x < 0.0) return 1.0;
+    if (screenCoords.y > 1.0 || screenCoords.y < 0.0) return 1.0;
 
-    vec4 b = texture(MSM, projCoord.xy);
-    //vec4 b = vec4(texture(ShadowMap, projCoord.xy).x);
-    //b = UndoQuantization(b);
+    vec4 b = texture(VSM, screenCoords);
 
-    return 1 - MSM_Intensity(Invalidate(b), fragPosLightSpace.w);
+    //return 1 - MSM_Intensity(Invalidate(b), fragPosLightSpace.w);
+    return 1 - momentShadowFactor(Invalidate(b), fragPosLightSpace.w);
 }
 
 
@@ -291,9 +293,9 @@ void main()
 {
     //float shadowIntensity = calculateShadow(fs_in.FragPosLightSpace);
 
-    //float shadowIntensity = calculateMSM(fs_in.FragPosLightSpace);
+    float shadowIntensity = calculateMSM(fs_in.FragPosLightSpace);
 
-    float shadowIntensity = calculateVSM(fs_in.FragPosLightSpace);
+    //float shadowIntensity = calculateVSM(fs_in.FragPosLightSpace);
 
 
 	vec3 color = vec3(1.0f);

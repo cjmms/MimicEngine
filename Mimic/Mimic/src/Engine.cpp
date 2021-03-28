@@ -25,13 +25,13 @@
 * DONE: Model Loading
 * DONE: Texture Loading
 * DONE: Volumetric lighting
+* DONE: VSM
 * 
 * TODO: imGUI
 * TODO: SSAO
 * TODO: bloom
 * TODO: Spot Light
 * TODO: HDR with adaptive exposure
-* TODO: soft shadow
 * TODO: light volume
 * 
 * TODO: instancing
