@@ -10,53 +10,19 @@
 Shadow::Shadow(glm::mat4 View, glm::mat4 Projection, int width, int height)
     :View(View), Projection(Projection),
     ShadowMapShader("res/Shaders/Shadow/DepthMap.shader"),
-    MSMShader("res/Shaders/Shadow/MomentMap.shader"),
     VSMShader("res/Shaders/Shadow/VSM.shader")
 {
-    //Fbo = new FBO_Color(width, height);
-
-    SetupVSM(width, height);
+    Setup(width, height);
 }
 
 
 
 
-void Shadow::CalculateMSM(Scene const* scene)
+
+
+void Shadow::Compute(Scene const* scene)
 {
-    /*
-    // fill depth buffer
-    CalculateShadowMap(scene);
-
-    Fbo->Bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    Quad().Draw(MSMShader, GetShadowMap());
-
-    Fbo->Unbind();
-    */
-
-    Fbo->Bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    MSMShader.setMat4("view", View);
-    MSMShader.setMat4("projection", Projection);
-
-    for (auto obj : scene->getObjects())
-    {
-        MSMShader.setMat4("model", obj->getModelMatrix());
-        obj->getModel()->Draw(MSMShader);
-    }
-    scene->RenderPlane(&MSMShader);
-
-    Fbo->Unbind();
-}
-
-
-
-
-void Shadow::ComputeVSM(Scene const* scene)
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, VSM_FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, Shadow_FBO);
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -78,15 +44,15 @@ void Shadow::ComputeVSM(Scene const* scene)
 
 
 
-void Shadow::SetupVSM(unsigned int shadowMapRes_w, unsigned int shadowMapRes_h)
+void Shadow::Setup(unsigned int shadowMapRes_w, unsigned int shadowMapRes_h)
 {
-    glGenFramebuffers(1, &VSM_FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, VSM_FBO);
+    glGenFramebuffers(1, &Shadow_FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, Shadow_FBO);
 
     float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-    glGenTextures(1, &VSMDepthTexture);
-    glBindTexture(GL_TEXTURE_2D, VSMDepthTexture);
+    glGenTextures(1, &DepthTexture);
+    glBindTexture(GL_TEXTURE_2D, DepthTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, shadowMapRes_w, shadowMapRes_h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -95,14 +61,18 @@ void Shadow::SetupVSM(unsigned int shadowMapRes_w, unsigned int shadowMapRes_h)
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, VSMDepthTexture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, DepthTexture, 0);
 
 
-    glGenTextures(1, &VSMColorTexture);
-    glBindTexture(GL_TEXTURE_2D, VSMColorTexture);
+    glGenTextures(1, &ColorTexture);
+    glBindTexture(GL_TEXTURE_2D, ColorTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, shadowMapRes_w, shadowMapRes_h, 0, GL_RGBA, GL_FLOAT, nullptr);
+
+    // Hardware linear filtering gives us soft shadows for free!
+    // My hardware is stupid, it only gives me bugs
     //glGenerateMipmap(GL_TEXTURE_2D);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Hardware linear filtering gives us soft shadows for free!
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); 
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); // Clamp to border to fix over-sampling
@@ -110,7 +80,7 @@ void Shadow::SetupVSM(unsigned int shadowMapRes_w, unsigned int shadowMapRes_h)
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, VSMColorTexture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ColorTexture, 0);
     
 
     // check if framebuffer created successfullly

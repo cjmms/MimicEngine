@@ -11,15 +11,12 @@ class Shadow
 {
 private:
 	Shader ShadowMapShader;
-	Shader MSMShader;
 	Shader VSMShader;
-
-	FBO_Color* Fbo;
 
 	const glm::mat4 View;
 	const glm::mat4 Projection;
 
-	unsigned int VSM_FBO, VSMDepthTexture, VSMColorTexture;
+	unsigned int Shadow_FBO, DepthTexture, ColorTexture;
 
 
 public:
@@ -29,13 +26,10 @@ public:
 	inline glm::mat4 GetProjection() const { return Projection; }
 
 	// returns a handle to a texture
-	inline unsigned int GetShadowMap() const { return VSMColorTexture; }
-	inline unsigned int GetMSM() const { return Fbo->getColorAttachment(); }
-	inline unsigned int GetVSM() const { return VSMColorTexture; }
+	inline unsigned int GetShadowMap() const { return ColorTexture; }
 
-	void CalculateMSM(Scene const* scene);
-	void ComputeVSM(Scene const* scene);
+	void Compute(Scene const* scene);
 
-	void SetupVSM(unsigned int shadowMapRes_w, unsigned int shadowMapRes_h);
+	void Setup(unsigned int shadowMapRes_w, unsigned int shadowMapRes_h);
 };
 

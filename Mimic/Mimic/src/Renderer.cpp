@@ -23,17 +23,9 @@ Renderer::Renderer(Scene const* scene)
 
     //std::cout <<  "Renderer Constructor" << std::endl;
 	glEnable(GL_DEPTH_TEST);
-    /*
-    glm::mat4 lightView = glm::lookAt(
-        glm::vec3(-70.0f, 70.0f, -10.0f), glm::vec3(30.0f, 60.0f, 55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
-    */
 
     glm::mat4 lightView = glm::lookAt(
         glm::vec3(-20.0f, 35.0f, 10.0),glm::vec3(0.0f, 0.0f, 00.0f), glm::vec3(0.0, 1.0, 0.0));
-
-
 
     glm::mat4 lightProjection = glm::perspective(
         glm::radians(45.0f), (float)UI_Mgr.getScreenWidth() / UI_Mgr.getScreenHeight(), 0.1f, 80.0f);
@@ -48,7 +40,7 @@ Renderer::Renderer(Scene const* scene)
 
     GaussianBlurShader = new Shader("res/Shaders/GaussianBlur.shader");
 
-    shadow->ComputeVSM(scene);
+    shadow->Compute(scene);
 }
 
 
@@ -73,22 +65,20 @@ void Renderer::Render(Scene const* scene)
     //VisualizeDepthBuffer(shadow->GetVSM());
     
     // First Pass, fill G-Buffer
-    scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
-    DeferredRenderer.Fill_G_Buffer(scene);
+    //scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
+    //DeferredRenderer.Fill_G_Buffer(scene);
 
     //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
-
     //DeferredRenderer.BindShadowMap(*shadow);
-    //DeferredRenderer.BindMSM(*shadow);
 
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
-    DeferredRenderer.Render(scene);
+    //DeferredRenderer.Render(scene);
     
-    //ForwardRendering(scene);    
+    ForwardRendering(scene);    
 
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    IBL.RenderSkybox();
+    //IBL.RenderSkybox();
 }
 
 
@@ -114,10 +104,7 @@ void Renderer::ForwardRendering(Scene const* scene)
     ForwardShader->setMat4("lightProjection", shadow->GetProjection());
     ForwardShader->setMat4("lightView", shadow->GetLightView());
 
-    //ForwardShader->setTexture("MSM", GaussianBlur(shadow->GetMSM(), 0));
-    //ForwardShader->setTexture("MSM", shadow->GetMSM());
-    ForwardShader->setTexture("ShadowMap", shadow->GetVSM());
-    ForwardShader->setTexture("VSM", GaussianBlur(shadow->GetVSM(), 5));
+    ForwardShader->setTexture("ShadowMap", GaussianBlur(shadow->GetShadowMap(), 5));
 
     for (auto obj : scene->getObjects())
     {

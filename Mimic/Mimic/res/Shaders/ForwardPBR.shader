@@ -55,12 +55,7 @@ uniform vec3 lightPositions[N_LIGHTS];
 uniform vec3 lightColors[N_LIGHTS];
 uniform vec3 camPos;
 
-
 uniform sampler2D ShadowMap;
-uniform sampler2D MSM;
-uniform sampler2D VSM;
-//uniform mat4 lightProjection;
-//uniform mat4 lightView;
 
 out vec4 FragColor;
 
@@ -158,72 +153,11 @@ float momentShadowFactor(vec4 shadowSample, float depth)
 
 
 
-float MSM_Intensity(vec4 b, float fragment_depth)
-{
-    float l32_d22 = -b.x * b.y + b.z;
-    float d22 = -b.x * b.x + b.y;
-    float squared_depth_variance = -b.x * b.y + b.z;
-
-    float d33_d22 = dot(vec2(squared_depth_variance, -l32_d22), vec2(d22, l32_d22));
-    float inv_d22 = 1.0 - d22;
-    float l32 = l32_d22 * inv_d22;
-
-    float z_zero = fragment_depth;
-    vec3 c = vec3(1.0, z_zero - b.x, z_zero * z_zero);
-    c.z -= b.y + l32 * c.y;
-    c.y *= inv_d22;
-    c.z *= d22 / d33_d22;
-    c.y -= l32 * c.z;
-    c.x -= dot(c.yz, b.xy);
-
-    float inv_c2 = 1.0 / c.z;
-    float p = c.y * inv_c2;
-    float q = c.x * inv_c2;
-    float r = sqrt((p * p * 0.25) - q);
-
-    float z_one = -p * 0.5 - r;
-    float z_two = -p * 0.5 + r;
-
-    vec4 switch_msm;
-    if (z_two < z_zero) {
-        switch_msm = vec4(z_one, z_zero, 1.0, 1.0);
-    }
-    else {
-        if (z_one < z_zero) {
-            switch_msm = vec4(z_zero, z_one, 0.0, 1.0);
-        }
-        else {
-            switch_msm = vec4(0.0);
-        }
-    }
-
-    float quotient = (switch_msm.x * z_two - b.x * (switch_msm.x + z_two + b.y)) / ((z_two - switch_msm.y) * (z_zero - z_one));
-    return clamp(switch_msm.y + switch_msm.z * quotient, 0.0, 1.0);
-}
 
 
-
-
-vec4 UndoQuantization(vec4 b)
-{
-    b -= vec4(0.5, 0.0, 0.5, 0.0);
-
-    vec4 result;
-
-    result.r = dot(vec4(-(1 / 3), 0.0, sqrt(3), 0.0), b);
-    result.g = dot(vec4(0.0, 0.125, 0.0, 1.0), b);
-    result.b = dot(vec4(-0.75, 0.0, 0.75 * sqrt(3), 0.0), b);
-    result.a = dot(vec4(0.0, -0.125, 0.0, 1.0), b);
-
-    return result;
-}
 
 vec4 Invalidate(vec4 b)
 {
-    //float alpha = 0.00015;
-    //return (1.0f - alpha) * b + alpha * 20;
-    //float alpha = 0.0008;
-    //float alpha = 0.08;
     float alpha = 0.001;
     return (1.0f - alpha) * b + alpha * 30;
 }
@@ -256,9 +190,8 @@ float calculateMSM(vec4 fragPosLightSpace)
     if (screenCoords.x > 1.0 || screenCoords.x < 0.0) return 1.0;
     if (screenCoords.y > 1.0 || screenCoords.y < 0.0) return 1.0;
 
-    vec4 b = texture(VSM, screenCoords);
+    vec4 b = texture(ShadowMap, screenCoords);
 
-    //return 1 - MSM_Intensity(Invalidate(b), fragPosLightSpace.w);
     return 1 - momentShadowFactor(Invalidate(b), fragPosLightSpace.w);
 }
 
@@ -276,7 +209,7 @@ float calculateVSM(vec4 fragPosLightSpace) {
     if (screenCoords.y > 1.0 || screenCoords.y < 0.0) return 1.0;
 
      float FragLightSpaceDepth = fragPosLightSpace.w; // Use raw distance instead of linear junk
-     vec2 moments = texture2D(VSM, screenCoords.xy).rg;
+     vec2 moments = texture2D(ShadowMap, screenCoords.xy).rg;
 
      float mean = moments.x;
      float variance = moments.y - mean * mean;
@@ -294,9 +227,9 @@ void main()
 {
     //float shadowIntensity = calculateShadow(fs_in.FragPosLightSpace);
 
-    float shadowIntensity = calculateMSM(fs_in.FragPosLightSpace);
+    //float shadowIntensity = calculateMSM(fs_in.FragPosLightSpace);
 
-    //float shadowIntensity = calculateVSM(fs_in.FragPosLightSpace);
+    float shadowIntensity = calculateVSM(fs_in.FragPosLightSpace);
 
 
 	vec3 color = vec3(1.0f);
@@ -311,24 +244,7 @@ void main()
 	}
 
 
-    FragColor = vec4((ambient + diffuse) , 1.0f);   // testing, no shadow
+    //FragColor = vec4((ambient + diffuse) , 1.0f);   // testing, no shadow
 
 	FragColor = vec4(ambient + diffuse * shadowIntensity, 1.0f);
-
-
-    vec2 screenCoords = fs_in.FragPosLightSpace.xy / fs_in.FragPosLightSpace.w;
-    screenCoords = screenCoords * 0.5 + 0.5; // [0, 1]
-
-    float distance = fs_in.FragPosLightSpace.w; // Use raw distance instead of linear junk
-    vec2 moments = texture(VSM, screenCoords.xy).rg;
-
-
-    //FragColor = vec4(vec3(moments.x /50 ), 1.0);
-    //FragColor = vec4(screenCoords.xy, 0, 1);
-    //FragColor = vec4(vec3(fs_in.FragPosLightSpace.w / 30), 1.0);
-    //FragColor = vec4(vec3(fs_in.FragPosLightSpace.z / 30), 1.0);
-    //FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-
-    //FragColor = vec4(fs_in.FragPosLightSpace.xyz, 1.0f);
-    //FragColor = vec4(vec3(texture(ShadowMap, screenCoords).r) / 2, 1.0f);
 }
