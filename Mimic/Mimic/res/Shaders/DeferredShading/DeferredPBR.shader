@@ -250,11 +250,11 @@ void main()
 
     float visibility = texture(gPosition, TexCoords).a;
 
-    if (visibility != 2.0) // 2.0 is PBR, if it's not PBR, return albedo directly
-    {
-        FragColor = vec4(pow(albedo, vec3(1.0 / 2.2)), 1.0f);
-        return;
-    }
+    //if (visibility != 2.0) // 2.0 is PBR, if it's not PBR, return albedo directly
+   // {
+     //   FragColor = vec4(pow(albedo, vec3(1.0 / 2.2)), 1.0f);
+       // return;
+   // }
 
     float metallic = texture(gAlbedoMetallic, TexCoords).a;
     float roughness = texture(gNormalRoughness, TexCoords).a;

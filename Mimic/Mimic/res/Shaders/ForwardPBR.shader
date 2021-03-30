@@ -223,7 +223,8 @@ vec4 Invalidate(vec4 b)
     //float alpha = 0.00015;
     //return (1.0f - alpha) * b + alpha * 20;
     //float alpha = 0.0008;
-    float alpha = 0.08;
+    //float alpha = 0.08;
+    float alpha = 0.001;
     return (1.0f - alpha) * b + alpha * 30;
 }
 
@@ -282,7 +283,7 @@ float calculateVSM(vec4 fragPosLightSpace) {
 
      if (FragLightSpaceDepth <= mean) return 1.0;    // not under shadow
 
-     // Chebychev’s inequality
+     // Chebychev inequality
      return variance / (variance + pow(FragLightSpaceDepth - mean, 2.0));
 }
 
