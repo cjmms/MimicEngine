@@ -37,6 +37,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     camera.updateCameraDirection((float)xpos, (float)ypos);
 }
 
+void mouseButton_callback(GLFWwindow* window, int button, int action, int mods)
+{
+
+    camera.SetMouseStatus(button, action);
+}
+
 
 
 
@@ -75,6 +81,7 @@ bool UI_Manager::init()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetMouseButtonCallback(window, mouseButton_callback);
 
     disableCursor();
 

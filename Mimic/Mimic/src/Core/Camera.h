@@ -81,6 +81,9 @@ public:
 	void Print() const;
 
 
+	void SetMouseStatus(int button, int action);
+
+
 private:
 	// calculate and normalize camera front vector base on yaw and pitch
 	void calculateCameraFront();
@@ -88,5 +91,7 @@ private:
 	// update yaw and pitch base on x, y difference
 	// pitch value can't be 90 degree
 	void calculateCameraAngle(float currentX, float currentY);
+
+	bool rightDown;
 };
 
