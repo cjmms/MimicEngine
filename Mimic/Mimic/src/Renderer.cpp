@@ -7,6 +7,17 @@
 #include "Scene.h"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "imgui/imgui.h"
+
+//#include "imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+#include "imgui/imgui_internal.h"
+
+
+
+
+
 extern bool test;
 extern Camera camera;
 extern UI_Manager UI_Mgr;
@@ -40,7 +51,8 @@ Renderer::Renderer(Scene const* scene)
 
     GaussianBlurShader = new Shader("res/Shaders/GaussianBlur.shader");
 
-    shadow->Compute(scene);
+    //shadow->Compute(scene);
+    
 }
 
 
@@ -62,8 +74,9 @@ void Renderer::Render(Scene const* scene)
 {
     //VisualizeDepthBuffer(shadow->GetShadowMap());
     //VisualizeDepthBuffer(shadow->GetShadowMap());
-    //VisualizeDepthBuffer(shadow->GetVSM());
+    //VisualizeDepthBuffer(shadow->GetVSM());    
     
+
     // First Pass, fill G-Buffer
     //scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
     //DeferredRenderer.Fill_G_Buffer(scene);
@@ -75,10 +88,14 @@ void Renderer::Render(Scene const* scene)
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
     //DeferredRenderer.Render(scene);
     
+    shadow->Compute(scene);
+
     ForwardRendering(scene);    
 
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //IBL.RenderSkybox();
+
+
 }
 
 
@@ -104,7 +121,7 @@ void Renderer::ForwardRendering(Scene const* scene)
     ForwardShader->setMat4("lightProjection", shadow->GetProjection());
     ForwardShader->setMat4("lightView", shadow->GetLightView());
 
-    ForwardShader->setTexture("ShadowMap", GaussianBlur(shadow->GetShadowMap(), 5));
+    ForwardShader->setTexture("ShadowMap", GaussianBlur(shadow->GetShadowMap(), 1));
 
     for (auto obj : scene->getObjects())
     {

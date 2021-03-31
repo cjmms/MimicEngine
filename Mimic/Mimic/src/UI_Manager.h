@@ -27,6 +27,8 @@ public:
 
 	inline bool windowClosed() { return glfwWindowShouldClose(window); }
 
+	inline GLFWwindow* getWindow() { return window; }
+
 private:
 	unsigned int window_width, window_height;
 	GLFWwindow* window;
