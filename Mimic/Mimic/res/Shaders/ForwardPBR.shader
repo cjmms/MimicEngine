@@ -56,6 +56,7 @@ uniform vec3 lightColors[N_LIGHTS];
 uniform vec3 camPos;
 
 uniform sampler2D ShadowMap;
+uniform int ShadowMapType;
 
 out vec4 FragColor;
 
@@ -225,11 +226,17 @@ float calculateVSM(vec4 fragPosLightSpace) {
 
 void main()
 {
-    //float shadowIntensity = calculateShadow(fs_in.FragPosLightSpace);
+    float shadowIntensity;
 
-    //float shadowIntensity = calculateMSM(fs_in.FragPosLightSpace);
-
-    float shadowIntensity = calculateVSM(fs_in.FragPosLightSpace);
+    if (ShadowMapType == 0) {
+        shadowIntensity = calculateShadow(fs_in.FragPosLightSpace);
+    }
+    else if (ShadowMapType == 1) {
+        shadowIntensity = calculateVSM(fs_in.FragPosLightSpace);
+    }
+    else{
+        shadowIntensity = calculateMSM(fs_in.FragPosLightSpace);
+    }
 
 
 	vec3 color = vec3(1.0f);

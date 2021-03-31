@@ -54,7 +54,7 @@ private:
 
 	unsigned int GaussianBlur(unsigned int texture, int level) const;
 
-	
+	void RenderUI();
 
 public:
 	Renderer(Scene const* scene);
@@ -69,5 +69,7 @@ public:
 	// shader is always fixed for light source
 	// the purpose of rendering light is for testing
 	void RenderLightSources(Scene const* scene) const;
+
+	
 };
 

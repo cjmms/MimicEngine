@@ -2,6 +2,10 @@
 #include <iostream>
 #include <stb_image.h>
 
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+#include "imgui/imgui_internal.h"
+
 bool test = true;
 
 void processInput(GLFWwindow* window)
@@ -74,6 +78,25 @@ bool UI_Manager::init()
 
     disableCursor();
 
+
+
+
+    // imgui
+    const char* glsl_version = "#version 130";
+
+    // Setup Dear ImGui context
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(getWindow(), true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
+
+
     return true;
 }
 
@@ -81,6 +104,12 @@ bool UI_Manager::init()
 
 void UI_Manager::close()
 {
+    // Cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+
     glfwTerminate();
 }
 
@@ -127,3 +156,18 @@ void UI_Manager::setScreenSize(unsigned int window_width, unsigned int window_he
 
 
 
+
+void UI_Manager::NewUIFrame()
+{
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+}
+
+
+void UI_Manager::RenderUI()
+{
+    // Rendering UI
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}

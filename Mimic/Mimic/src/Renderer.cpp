@@ -22,6 +22,9 @@ extern bool test;
 extern Camera camera;
 extern UI_Manager UI_Mgr;
 
+int GaussianBlurPass = 0;
+int ShadowMapType = 0;
+
 Renderer::Renderer(Scene const* scene)
     :lightShader(new Shader("res/Shaders/basic.shader")),
     debugMode(debugMode),
@@ -70,12 +73,26 @@ Renderer::~Renderer()
 
 
 
-void Renderer::Render(Scene const* scene)  
+void Renderer::RenderUI()
 {
-    //VisualizeDepthBuffer(shadow->GetShadowMap());
-    //VisualizeDepthBuffer(shadow->GetShadowMap());
-    //VisualizeDepthBuffer(shadow->GetVSM());    
-    
+    ImGui::Begin("UI");                          
+
+    ImGui::Text("ShadowMap Gaussian Blur Pass.");               
+    ImGui::SliderInt("int", &GaussianBlurPass, 0, 10);
+
+    ImGui::RadioButton("Standard Shadow Map", &ShadowMapType, 0);
+    ImGui::RadioButton("Variance Shadow Map", &ShadowMapType, 1);
+    ImGui::RadioButton("Moment Shadow Map", &ShadowMapType, 2);
+
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::End();
+}
+
+
+
+void Renderer::Render(Scene const* scene)  
+{    
+    RenderUI();
 
     // First Pass, fill G-Buffer
     //scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
@@ -94,8 +111,6 @@ void Renderer::Render(Scene const* scene)
 
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //IBL.RenderSkybox();
-
-
 }
 
 
@@ -121,7 +136,8 @@ void Renderer::ForwardRendering(Scene const* scene)
     ForwardShader->setMat4("lightProjection", shadow->GetProjection());
     ForwardShader->setMat4("lightView", shadow->GetLightView());
 
-    ForwardShader->setTexture("ShadowMap", GaussianBlur(shadow->GetShadowMap(), 1));
+    ForwardShader->setTexture("ShadowMap", GaussianBlur(shadow->GetShadowMap(), GaussianBlurPass));
+    ForwardShader->setInt("ShadowMapType", ShadowMapType);
 
     for (auto obj : scene->getObjects())
     {
@@ -174,11 +190,12 @@ unsigned int Renderer::GaussianBlur(unsigned int texture, int level) const
         PingBufferFBO.Unbind();
     }
 
+
     for (int i = 0; i < level; i++)
     {
-
         PongBufferFBO.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         GaussianBlurShader->setInt("horizontal", true);
         Quad().Draw(*GaussianBlurShader, PingBufferFBO.getColorAttachment());
         PongBufferFBO.Unbind();

@@ -29,6 +29,9 @@ public:
 
 	inline GLFWwindow* getWindow() { return window; }
 
+	void NewUIFrame();
+	void RenderUI();
+
 private:
 	unsigned int window_width, window_height;
 	GLFWwindow* window;

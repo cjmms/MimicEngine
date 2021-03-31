@@ -13,9 +13,7 @@
 
 #define SHADOW_MAP_DEBUG 0
 
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
-#include "imgui/imgui_internal.h"
+
 
 
 /*
@@ -97,24 +95,7 @@ void Engine::run()
 {
     Renderer renderer(scene);
 
-    //UI_Mgr.enableCursor();
-
-
-    // imgui
-    const char* glsl_version = "#version 130";
-
-    // Setup Dear ImGui context
-    //IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-
-    // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(UI_Mgr.getWindow(), true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
-
+    UI_Mgr.enableCursor();
 
 
     while (!UI_Mgr.windowClosed())
@@ -122,30 +103,15 @@ void Engine::run()
         UI_Mgr.update();
 
         //camera.Print();
+        camera.disable();
 
         camera.cameraUpdateFrameTime();
 
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        
-        //if (showUI)
-        {
-            ImGui::Begin("UI");                          // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
-            ImGui::End();
-        }
-
-        
+        UI_Mgr.NewUIFrame();      
 
         renderer.Render(scene);
         renderer.RenderLightSources(scene);
 
-        // Rendering UI
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        UI_Mgr.RenderUI();
     }
 }
