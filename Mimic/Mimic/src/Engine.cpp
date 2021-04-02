@@ -69,10 +69,10 @@ void Engine::init()
     //scene->addObjects("res/objects/Knife/Knife.obj", glm::vec3(10.0));
     //scene->InitTextures("res/objects/Knife/");
 
-    //scene->addObjects("res/objects/Axe/Axe.obj", glm::vec3(1.0));
-    //scene->InitTextures("res/objects/Axe/");
+    scene->addObjects("res/objects/Axe/Axe.obj", glm::vec3(1.0));
+    scene->InitTextures("res/objects/Axe/");
 
-    scene->addObjects("res/objects/backpack/backpack.obj", glm::vec3(3.0));
+    //scene->addObjects("res/objects/backpack/backpack.obj", glm::vec3(3.0));
 
     /*
     // dragon
@@ -95,7 +95,7 @@ void Engine::run()
 {
     Renderer renderer(scene);
 
-    UI_Mgr.enableCursor();
+    //UI_Mgr.enableCursor();
 
 
     while (!UI_Mgr.windowClosed())

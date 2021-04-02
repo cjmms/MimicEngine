@@ -104,6 +104,13 @@ void DeferredRendering::Render(Scene const* scene) const
 
     Bind_G_Buffer(DeferredLightingShader);
 
+    DeferredLightingShader->Bind();
+    glActiveTexture(GL_TEXTURE20);  // why 20? hard coded
+    glBindTexture(GL_TEXTURE_CUBE_MAP, IBL.GetIrradianceMap());
+
+    DeferredLightingShader->setInt("IrradianceMap", 20); 
+    DeferredLightingShader->unBind();
+
     const std::vector<Light* > lights = scene->getLightSources();
 
     for (unsigned int i = 0; i < lights.size(); i++)

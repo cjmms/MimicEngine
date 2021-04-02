@@ -40,6 +40,7 @@ uniform mat4 lightProjection;
 uniform mat4 lightView;
 uniform sampler2D shadowMap;
 
+uniform samplerCube IrradianceMap;
 
 
 
@@ -79,9 +80,9 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
     return ggx1 * ggx2;
 }
 // ----------------------------------------------------------------------------
-vec3 fresnelSchlick(float cosTheta, vec3 F0)
+vec3 fresnelSchlick(float cosTheta, vec3 F0, float roughness)
 {
-    return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+    return F0 + ( max( vec3(1.0 - roughness), F0) - F0 ) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
 // ----------------------------------------------------------------------------
 
@@ -102,7 +103,7 @@ vec3 reflection(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, ve
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, roughness);
         float G = GeometrySmith(N, V, L, roughness);
-        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0, roughness);
 
         vec3 nominator = NDF * G * F;
         float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; // 0.001 to prevent divide by zero.
@@ -128,90 +129,20 @@ vec3 reflection(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, ve
     return Lo;
 }
 
-/// Computes the Moment-shadow intensity for the fragment depth
-/// 
-/// - b is RGBA value that you got from sampling the texture and 
-///   putting it through the reverse matrix.
-/// - fragment_depth is the sample point at which you want to calculate
-///   the shadow
-/// - The return value is the shadow value
-float compute_msm_shadow_intensity(vec4 b, float fragment_depth) {
-
-    // OpenGL 4 only - fma has higher precision:
-    // float l32_d22 = fma(-b.x, b.y, b.z); // a * b + c
-    // float d22 = fma(-b.x, b.x, b.y);     // a * b + c
-    // float squared_depth_variance = fma(-b.x, b.y, b.z); // a * b + c
-
-    float l32_d22 = -b.x * b.y + b.z;
-    float d22 = -b.x * b.x + b.y;
-    float squared_depth_variance = -b.x * b.y + b.z;
-
-    float d33_d22 = dot(vec2(squared_depth_variance, -l32_d22), vec2(d22, l32_d22));
-    float inv_d22 = 1.0 - d22;
-    float l32 = l32_d22 * inv_d22;
-
-    float z_zero = fragment_depth;
-    vec3 c = vec3(1.0, z_zero - b.x, z_zero * z_zero);
-    c.z -= b.y + l32 * c.y;
-    c.y *= inv_d22;
-    c.z *= d22 / d33_d22;
-    c.y -= l32 * c.z;
-    c.x -= dot(c.yz, b.xy);
-
-    float inv_c2 = 1.0 / c.z;
-    float p = c.y * inv_c2;
-    float q = c.x * inv_c2;
-    float r = sqrt((p * p * 0.25) - q);
-
-    float z_one = -p * 0.5 - r;
-    float z_two = -p * 0.5 + r;
-
-    vec4 switch_msm;
-    if (z_two < z_zero) {
-        switch_msm = vec4(z_one, z_zero, 1.0, 1.0);
-    }
-    else {
-        if (z_one < z_zero) {
-            switch_msm = vec4(z_zero, z_one, 0.0, 1.0);
-        }
-        else {
-            switch_msm = vec4(0.0);
-        }
-    }
-
-    float quotient = (switch_msm.x * z_two - b.x * (switch_msm.x + z_two + b.y)) / ((z_two - switch_msm.y) * (z_zero - z_one));
-    return clamp(switch_msm.y + switch_msm.z * quotient, 0.0, 1.0);
-}
 
 
-
-float calculateShadowIntensity(vec3 N, vec3 WorldPos)
+// Calculate the diffuse ambient light from IBL
+// Kd is approximated by using 1 - Ks, this is not good enough.
+// Because there aresome energy get absorbed by the transmission and get refracted.
+vec3 IBLAmbientDiffuse(vec3 N, vec3 V, vec3 albedo, float roughness, vec3 F0, vec3 ao)
 {
-    vec4 lightSpaceFragPos = lightProjection * lightView * vec4(WorldPos, 1.0f);
-    vec3 projCoord = lightSpaceFragPos.xyz / lightSpaceFragPos.w;
-    float FragDepth = projCoord.z;
-    // transform to [0,1] range
-    projCoord = projCoord * 0.5 + 0.5;
-
-    if (projCoord.z > 1 || projCoord.z < 0) return 0;
-    if (projCoord.x > 1 || projCoord.x < 0) return 0;
-    if (projCoord.y > 1 || projCoord.y < 0) return 0;
-
-    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    vec4 b =  texture(shadowMap, projCoord.xy);
-
-    float intensity = compute_msm_shadow_intensity(  b, FragDepth);
-
-    float shadow = FragDepth > (b.x ) ? 0.01 : 1.0;
-
-    //if (FragDepth > intensity) return intensity;
-    //else return 0.0;
-
-    //float shadow = FragDepth > (intensity * 0.5 + 0.5) ? 0.01 : 1.0;
-
-    return shadow;
-    //return compute_msm_shadow_intensity(0.98 * b, FragDepth);
+    vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0, roughness);
+    vec3 kD = 1.0 - kS;     
+    vec3 irradiance = texture(IrradianceMap, N).rgb;
+    vec3 diffuse = irradiance * albedo;
+    return (kD * diffuse) * ao;
 }
+
 
 
 
@@ -250,11 +181,11 @@ void main()
 
     float visibility = texture(gPosition, TexCoords).a;
 
-    //if (visibility != 2.0) // 2.0 is PBR, if it's not PBR, return albedo directly
-   // {
-     //   FragColor = vec4(pow(albedo, vec3(1.0 / 2.2)), 1.0f);
-       // return;
-   // }
+    if (visibility != 2.0) // 2.0 is PBR, if it's not PBR, return albedo directly
+    {
+        FragColor = vec4(pow(albedo, vec3(1.0 / 2.2)), 1.0f);
+        return;
+    }
 
     float metallic = texture(gAlbedoMetallic, TexCoords).a;
     float roughness = texture(gNormalRoughness, TexCoords).a;
@@ -267,19 +198,16 @@ void main()
     vec3 F0 = mix(vec3(0.04f), albedo, metallic);
 
     // reflectance equation
-    vec3 Lo = reflection(N, V, albedo, metallic, roughness, F0, WorldPos);
+    vec3 Lo = reflection(N, V, albedo, roughness, F0, WorldPos);
 
-    // NO AO
-    vec3 color = Lo;
-
+    // Diffuse AO from IBL
+    vec3 color = Lo + IBLAmbientDiffuse(N, V, albedo, metallic, roughness, F0, vec3(1.0));
 
     // volumetric lighting
     //color += 0.01f * texture(volumetricLightTexture, TexCoords).xyz;
 
     // shadow
     //color *= 1 - calculateShadow(N, WorldPos);
-    //float shadowIntensity = calculateShadowIntensity(N, WorldPos);
-    //if (shadowIntensity != 0) color *= shadowIntensity;
 
 
     // HDR tonemapping

@@ -59,7 +59,7 @@ void Camera::enable()
 void Camera::updateCameraDirection(float currentX, float currentY)
 {
 	//if (disabled) return;
-	if (!rightDown) return;
+	//if (!rightDown) return;
 
 	// make sure camera doesn't suddenly move at the beginning
 	if (firstMouse)

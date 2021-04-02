@@ -92,22 +92,22 @@ void Renderer::RenderUI()
 
 void Renderer::Render(Scene const* scene)  
 {    
-    RenderUI();
+    //RenderUI();
 
     // First Pass, fill G-Buffer
-    //scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
-    //DeferredRenderer.Fill_G_Buffer(scene);
+    scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
+    DeferredRenderer.Fill_G_Buffer(scene);
 
     //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
     //DeferredRenderer.BindShadowMap(*shadow);
 
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
-    //DeferredRenderer.Render(scene);
+    DeferredRenderer.Render(scene);
     
-    shadow->Compute(scene);
+    //shadow->Compute(scene);
 
-    ForwardRendering(scene);    
+    //ForwardRendering(scene);    
 
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //IBL.RenderSkybox();

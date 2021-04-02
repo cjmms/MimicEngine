@@ -55,5 +55,7 @@ public:
 	void RenderEquirectangular2Cube() const;
 
 	void RenderSkybox() const;
+
+	inline unsigned int GetIrradianceMap() const { return IrradianceMapTex; }
 };
 
