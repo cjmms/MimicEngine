@@ -21,10 +21,19 @@ private:
 	// Cubemap, irradiance Map
 	unsigned int IrradianceMapTex;
 
+	unsigned int PrefilterMap;
+
 	// render Equirectangular HDR texture to a cube
 	Shader* Equirectangular2CubemapShader;
 	Shader* CubemapShader;
 	Shader* IrradianceShader;
+	Shader* PrefilterShader;
+
+
+	void InitPrefilterMap();
+
+	void RenderPerfilter();
+
 
 	// res: resolution of each face of cubemap
 	void InitCubemapFBO(unsigned int res);

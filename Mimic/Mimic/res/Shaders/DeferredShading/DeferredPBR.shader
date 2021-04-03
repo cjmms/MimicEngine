@@ -198,10 +198,10 @@ void main()
     vec3 F0 = mix(vec3(0.04f), albedo, metallic);
 
     // reflectance equation
-    vec3 Lo = reflection(N, V, albedo, roughness, F0, WorldPos);
+    vec3 Lo = reflection(N, V, albedo, metallic, roughness, F0, WorldPos);
 
     // Diffuse AO from IBL
-    vec3 color = Lo + IBLAmbientDiffuse(N, V, albedo, metallic, roughness, F0, vec3(1.0));
+    vec3 color = Lo + IBLAmbientDiffuse(N, V, albedo, roughness, F0, vec3(1.0));
 
     // volumetric lighting
     //color += 0.01f * texture(volumetricLightTexture, TexCoords).xyz;

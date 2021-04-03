@@ -186,5 +186,6 @@
     <None Include="res\Shaders\IBL\equirectangular.shader" />
     <None Include="res\Shaders\IBL\Cubemap.shader" />
     <None Include="res\Shaders\IBL\Convolution.shader" />
+    <None Include="res\Shaders\IBL\Prefilter.shader" />
   </ItemGroup>
 </Project>
