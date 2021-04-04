@@ -104,7 +104,7 @@ void Renderer::Render(Scene const* scene)
 
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
     DeferredRenderer.Render(scene);
-    
+
     //shadow->Compute(scene);
 
     //ForwardRendering(scene);    

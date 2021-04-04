@@ -110,11 +110,11 @@ void Shader::shaderErrorInfo(unsigned int shader, unsigned int type)
     {
         glGetShaderInfoLog(shader, 512, NULL, infoLog);
         if (type == GL_VERTEX_SHADER)
-            std::cout << "File Name: " << shaderFilePath << "ERROR: Vertex Shader Compilation Error. " << infoLog << std::endl;
+            std::cout << "File Name: " << shaderFilePath << " ERROR: Vertex Shader Compilation Error. " << infoLog << std::endl;
         else if (type == GL_FRAGMENT_SHADER)
-            std::cout << "File Name: " << shaderFilePath << "ERROR: Fragment Shader Compilation Error. " << infoLog << std::endl;
+            std::cout << "File Name: " << shaderFilePath << " ERROR: Fragment Shader Compilation Error. " << infoLog << std::endl;
         else
-            std::cout << "File Name: " << shaderFilePath << "ERROR: Geometry Shader Compilation Error. " << infoLog << std::endl;
+            std::cout << "File Name: " << shaderFilePath << " ERROR: Geometry Shader Compilation Error. " << infoLog << std::endl;
     }
 }
 

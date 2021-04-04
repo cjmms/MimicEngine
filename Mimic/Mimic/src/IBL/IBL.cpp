@@ -30,6 +30,9 @@ IBL::IBL(const char* address, unsigned int res)
 
 	InitPrefilterMap();
 	RenderPerfilter();
+
+	InitBRDFIntegration(512);
+	RenderBRDFIntegration(512);
 }
 
 
@@ -331,4 +334,41 @@ void IBL::Equirectangular2Cubemap()
 {
 	Equirectangular2CubemapShader->setTexture("equirectangularMap", HDR_Env);
 	RenderCubemap(Equirectangular2CubemapShader, res, EnvCubemapTex);
+}
+
+
+
+
+
+void IBL::InitBRDFIntegration(float textureSize)
+{
+	glGenTextures(1, &BRDF_IntegrationMap);
+
+	// pre-allocate enough memory for the LUT texture.
+	glBindTexture(GL_TEXTURE_2D, BRDF_IntegrationMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, textureSize, textureSize, 0, GL_RG, GL_FLOAT, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	//unsigned int RBO;
+	glBindFramebuffer(GL_FRAMEBUFFER, CubemapFBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, CubemapRBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, textureSize, textureSize);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, BRDF_IntegrationMap, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+
+void IBL::RenderBRDFIntegration(float textureSize)
+{
+	glViewport(0, 0, textureSize, textureSize);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, CubemapFBO);
+	Quad::Quad().Draw(*BRDF_IntegrationShader);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glViewport(0, 0, UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
 }

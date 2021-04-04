@@ -60,6 +60,12 @@ private:
 
 	void RenderIrradianceMap(unsigned int lowRes);
 
+	// init a square as render target, bind this texture to FBO
+	void InitBRDFIntegration(float textureSize);
+	void RenderBRDFIntegration(float textureSize);
+
+
+
 public:
 	IBL(const char* , unsigned int res);
 
