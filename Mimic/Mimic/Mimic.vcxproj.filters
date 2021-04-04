@@ -187,5 +187,6 @@
     <None Include="res\Shaders\IBL\Cubemap.shader" />
     <None Include="res\Shaders\IBL\Convolution.shader" />
     <None Include="res\Shaders\IBL\Prefilter.shader" />
+    <None Include="res\Shaders\IBL\BRDF_Integration.shader" />
   </ItemGroup>
 </Project>

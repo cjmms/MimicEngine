@@ -16,6 +16,7 @@ IBL::IBL(const char* address, unsigned int res)
 	CubemapShader = new Shader("res/Shaders/IBL/Cubemap.shader");
 	IrradianceShader = new Shader("res/Shaders/IBL/Convolution.shader");
 	PrefilterShader = new Shader("res/Shaders/IBL/Prefilter.shader");
+	BRDF_IntegrationShader = new Shader("res/Shaders/IBL/BRDF_Integration.shader");
 
 	HDR_Env = ResourceManager::loadHDRTexture(address);
 

@@ -23,11 +23,16 @@ private:
 
 	unsigned int PrefilterMap;
 
+	// BRDF integration map
+	unsigned int BRDF_IntegrationMap;
+
+
 	// render Equirectangular HDR texture to a cube
 	Shader* Equirectangular2CubemapShader;
 	Shader* CubemapShader;
 	Shader* IrradianceShader;
 	Shader* PrefilterShader;
+	Shader* BRDF_IntegrationShader;
 
 
 	void InitPrefilterMap();
