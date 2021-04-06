@@ -26,6 +26,8 @@ private:
 	// BRDF integration map
 	unsigned int BRDF_IntegrationMap;
 
+	unsigned int CaptureFBO, CaptureRBO;
+
 
 	// render Equirectangular HDR texture to a cube
 	Shader* Equirectangular2CubemapShader;
@@ -33,6 +35,7 @@ private:
 	Shader* IrradianceShader;
 	Shader* PrefilterShader;
 	Shader* BRDF_IntegrationShader;
+
 
 
 	void InitPrefilterMap();
@@ -54,6 +57,8 @@ private:
 
 	void initCube();
 	void RenderCube(Shader* shader) const;
+
+
 
 	// using Equirectangular to render 6 faces of cubemap
 	void RenderCubemap(Shader* shader, unsigned int res, unsigned int outputCubemapTex);
@@ -77,5 +82,9 @@ public:
 	void RenderSkybox() const;
 
 	inline unsigned int GetIrradianceMap() const { return IrradianceMapTex; }
+	inline unsigned int GetBRDFIntegration() const { return BRDF_IntegrationMap; }
+	inline unsigned int GetPrefilterMap() const { return PrefilterMap; }
+	
+
 };
 

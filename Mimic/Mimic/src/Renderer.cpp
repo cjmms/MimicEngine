@@ -92,6 +92,9 @@ void Renderer::RenderUI()
 
 void Renderer::Render(Scene const* scene)  
 {    
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //Quad::Quad().Draw(*ColorQuadShader, IBL.BRDF_IntegrationMap);
+
     //RenderUI();
 
     // First Pass, fill G-Buffer

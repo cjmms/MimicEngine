@@ -30,5 +30,5 @@ void main()
 	//FragColor = vec4(vec3(texture(map, TextureCoord).r ), 1.0);
 
 	
-	//FragColor = vec4(1.0f);
+	//FragColor = vec4(1.0f, 0, 0, 0);
 }

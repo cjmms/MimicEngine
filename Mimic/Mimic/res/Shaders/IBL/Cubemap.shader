@@ -29,7 +29,7 @@ uniform samplerCube environmentMap;
 
 void main()
 {
-    vec3 envColor = texture(environmentMap, localPos).rgb;  // sampling cubemap
+    vec3 envColor = textureLod(environmentMap, localPos, 0.0).rgb;  // sampling cubemap
 
     envColor = envColor / (envColor + vec3(1.0));   // tone mapping
     envColor = pow(envColor, vec3(1.0 / 2.2));      // gamma correction

@@ -104,12 +104,21 @@ void DeferredRendering::Render(Scene const* scene) const
 
     Bind_G_Buffer(DeferredLightingShader);
 
+    // IBL Textures
     DeferredLightingShader->Bind();
     glActiveTexture(GL_TEXTURE20);  // why 20? hard coded
     glBindTexture(GL_TEXTURE_CUBE_MAP, IBL.GetIrradianceMap());
 
     DeferredLightingShader->setInt("IrradianceMap", 20); 
+    
+    glActiveTexture(GL_TEXTURE21);  // why 21? hard coded
+    glBindTexture(GL_TEXTURE_CUBE_MAP, IBL.GetPrefilterMap());
+
+    DeferredLightingShader->setInt("PrefilterMap", 21);
     DeferredLightingShader->unBind();
+    DeferredLightingShader->setTexture("BRDFIntegration", IBL.GetBRDFIntegration());
+
+
 
     const std::vector<Light* > lights = scene->getLightSources();
 

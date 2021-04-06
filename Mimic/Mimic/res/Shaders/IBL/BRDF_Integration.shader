@@ -19,7 +19,7 @@ void main() {
 #version 330 core
 
 in vec2 TextureCoord;
-out vec4 FragColor;
+out vec2 FragColor;
 
 const float PI = 3.14159265359;
 
@@ -84,11 +84,11 @@ vec2 IntegrateBRDF(float NdotV, float roughness)
 			A += (1.0 - Fc) * G_Vis;
 			B += Fc * G_Vis;
 		}
-
-		A /= float(SAMPLE_COUNT);
-		B /= float(SAMPLE_COUNT);
-		return vec2(A, B);
 	}
+
+	A /= float(SAMPLE_COUNT);
+	B /= float(SAMPLE_COUNT);
+	return vec2(A, B);
 }
 
 
@@ -97,7 +97,7 @@ void main()
 {
 	// TextureCoord.x represents n dot v
 	// TextureCoord.y represents roughness
-	FragColor = vec4(IntegrateBRDF(TextureCoord.x, TextureCoord.y), 0.0, 0.0);
+	FragColor = IntegrateBRDF(TextureCoord.x, TextureCoord.y);
 }
 
 
@@ -147,9 +147,23 @@ float VanDerCorput(uint n, uint base)
 	return result;
 }
 
+
+float RadicalInverse_VdC(uint bits)
+{
+	bits = (bits << 16u) | (bits >> 16u);
+	bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
+	bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
+	bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
+	bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
+	return float(bits) * 2.3283064365386963e-10; // / 0x100000000
+}
+
+
+
+
 // ----------------------------------------------------------------------------
 // using hammersley sequence base from Van Der Corput sequence
 vec2 Hammersley(uint i, uint N)
 {
-	return vec2(float(i) / float(N), VanDerCorput(i, 2u));
+	return vec2(float(i) / float(N), RadicalInverse_VdC(i));
 }

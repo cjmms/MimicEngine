@@ -40,8 +40,10 @@ uniform mat4 lightProjection;
 uniform mat4 lightView;
 uniform sampler2D shadowMap;
 
+// IBL
 uniform samplerCube IrradianceMap;
-
+uniform samplerCube PrefilterMap;
+uniform sampler2D BRDFIntegration;
 
 
 // ----------------------------------------------------------------------------
@@ -173,6 +175,27 @@ float calculateShadow(vec3 N, vec3 WorldPos)
 
 
 
+vec3 ComputeIBLAO(vec3 N, vec3 V, vec3 R, vec3 albedo, float roughness, float metallic, vec3 F0, float scale)
+{
+    vec3 F = fresnelSchlick(max(dot(N, V), 0.0), F0, roughness);
+
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+
+    vec3 irradiance = texture(IrradianceMap, N).rgb;
+    vec3 diffuse = irradiance * albedo;
+
+    const float MAX_REFLECTION_LOD = 4.0;
+    vec3 prefilteredColor = textureLod(PrefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+    vec2 envBRDF = texture(BRDFIntegration, vec2(max(dot(N, V), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+
+    return (kD * diffuse + specular) * scale;
+}
+
+
+
 void main()
 {
     vec3 WorldPos = texture(gPosition, TexCoords).rgb;
@@ -192,6 +215,7 @@ void main()
 
     vec3 N = texture(gNormalRoughness, TexCoords).rgb;
     vec3 V = normalize(camPos - WorldPos);
+    vec3 R = reflect(-V, N);
 
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
     // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
@@ -201,7 +225,8 @@ void main()
     vec3 Lo = reflection(N, V, albedo, metallic, roughness, F0, WorldPos);
 
     // Diffuse AO from IBL
-    vec3 color = Lo + IBLAmbientDiffuse(N, V, albedo, roughness, F0, vec3(1.0));
+    //vec3 color = Lo + IBLAmbientDiffuse(N, V, albedo, roughness, F0, vec3(1.0));
+    vec3 color = Lo + ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
 
     // volumetric lighting
     //color += 0.01f * texture(volumetricLightTexture, TexCoords).xyz;

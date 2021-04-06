@@ -2,6 +2,7 @@
 #include "../ResourceManager.h"
 #include "../Core/Camera.h"
 #include "../UI_Manager.h"
+#include <iostream>
 
 extern Camera camera;
 extern UI_Manager UI_Mgr;
@@ -20,6 +21,7 @@ IBL::IBL(const char* address, unsigned int res)
 
 	HDR_Env = ResourceManager::loadHDRTexture(address);
 
+	
 	initCube();
 	InitCubemapTexture(res);
 	InitCubemapFBO(res);
@@ -30,7 +32,7 @@ IBL::IBL(const char* address, unsigned int res)
 
 	InitPrefilterMap();
 	RenderPerfilter();
-
+	
 	InitBRDFIntegration(512);
 	RenderBRDFIntegration(512);
 }
@@ -127,7 +129,7 @@ void IBL::RenderSkybox() const
 
 	// testing purpose, test if irradiance map is generated correctly
 	//glBindTexture(GL_TEXTURE_CUBE_MAP, IrradianceMapTex);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, PrefilterMap);
+	//glBindTexture(GL_TEXTURE_CUBE_MAP, PrefilterMap);
 
 	CubemapShader->setInt("environmentMap", 0);
 	CubemapShader->unBind();
@@ -220,6 +222,9 @@ void IBL::RenderCube(Shader* shader) const
 
 	shader->unBind();
 }
+
+
+
 
 
 
@@ -351,12 +356,18 @@ void IBL::InitBRDFIntegration(float textureSize)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);        // unbind texture
 
-	//unsigned int RBO;
-	glBindFramebuffer(GL_FRAMEBUFFER, CubemapFBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, CubemapRBO);
+	glGenFramebuffers(1, &CaptureFBO);
+	glGenRenderbuffers(1, &CaptureRBO);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, CaptureFBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, CaptureRBO);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, textureSize, textureSize);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_COMPONENT24, GL_RENDERBUFFER, CaptureRBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, BRDF_IntegrationMap, 0);
+
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -366,7 +377,7 @@ void IBL::RenderBRDFIntegration(float textureSize)
 {
 	glViewport(0, 0, textureSize, textureSize);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, CubemapFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, CaptureFBO);
 	Quad::Quad().Draw(*BRDF_IntegrationShader);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
