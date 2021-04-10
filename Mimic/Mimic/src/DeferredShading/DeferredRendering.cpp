@@ -10,7 +10,7 @@ extern Camera camera;
 
 
 DeferredRendering::DeferredRendering(unsigned int width, unsigned int height)
-    :IBL("res/Barce_Rooftop_C_3k.hdr", 4096)
+    :IBL("res/IBL/fin4_Ref.hdr", 4096)
 {
     Fill_G_BufferShader = new Shader("res/Shaders/DeferredShading/FillG-Buffer.shader");
     DeferredLightingShader = new Shader("res/Shaders/DeferredShading/DeferredPBR.shader");

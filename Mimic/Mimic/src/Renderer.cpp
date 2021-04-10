@@ -32,7 +32,7 @@ Renderer::Renderer(Scene const* scene)
     VolumetricLight(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     PingBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     PongBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
-    IBL("res/Barce_Rooftop_C_3k.hdr", 4096)
+    IBL("res/IBL/fin4_Ref.hdr", 4096)
 {
 
     //std::cout <<  "Renderer Constructor" << std::endl;

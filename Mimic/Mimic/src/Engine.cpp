@@ -63,8 +63,11 @@ void Engine::init()
 
     //scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
 
-    scene->addObjects("res/objects/lion/lion.obj", glm::vec3(5.0));
-    scene->InitTextures("res/objects/lion/");
+    //scene->addObjects("res/objects/lion/lion.obj", glm::vec3(5.0));
+    //scene->InitTextures("res/objects/lion/");
+
+    scene->addObjects("res/objects/Pokemon/Pokemon.obj", glm::vec3(0.1f));
+    scene->InitTextures("res/objects/Pokemon/");
 
     //scene->addObjects("res/objects/Knife/Knife.obj", glm::vec3(10.0));
     //scene->InitTextures("res/objects/Knife/");
