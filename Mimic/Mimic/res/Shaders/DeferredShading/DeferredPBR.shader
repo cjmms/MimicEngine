@@ -226,7 +226,10 @@ void main()
 
     // Diffuse AO from IBL
     //vec3 color = Lo + IBLAmbientDiffuse(N, V, albedo, roughness, F0, vec3(1.0));
-    vec3 color = Lo + ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
+
+    vec3 color = Lo;
+
+    //color += ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
 
     // volumetric lighting
     //color += 0.01f * texture(volumetricLightTexture, TexCoords).xyz;
