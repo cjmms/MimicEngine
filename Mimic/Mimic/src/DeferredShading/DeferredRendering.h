@@ -35,6 +35,8 @@ public:
 
 	inline Shader* GetDeferredShader() const { return DeferredLightingShader; }
 	inline unsigned int Get_G_Position() const { return gPosition; }
+	inline unsigned int Get_G_NormalRoughness() const { return gNormalRoughness; }
+	inline unsigned int Get_G_AlbedoMetallic() const { return gAlbedoMetallic; }
 
 	void BindShadowMap(const Shadow& shadow) const;
 	void BindVolumetricLight(const VolumetricLight& vl) const;
