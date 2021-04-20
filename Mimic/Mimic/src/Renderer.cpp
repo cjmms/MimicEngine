@@ -114,7 +114,7 @@ void Renderer::Render(Scene const* scene)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //Quad::Quad().Draw(*ColorQuadShader, SSAO.GetNoiseTex());
-    Quad::Quad().Draw(*ColorQuadShader, SSAO.GetSSAO());
+    Quad::Quad().Draw(*ColorQuadShader, GaussianBlur(SSAO.GetSSAO(), 2));
 
 
     //shadow->Compute(scene);

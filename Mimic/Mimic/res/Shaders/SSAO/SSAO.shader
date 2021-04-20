@@ -43,8 +43,7 @@ uniform float noiseTexLength;
 
 void main()
 {
-    // view space frag position
-    //vec3 fragPos = vec4(view * vec4(texture(gPosition, TexCoords).xyz, 1.0)).xyz;    
+    // view space frag position  
     vec3 fragPos = texture(gPosition, TexCoords).xyz;
     vec3 normal = normalize(texture(gNormal, TexCoords).xyz);
 
@@ -72,11 +71,11 @@ void main()
         offset.xyz = offset.xyz * 0.5 + 0.5;    // mapping from [-1, +1] to [0, 1]
 
         // access sample depth
-        //float sampleDepth = vec4(view * vec4(texture(gPosition, offset.xy).xyz, 1.0)).z;
         float sampleDepth = texture(gPosition, offset.xy).z;
 
-        float bias = 0.025;
+        float bias = 0.015;
         
+        //float range = 1 - radius / abs(fragPos.z - sampleDepth);
         occlusion += (sampleDepth >= samplePos.z + bias ? 1.0 : 0.0);
     }
 
