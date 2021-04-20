@@ -106,12 +106,19 @@ void SSAO::RenderSSAO(unsigned int gPosition, unsigned int gNormal)
     // bind G-Buffer, bind noiseTexture
     SSAOshader.setTexture("gPosition", gPosition);
     SSAOshader.setTexture("gNormal", gNormal);
-    SSAOshader.setTexture("NoiseTexture", NoiseTexture);
+    SSAOshader.setTexture("texNoise", NoiseTexture);
+
+    SSAOshader.setInt("kernelSize", KernelSize);
+    SSAOshader.setFloat("radius", 1.0f);
 
     SendKernelSamplesToShader();
 
     SSAOshader.setMat4("view", camera.getViewMatrix());
     SSAOshader.setMat4("projection", camera.getProjectionMatrix());
+
+    SSAOshader.setFloat("screenWidth", UI_Mgr.getScreenWidth());
+    SSAOshader.setFloat("screenHeight", UI_Mgr.getScreenHeight());
+    SSAOshader.setFloat("noiseTexLength", NoiseTextureLength);
 
     Quad::Quad().Draw(SSAOshader);              // render SSAO into a quad
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
