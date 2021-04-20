@@ -21,7 +21,7 @@ private:
 	inline float lerp(float a, float b, float f) const { return a + f * (b - a); }
 
 	// disribute samples closer to origin
-	inline float WeightToSample(float i) const { lerp(0.1f, 1.0f, powf( i / KernelSize, 2)); }
+	inline float WeightToSample(float i) const { return lerp(0.1f, 1.0f, powf( i / KernelSize, 2)); }
 
 	// add random noise into ssaoNoise
 	void FillNoise();
@@ -32,6 +32,9 @@ private:
 	void SendKernelSamplesToShader();
 
 public:
+	inline unsigned int GetNoiseTex() const { return NoiseTexture; }
+	inline unsigned int GetSSAO() const { return ssaoColorBuffer; }
+
 	SSAO(unsigned int KernelSize, unsigned int NoiseTextureLength);
 
 	void ComputeSampleKernel();

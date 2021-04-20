@@ -93,6 +93,9 @@
     <ClCompile Include="src\imgui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\SSAO\SSAO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\VertexBuffer.h">
@@ -170,6 +173,9 @@
     <ClInclude Include="src\imgui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\SSAO\SSAO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\basic.shader" />
@@ -188,5 +194,6 @@
     <None Include="res\Shaders\IBL\Convolution.shader" />
     <None Include="res\Shaders\IBL\Prefilter.shader" />
     <None Include="res\Shaders\IBL\BRDF_Integration.shader" />
+    <None Include="res\Shaders\SSAO\SSAO.shader" />
   </ItemGroup>
 </Project>

@@ -30,7 +30,7 @@ uniform sampler2D texNoise; // noise texture(random rotation)
 uniform int kernelSize;     // number of random sampled positions in hemisphere
 uniform float radius;       // radius if hemisphere
 
-uniform vec3 samples[kernelSize];   // random sample kernel
+uniform vec3 samples[64];   // random sample kernel
 uniform mat4 view;
 uniform mat4 projection;
 
@@ -44,12 +44,13 @@ uniform float noiseTexLength;
 void main()
 {
     // view space frag position
-    vec3 fragPos = view * texture(gPosition, TexCoords).xyz;    
-    vec3 normal = texture(gNormal, TexCoords).xyz;
+    //vec3 fragPos = vec4(view * vec4(texture(gPosition, TexCoords).xyz, 1.0)).xyz;    
+    vec3 fragPos = texture(gPosition, TexCoords).xyz;
+    vec3 normal = normalize(texture(gNormal, TexCoords).xyz);
 
     // scale the noise texture so that it maps the whole screen
     vec2 noiseScale = vec2(screenWidth / noiseTexLength, screenHeight / noiseTexLength);
-    vec3 randomVec = texture(texNoise, TexCoords * noiseScale).xyz;
+    vec3 randomVec = normalize(texture(texNoise, TexCoords * noiseScale).xyz);
 
     // prepare an orthogonal basis for transformation from tangent space to view space
     vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
@@ -59,27 +60,30 @@ void main()
 
     // compute occlusion
     float occlusion = 0.0;
-    for (int i = 0; i < kernalSize; ++i)
+    for (int i = 0; i < kernelSize; ++i)
     {
         vec3 samplePos = TBN * samples[i];      // transform sample from tangent space to view space
         samplePos = fragPos + samplePos * radius;
 
         // transform samplePos to screen space in order to sample depth value
         vec4 offset = vec4(samplePos, 1.0);
-        offset = projection * offset;           // view space to clip space
+        offset = projection * view * offset;           // view space to clip space
         offset.xyz /= offset.w;                 // perspective division
         offset.xyz = offset.xyz * 0.5 + 0.5;    // mapping from [-1, +1] to [0, 1]
 
         // access sample depth
+        //float sampleDepth = vec4(view * vec4(texture(gPosition, offset.xy).xyz, 1.0)).z;
         float sampleDepth = texture(gPosition, offset.xy).z;
 
         float bias = 0.025;
-        occlusion += (sampleDepth ? = samplePos.z + bias ? 1.0 : 0.0);
+        
+        occlusion += (sampleDepth >= samplePos.z + bias ? 1.0 : 0.0);
     }
 
 
     // normalize occlusion by size of kernel
-    FragColor = 1.0 - (occlusion / kernelSize);
+    occlusion = 1.0 - (occlusion / kernelSize);
+    FragColor = occlusion;
 }
 
 

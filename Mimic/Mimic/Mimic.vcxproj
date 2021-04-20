@@ -116,6 +116,7 @@
     <ClCompile Include="src\Core\VertexBuffer.cpp" />
     <ClCompile Include="src\UI_Manager.cpp" />
     <ClCompile Include="src\VolumetricLight\VolumetricLight.cpp" />
+    <ClCompile Include="src\SSAO\SSAO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\IBL\IBL.h" />
@@ -143,6 +144,7 @@
     <ClInclude Include="src\Core\VertexBuffer.h" />
     <ClInclude Include="src\UI_Manager.h" />
     <ClInclude Include="src\VolumetricLight\VolumetricLight.h" />
+    <ClInclude Include="src\SSAO\SSAO.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shaders\basic.shader" />
@@ -153,6 +155,7 @@
     <None Include="res\Shaders\GaussianBlur.shader" />
     <None Include="res\Shaders\IBL\Prefilter.shader" />
     <None Include="res\Shaders\Shadow\VSM.shader" />
+    <None Include="res\Shaders\SSAO\SSAO.shader" />
     <None Include="res\Shaders\VolumetricLight\BilateralUp.shader" />
     <None Include="res\Shaders\DeferredShading\DeferredPBR.shader" />
     <None Include="res\Shaders\Shadow\DepthMap.shader" />

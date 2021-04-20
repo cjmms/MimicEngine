@@ -243,6 +243,8 @@ void main()
     // gamma correct
     color = pow(color, vec3(1.0 / 2.2));
 
+    FragColor = vec4(color, 1.0f);
+
     // Debuging purposes
     //FragColor = vec4(albedo, 1.0f);
     //FragColor = vec4(N, 1.0f);
@@ -252,5 +254,4 @@ void main()
     //FragColor = vec4(vec3(roughness), 1.0f);
 
 
-    FragColor = vec4(color, 1.0f);
 }

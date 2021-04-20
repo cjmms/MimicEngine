@@ -81,7 +81,7 @@ void DeferredRendering::Fill_G_Buffer(Scene const* scene) const
         obj->getModel()->Draw(*Fill_G_BufferShader);
     }
 
-    IBL.RenderSkybox();
+    //IBL.RenderSkybox();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

@@ -4,6 +4,7 @@
 #include "VolumetricLight/VolumetricLight.h"
 #include "Shadow/Shadow.h"
 #include "IBL/IBL.h"
+#include "SSAO/SSAO.h"
 
 /*
 * Purpose of Renderer: render object base on input, hide all details of how rendering works
@@ -42,6 +43,7 @@ private:
 	Shadow* shadow;
 	VolumetricLight VolumetricLight;
 	IBL IBL;
+	SSAO SSAO;
 
 	bool debugMode;
 

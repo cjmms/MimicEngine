@@ -12,6 +12,7 @@ extern UI_Manager UI_Mgr;
 IBL::IBL(const char* address, unsigned int res)
 	:res(res)
 {
+	/*
 	// used to render HDR Equirectangular map to a cube
 	Equirectangular2CubemapShader = new Shader("res/Shaders/IBL/equirectangular.shader");
 	CubemapShader = new Shader("res/Shaders/IBL/Cubemap.shader");
@@ -35,6 +36,7 @@ IBL::IBL(const char* address, unsigned int res)
 	
 	InitBRDFIntegration(512);
 	RenderBRDFIntegration(512);
+	*/
 }
 
 

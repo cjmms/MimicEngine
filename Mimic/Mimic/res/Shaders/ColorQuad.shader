@@ -26,6 +26,11 @@ void main()
 {
 	FragColor = texture(map, TextureCoord);
 
+	// only first channel
+	float c = texture(map, TextureCoord).r;
+	FragColor = vec4(c, c, c, 1.0);
+
+
 	// visualize depth
 	//FragColor = vec4(vec3(texture(map, TextureCoord).r ), 1.0);
 

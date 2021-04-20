@@ -32,7 +32,8 @@ Renderer::Renderer(Scene const* scene)
     VolumetricLight(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     PingBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     PongBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
-    IBL("res/IBL/fin4_Ref.hdr", 4096)
+    IBL("res/IBL/fin4_Ref.hdr", 4096),
+    SSAO(64, 4)
 {
 
     //std::cout <<  "Renderer Constructor" << std::endl;
@@ -101,12 +102,20 @@ void Renderer::Render(Scene const* scene)
     scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
     DeferredRenderer.Fill_G_Buffer(scene);
 
+    SSAO.RenderSSAO(DeferredRenderer.Get_G_Position(), DeferredRenderer.Get_G_NormalRoughness());
+
     //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
     //DeferredRenderer.BindShadowMap(*shadow);
 
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
-    DeferredRenderer.Render(scene);
+    //DeferredRenderer.Render(scene);
+
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //Quad::Quad().Draw(*ColorQuadShader, SSAO.GetNoiseTex());
+    Quad::Quad().Draw(*ColorQuadShader, SSAO.GetSSAO());
+
 
     //shadow->Compute(scene);
 

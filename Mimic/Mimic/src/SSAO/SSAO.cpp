@@ -109,7 +109,7 @@ void SSAO::RenderSSAO(unsigned int gPosition, unsigned int gNormal)
     SSAOshader.setTexture("texNoise", NoiseTexture);
 
     SSAOshader.setInt("kernelSize", KernelSize);
-    SSAOshader.setFloat("radius", 1.0f);
+    SSAOshader.setFloat("radius", 0.5f);
 
     SendKernelSamplesToShader();
 
