@@ -54,7 +54,7 @@ void SSAO::FillNoise()
         glm::vec3 sample(                               // random direction
             randomFloats(generator) * 2.0 - 1.0,        // range from -1 to 1
             randomFloats(generator) * 2.0 - 1.0,        // range from -1 to 1
-            randomFloats(generator)                     // range from 0 to 1
+            0.0                    
         );
 
         ssaoNoise.push_back(sample);
@@ -66,7 +66,7 @@ void SSAO::ComputeNoiseTexture()
 {
     glGenTextures(1, &NoiseTexture);
     glBindTexture(GL_TEXTURE_2D, NoiseTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, NoiseTextureLength, NoiseTextureLength, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, NoiseTextureLength, NoiseTextureLength, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);       // repeat the noise pattern

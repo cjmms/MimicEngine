@@ -58,6 +58,11 @@ private:
 
 	void RenderUI();
 
+	void ShadowUI();
+	void SSAO_UI();
+
+	bool ssaoEnable;
+
 public:
 	Renderer(Scene const* scene);
 

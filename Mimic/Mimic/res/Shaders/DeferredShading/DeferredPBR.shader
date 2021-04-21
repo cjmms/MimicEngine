@@ -45,6 +45,10 @@ uniform samplerCube IrradianceMap;
 uniform samplerCube PrefilterMap;
 uniform sampler2D BRDFIntegration;
 
+uniform sampler2D SSAO;
+
+uniform bool enableAmbient;
+
 
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -224,10 +228,18 @@ void main()
     // reflectance equation
     vec3 Lo = reflection(N, V, albedo, metallic, roughness, F0, WorldPos);
 
-    // Diffuse AO from IBL
-    //vec3 color = Lo + IBLAmbientDiffuse(N, V, albedo, roughness, F0, vec3(1.0));
+    // ambient
+    vec3 ambient = ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
+    float ao = texture(SSAO, TexCoords).x;
+    ambient *= ao;
 
-    vec3 color = Lo;
+    // Diffuse AO from IBL
+    vec3 color = Lo + ambient;
+
+    //vec3 ambient = vec3(0.03) * albedo;
+     //ambient = ambient * texture(SSAO, TexCoords).x;
+    //vec3 color = Lo + ambient;
+    //vec3 color = Lo ;
 
     //color += ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
 
@@ -244,6 +256,7 @@ void main()
     color = pow(color, vec3(1.0 / 2.2));
 
     FragColor = vec4(color, 1.0f);
+    FragColor = vec4(ao, ao, ao, 1.0f);
 
     // Debuging purposes
     //FragColor = vec4(albedo, 1.0f);

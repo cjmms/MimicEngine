@@ -33,7 +33,7 @@ Renderer::Renderer(Scene const* scene)
     PingBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     PongBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     IBL("res/IBL/fin4_Ref.hdr", 4096),
-    SSAO(64, 4)
+    SSAO(128, 4)
 {
 
     //std::cout <<  "Renderer Constructor" << std::endl;
@@ -78,7 +78,15 @@ void Renderer::RenderUI()
 {
     ImGui::Begin("UI");                          
 
-    ImGui::Text("ShadowMap Gaussian Blur Pass.");               
+    //ShadowUI();
+    SSAO_UI();
+    
+    ImGui::End();
+}
+
+void Renderer::ShadowUI()
+{
+    ImGui::Text("ShadowMap Gaussian Blur Pass.");
     ImGui::SliderInt("int", &GaussianBlurPass, 0, 10);
 
     ImGui::RadioButton("Standard Shadow Map", &ShadowMapType, 0);
@@ -86,7 +94,13 @@ void Renderer::RenderUI()
     ImGui::RadioButton("Moment Shadow Map", &ShadowMapType, 2);
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ImGui::End();
+}
+
+
+void Renderer::SSAO_UI()
+{
+    ImGui::Checkbox("Demo Window", &ssaoEnable);
+    DeferredRenderer.SetSSAOEnable(ssaoEnable);
 }
 
 
@@ -96,19 +110,22 @@ void Renderer::Render(Scene const* scene)
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //Quad::Quad().Draw(*ColorQuadShader, IBL.BRDF_IntegrationMap);
 
-    //RenderUI();
+    RenderUI();
 
     // First Pass, fill G-Buffer
     scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
     DeferredRenderer.Fill_G_Buffer(scene);
 
     SSAO.RenderSSAO(DeferredRenderer.Get_G_Position(), DeferredRenderer.Get_G_NormalRoughness());
+    
 
     //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
     //DeferredRenderer.BindShadowMap(*shadow);
 
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
+
+    //DeferredRenderer.BindSSAO(SSAO.GetSSAO());
     //DeferredRenderer.Render(scene);
 
 

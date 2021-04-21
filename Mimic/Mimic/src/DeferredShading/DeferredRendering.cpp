@@ -118,6 +118,7 @@ void DeferredRendering::Render(Scene const* scene) const
     DeferredLightingShader->unBind();
     DeferredLightingShader->setTexture("BRDFIntegration", IBL.GetBRDFIntegration());
 
+    DeferredLightingShader->setInt("enableAmbient", enableSSAO);
 
 
     const std::vector<Light* > lights = scene->getLightSources();
@@ -151,4 +152,10 @@ void DeferredRendering::BindVolumetricLight(const VolumetricLight& vl) const
 {
     DeferredLightingShader->setTexture(
         "volumetricLightTexture", vl.GetVolumetricLight());
+}
+
+
+void DeferredRendering::BindSSAO(unsigned int SSAO)
+{
+    DeferredLightingShader->setTexture("SSAO", SSAO);
 }

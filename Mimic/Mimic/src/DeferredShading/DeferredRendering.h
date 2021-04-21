@@ -26,6 +26,8 @@ private:
 
 	IBL IBL;
 
+	bool enableSSAO;
+
 public:
 	DeferredRendering(unsigned int width, unsigned int height);
 
@@ -40,5 +42,9 @@ public:
 
 	void BindShadowMap(const Shadow& shadow) const;
 	void BindVolumetricLight(const VolumetricLight& vl) const;
+	void BindSSAO(unsigned int SSAO);
 	inline Shader* GetFillBufferShader() const { return Fill_G_BufferShader; }
+
+	void SetSSAOEnable(bool enable) { enableSSAO = enable; };
+
 };
