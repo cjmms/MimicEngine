@@ -11,8 +11,8 @@ private:
 	Shader BilateralUpShader;
 	Shader VolumetricLightShader;
 
-	FBO_Color LightingFBO;
-	FBO_Color HalfResFBO;
+	//FBO_Color LightingFBO;
+	//FBO_Color HalfResFBO;
 
 	unsigned int width, height;
 
@@ -22,5 +22,7 @@ public:
 	void Compute(const Shadow& shadow, unsigned int gPosition);
 	inline unsigned int GetVolumetricLight() const { return LightingFBO.getColorAttachment(); }
 
+	FBO_Color LightingFBO;
+	FBO_Color HalfResFBO;
 };
 
