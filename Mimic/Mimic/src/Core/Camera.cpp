@@ -5,6 +5,7 @@ Camera::Camera()
 	: sensitivity(0.1f), deltaTime(0.0f), lastFrame(0.0f), firstMouse(true), fov(45.0f),
 	disabled(false)
 {
+	/*
 	cameraPos = glm::vec3(0.0f, 1.0f, 4.0f);
 	cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 	cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -14,6 +15,18 @@ Camera::Camera()
 
 	yaw = -90.0f;
 	pitch = 0.0f;
+	*/
+
+	cameraPos = glm::vec3(103.9f, 55.7f, 41.6f);
+	cameraFront = glm::vec3(-0.996f, 0.061f, 0.064f);
+	cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	lastX = 600;
+	lastY = 500;
+
+	yaw = 179.2f;
+	pitch = 1.6f;
+
 }
 
 
@@ -58,7 +71,7 @@ void Camera::enable()
 
 void Camera::updateCameraDirection(float currentX, float currentY)
 {
-	//if (disabled) return;
+	if (disabled) return;
 	//if (!rightDown) return;
 
 	// make sure camera doesn't suddenly move at the beginning
@@ -206,13 +219,16 @@ void Camera::Print() const
 									 << cameraPos.y << ", " 
 									 << cameraPos.z << std::endl;
 
-	std::cout << "Camera Center: " << cameraFront.x + cameraPos.x << ", "
-		<< cameraFront.y + cameraPos.y << ", "
-		<< cameraFront.z + cameraPos.z << std::endl;
+	std::cout << "Camera front: " << cameraFront.x  << ", "
+		<< cameraFront.y  << ", "
+		<< cameraFront.z  << std::endl;
 
 	std::cout << "Camera Up: " << cameraUp.x << ", "
 		<< cameraUp.y << ", "
 		<< cameraUp.z << std::endl;
+
+	std::cout << "yaw: " << yaw << std::endl;
+	std::cout << "pitch: " << pitch << std::endl;
 }
 
 

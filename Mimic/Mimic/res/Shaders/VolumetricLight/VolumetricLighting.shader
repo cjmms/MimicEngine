@@ -25,8 +25,8 @@ in vec2 TexCoords;
 uniform vec3 camPos;
 
 const float PI = 3.14159265359;
-const float G_SCATTERING = 0.45f;
-const int NB_SAMPLES = 10;
+uniform float G_SCATTERING;
+uniform int MarchingSteps;
 
 vec3 lightPos = vec3(-70.0f, 70.0f, -10.0f);
 
@@ -35,6 +35,8 @@ uniform sampler2D gPosition;
 uniform mat4 lightProjection;
 uniform mat4 lightView;
 uniform sampler2D shadowMap;
+
+uniform bool enableDithering;
 
 
 // bayer matrix
@@ -68,7 +70,7 @@ vec3 calculateVolumetricLighting(vec3 fragPos)
     float rayLength = length(viewRay);
     vec3 viewRayDir = viewRay / rayLength;
     // Step length
-    float stepLength = rayLength / NB_SAMPLES;
+    float stepLength = rayLength / MarchingSteps;
     //float stepLength = 0.01f;
     vec3 step = viewRayDir * stepLength;	// point from camera to pixel
     // init sampleing position and accumlated fog value
@@ -76,11 +78,11 @@ vec3 calculateVolumetricLighting(vec3 fragPos)
     vec3 accumFog = vec3(0.0);
 
     // disable dithering
-    //if (enableDithering == 1)
-    currentPos += step * calculateDitherValue(gl_FragCoord.xy);
+    if (enableDithering)
+        currentPos += step * calculateDitherValue(gl_FragCoord.xy);
 
     // sampling along with viewRay
-    for (int i = 0; i < NB_SAMPLES; ++i)
+    for (int i = 0; i < MarchingSteps; ++i)
     {
         vec4 InLightWorldSpace = lightProjection * lightView * vec4(currentPos, 1.0f);
         vec4 sampleInLightWorldSpace = InLightWorldSpace / InLightWorldSpace.w;
@@ -93,7 +95,7 @@ vec3 calculateVolumetricLighting(vec3 fragPos)
         if ((depthMapDepth) > sampleInLightWorldSpace.z)
         {
             vec3 sunDir = normalize(lightPos - currentPos);
-            accumFog += ComputeScattering(dot(viewRayDir, sunDir)) * vec3(10.0f) / NB_SAMPLES;
+            accumFog += ComputeScattering(dot(viewRayDir, sunDir)) * vec3(10.0f) / MarchingSteps;
         }
 
         currentPos += step;	// move to next sample

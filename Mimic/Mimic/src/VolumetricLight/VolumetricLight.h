@@ -16,6 +16,11 @@ private:
 
 	unsigned int width, height;
 
+	int Steps;
+	float G_SCATTERING;
+	bool enableDithering;
+	bool BilateralSwitch;
+
 
 public:
 	VolumetricLight(unsigned int width, unsigned int height);
@@ -24,5 +29,7 @@ public:
 
 	FBO_Color LightingFBO;
 	FBO_Color HalfResFBO;
+
+	void UI();
 };
 

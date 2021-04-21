@@ -86,47 +86,6 @@ Renderer::~Renderer()
 
 
 
-void Renderer::RenderUI()
-{
-    ImGui::Begin("UI");                          
-
-    ShadowUI();
-    SSAO_UI();
-    IBL_UI();
-    
-    ImGui::End();
-}
-
-void Renderer::IBL_UI()
-{
-    ImGui::Checkbox("Enable IBL", &enableIBL);
-    DeferredRenderer.SetIBLEnable(enableIBL);
-
-    ImGui::SliderFloat("ao", &ao, 0.0f, 0.3f);
-    DeferredRenderer.SetAO(ao);
-}
-
-void Renderer::ShadowUI()
-{
-    ImGui::Text("ShadowMap Gaussian Blur Pass.");
-    ImGui::SliderInt("int", &GaussianBlurPass, 0, 10);
-
-    ImGui::RadioButton("Standard Shadow Map", &ShadowMapType, 0);
-    ImGui::RadioButton("Variance Shadow Map", &ShadowMapType, 1);
-    ImGui::RadioButton("Moment Shadow Map", &ShadowMapType, 2);
-
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-}
-
-
-void Renderer::SSAO_UI()
-{
-    ImGui::Checkbox("Enable SSAO", &ssaoEnable);
-    DeferredRenderer.SetSSAOEnable(ssaoEnable);
-}
-
-
-
 void Renderer::Render(Scene const* scene)  
 {    
     RenderUI();
@@ -145,6 +104,12 @@ void Renderer::Render(Scene const* scene)
     DeferredRenderer.BindVolumetricLight(VolumetricLight);
 
     DeferredRenderer.Render(scene);
+
+    //VisualizeDepthBuffer(shadow->GetRangeShadowMap());
+
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //Quad::Quad().Draw(*ColorQuadShader, VolumetricLight.GetVolumetricLight());
+
 
     //shadow->Compute(scene);
 
@@ -250,5 +215,33 @@ unsigned int Renderer::GaussianBlur(unsigned int texture, int level) const
 
     return PingBufferFBO.getColorAttachment();
 }
+
+
+void Renderer::RenderUI()
+{
+    ImGui::Begin("UI");
+
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    //ShadowUI();
+    //SSAO_UI();
+    //IBL_UI();
+    VolumetricLight.UI();
+    DeferredRenderer.UI();
+
+    ImGui::End();
+}
+
+
+
+void Renderer::ShadowUI()
+{
+    ImGui::Text("ShadowMap Gaussian Blur Pass.");
+    ImGui::SliderInt("int", &GaussianBlurPass, 0, 10);
+
+    ImGui::RadioButton("Standard Shadow Map", &ShadowMapType, 0);
+    ImGui::RadioButton("Variance Shadow Map", &ShadowMapType, 1);
+    ImGui::RadioButton("Moment Shadow Map", &ShadowMapType, 2);
+}
+
 
 

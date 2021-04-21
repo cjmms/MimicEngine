@@ -52,6 +52,8 @@ uniform bool enableIBL;
 
 uniform float ao;
 
+uniform float scatteringFactor;
+
 
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -240,7 +242,7 @@ void main()
     vec3 color = Lo + ambient * ao;
 
     // volumetric lighting
-    color += 0.01f * texture(volumetricLightTexture, TexCoords).xyz;
+    color += scatteringFactor * texture(volumetricLightTexture, TexCoords).xyz;
 
     // shadow
     //color *= 1 - calculateShadow(N, WorldPos);

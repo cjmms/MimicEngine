@@ -6,11 +6,18 @@
 #include "../Shadow/Shadow.h"
 #include "../VolumetricLight/VolumetricLight.h"
 
+#include "../imgui/imgui.h"
+
+//#include "imgui.h"
+#include "../imgui/imgui_impl_glfw.h"
+#include "../imgui/imgui_impl_opengl3.h"
+#include "../imgui/imgui_internal.h"
+
 extern Camera camera;
 
 
 DeferredRendering::DeferredRendering(unsigned int width, unsigned int height)
-    :IBL("res/IBL/fin4_Ref.hdr", 4096)
+    :IBL("res/IBL/fin4_Ref.hdr", 4096), scatteringFactor(0.01)
 {
     Fill_G_BufferShader = new Shader("res/Shaders/DeferredShading/FillG-Buffer.shader");
     DeferredLightingShader = new Shader("res/Shaders/DeferredShading/DeferredPBR.shader");
@@ -122,7 +129,7 @@ void DeferredRendering::Render(Scene const* scene) const
     DeferredLightingShader->setInt("enableIBL", enableIBL);
 
     DeferredLightingShader->setFloat("ao", ao);
-
+    DeferredLightingShader->setFloat("scatteringFactor", scatteringFactor);
     
 
 
@@ -163,4 +170,16 @@ void DeferredRendering::BindVolumetricLight(const VolumetricLight& vl) const
 void DeferredRendering::BindSSAO(unsigned int SSAO)
 {
     DeferredLightingShader->setTexture("SSAO", SSAO);
+}
+
+
+void DeferredRendering::UI()
+{
+    ImGui::Checkbox("Enable IBL", &enableIBL);
+
+    ImGui::SliderFloat("ao", &ao, 0.0f, 0.3f);
+
+    ImGui::Checkbox("Enable SSAO", &enableSSAO);
+
+    ImGui::SliderFloat("Scattering Factor", &scatteringFactor, 0.0f, 0.1f);
 }
