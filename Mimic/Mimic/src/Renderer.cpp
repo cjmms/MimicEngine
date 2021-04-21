@@ -80,8 +80,18 @@ void Renderer::RenderUI()
 
     //ShadowUI();
     SSAO_UI();
+    IBL_UI();
     
     ImGui::End();
+}
+
+void Renderer::IBL_UI()
+{
+    ImGui::Checkbox("Enable IBL", &enableIBL);
+    DeferredRenderer.SetIBLEnable(enableIBL);
+
+    ImGui::SliderFloat("ao", &ao, 0.0f, 0.3f);
+    DeferredRenderer.SetAO(ao);
 }
 
 void Renderer::ShadowUI()

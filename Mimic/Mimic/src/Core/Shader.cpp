@@ -188,8 +188,10 @@ void Shader::setVec2(const std::string& name, glm::vec2 vec)
 
 void Shader::setFloat(const char* name, float value)
 {
+    this->Bind();
     unsigned int location = getUniformLocation(name);
     glUniform1f(location, value);
+    this->unBind();
 }
 
 

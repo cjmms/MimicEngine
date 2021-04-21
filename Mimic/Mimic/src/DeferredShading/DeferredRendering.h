@@ -27,6 +27,9 @@ private:
 	IBL IBL;
 
 	bool enableSSAO;
+	bool enableIBL;
+
+	float ao;
 
 public:
 	DeferredRendering(unsigned int width, unsigned int height);
@@ -46,5 +49,7 @@ public:
 	inline Shader* GetFillBufferShader() const { return Fill_G_BufferShader; }
 
 	void SetSSAOEnable(bool enable) { enableSSAO = enable; };
+	void SetIBLEnable(bool enable) { enableIBL = enable; };
+	void SetAO(float f) { ao = f; }
 
 };

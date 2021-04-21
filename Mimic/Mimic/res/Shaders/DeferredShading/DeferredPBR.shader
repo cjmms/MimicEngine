@@ -48,6 +48,9 @@ uniform sampler2D BRDFIntegration;
 uniform sampler2D SSAO;
 
 uniform bool enableAmbient;
+uniform bool enableIBL;
+
+uniform float ao;
 
 
 // ----------------------------------------------------------------------------
@@ -229,11 +232,12 @@ void main()
     vec3 Lo = reflection(N, V, albedo, metallic, roughness, F0, WorldPos);
 
     // ambient
-    vec3 ambient = ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
+    vec3 ambient = vec3(0);
+    if (enableIBL) ambient = ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
     if (enableAmbient) ambient *= texture(SSAO, TexCoords).x;
 
     // Diffuse AO from IBL
-    vec3 color = Lo + ambient * 0.3;
+    vec3 color = Lo + ambient * ao;
 
     // volumetric lighting
     //color += 0.01f * texture(volumetricLightTexture, TexCoords).xyz;

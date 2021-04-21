@@ -119,6 +119,11 @@ void DeferredRendering::Render(Scene const* scene) const
     DeferredLightingShader->setTexture("BRDFIntegration", IBL.GetBRDFIntegration());
 
     DeferredLightingShader->setInt("enableAmbient", enableSSAO);
+    DeferredLightingShader->setInt("enableIBL", enableIBL);
+
+    DeferredLightingShader->setFloat("ao", ao);
+
+    
 
 
     const std::vector<Light* > lights = scene->getLightSources();
