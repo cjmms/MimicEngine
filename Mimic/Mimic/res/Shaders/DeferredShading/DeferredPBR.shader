@@ -230,18 +230,10 @@ void main()
 
     // ambient
     vec3 ambient = ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
-    float ao = texture(SSAO, TexCoords).x;
-    ambient *= ao;
+    if (enableAmbient) ambient *= texture(SSAO, TexCoords).x;
 
     // Diffuse AO from IBL
-    vec3 color = Lo + ambient;
-
-    //vec3 ambient = vec3(0.03) * albedo;
-     //ambient = ambient * texture(SSAO, TexCoords).x;
-    //vec3 color = Lo + ambient;
-    //vec3 color = Lo ;
-
-    //color += ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
+    vec3 color = Lo + ambient * 0.3;
 
     // volumetric lighting
     //color += 0.01f * texture(volumetricLightTexture, TexCoords).xyz;
@@ -256,7 +248,6 @@ void main()
     color = pow(color, vec3(1.0 / 2.2));
 
     FragColor = vec4(color, 1.0f);
-    FragColor = vec4(ao, ao, ao, 1.0f);
 
     // Debuging purposes
     //FragColor = vec4(albedo, 1.0f);

@@ -99,7 +99,7 @@ void Renderer::ShadowUI()
 
 void Renderer::SSAO_UI()
 {
-    ImGui::Checkbox("Demo Window", &ssaoEnable);
+    ImGui::Checkbox("Enable SSAO", &ssaoEnable);
     DeferredRenderer.SetSSAOEnable(ssaoEnable);
 }
 
@@ -125,13 +125,13 @@ void Renderer::Render(Scene const* scene)
 
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
 
-    //DeferredRenderer.BindSSAO(SSAO.GetSSAO());
-    //DeferredRenderer.Render(scene);
+    DeferredRenderer.BindSSAO(GaussianBlur(SSAO.GetSSAO(), 2));
+    DeferredRenderer.Render(scene);
 
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //Quad::Quad().Draw(*ColorQuadShader, SSAO.GetNoiseTex());
-    Quad::Quad().Draw(*ColorQuadShader, GaussianBlur(SSAO.GetSSAO(), 2));
+    //Quad::Quad().Draw(*ColorQuadShader, GaussianBlur(SSAO.GetSSAO(), 2));
 
 
     //shadow->Compute(scene);
@@ -139,7 +139,7 @@ void Renderer::Render(Scene const* scene)
     //ForwardRendering(scene);    
 
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //IBL.RenderSkybox();
+    IBL.RenderSkybox();
 }
 
 

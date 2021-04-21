@@ -52,8 +52,16 @@ void main()
     // view space frag position  
     vec3 fragPos = worldToView(texture(gPosition, TexCoords).xyz);
 
-
     vec3 normal = normalize(texture(gNormal, TexCoords).xyz);
+
+    // get rid of skybox
+    float visibility = texture(gPosition, TexCoords).a;
+
+    if (visibility != 2.0) // 2.0 is PBR, if it's not PBR, return albedo directly
+    {
+        FragColor = 1.0;
+        return;
+    }
 
     // scale the noise texture so that it maps the whole screen
     vec2 noiseScale = vec2(screenWidth / noiseTexLength, screenHeight / noiseTexLength);
