@@ -89,6 +89,8 @@ vec3 calculateVolumetricLighting(vec3 fragPos)
         sampleInLightWorldSpace = sampleInLightWorldSpace * 0.5 + 0.5;
         if (InLightWorldSpace.w <= 0) continue;
 
+        vec4 viewPos = lightView * vec4(currentPos, 1.0f);
+
         float depthMapDepth = texture(shadowMap, sampleInLightWorldSpace.xy).r;
         if ((depthMapDepth) > sampleInLightWorldSpace.z)
         {

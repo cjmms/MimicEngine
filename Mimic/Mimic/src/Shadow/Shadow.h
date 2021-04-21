@@ -27,6 +27,7 @@ public:
 
 	// returns a handle to a texture
 	inline unsigned int GetShadowMap() const { return ColorTexture; }
+	inline unsigned int GetRangeShadowMap() const { return DepthTexture; }
 
 	void Compute(Scene const* scene);
 

@@ -39,6 +39,8 @@ Renderer::Renderer(Scene const* scene)
     //std::cout <<  "Renderer Constructor" << std::endl;
 	glEnable(GL_DEPTH_TEST);
 
+    
+    //shadow for Project 2
     glm::mat4 lightView = glm::lookAt(
         glm::vec3(-20.0f, 35.0f, 10.0),glm::vec3(0.0f, 0.0f, 00.0f), glm::vec3(0.0, 1.0, 0.0));
 
@@ -46,7 +48,17 @@ Renderer::Renderer(Scene const* scene)
         glm::radians(45.0f), (float)UI_Mgr.getScreenWidth() / UI_Mgr.getScreenHeight(), 0.1f, 80.0f);
 
     shadow = new Shadow(lightView, lightProjection, UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
-  
+    
+    /*
+    // shadow for project 5
+    glm::mat4 lightView = glm::lookAt(
+        glm::vec3(-70.0f, 70.0f, -10.0f), glm::vec3(30.0f, 60.0f, 55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
+
+    shadow = new Shadow(lightView, lightProjection, UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
+    */
+
     ColorQuadShader = new Shader("res/Shaders/ColorQuad.shader");
 
     DepthQuadShader = new Shader("res/Shaders/DepthQuad.shader");
@@ -55,7 +67,7 @@ Renderer::Renderer(Scene const* scene)
 
     GaussianBlurShader = new Shader("res/Shaders/GaussianBlur.shader");
 
-    //shadow->Compute(scene);
+    shadow->Compute(scene);
     
 }
 
@@ -129,19 +141,14 @@ void Renderer::Render(Scene const* scene)
     SSAO.RenderSSAO(DeferredRenderer.Get_G_Position(), DeferredRenderer.Get_G_NormalRoughness());
     
 
-    //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
+    VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
     //DeferredRenderer.BindShadowMap(*shadow);
 
-    //DeferredRenderer.BindVolumetricLight(VolumetricLight);
+    DeferredRenderer.BindVolumetricLight(VolumetricLight);
 
     DeferredRenderer.BindSSAO(GaussianBlur(SSAO.GetSSAO(), 2));
     DeferredRenderer.Render(scene);
-
-
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //Quad::Quad().Draw(*ColorQuadShader, SSAO.GetNoiseTex());
-    //Quad::Quad().Draw(*ColorQuadShader, GaussianBlur(SSAO.GetSSAO(), 2));
 
 
     //shadow->Compute(scene);
@@ -149,7 +156,7 @@ void Renderer::Render(Scene const* scene)
     //ForwardRendering(scene);    
 
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    IBL.RenderSkybox();
+    //IBL.RenderSkybox();
 }
 
 

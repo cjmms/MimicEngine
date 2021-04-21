@@ -240,7 +240,7 @@ void main()
     vec3 color = Lo + ambient * ao;
 
     // volumetric lighting
-    //color += 0.01f * texture(volumetricLightTexture, TexCoords).xyz;
+    color += 0.01f * texture(volumetricLightTexture, TexCoords).xyz;
 
     // shadow
     //color *= 1 - calculateShadow(N, WorldPos);

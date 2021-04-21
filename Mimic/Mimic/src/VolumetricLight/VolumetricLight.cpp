@@ -26,7 +26,7 @@ void VolumetricLight::Compute(const Shadow& shadow, unsigned int gPosition)
     VolumetricLightShader.setMat4("lightView", shadow.GetLightView());
 
     // bind shadow map
-    VolumetricLightShader.setTexture("shadowMap", shadow.GetShadowMap());
+    VolumetricLightShader.setTexture("shadowMap", shadow.GetRangeShadowMap());
 
     // bind gPosition
     VolumetricLightShader.setTexture("gPosition", gPosition);

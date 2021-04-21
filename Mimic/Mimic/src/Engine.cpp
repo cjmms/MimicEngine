@@ -57,14 +57,14 @@ void Engine::init()
     // init scene
     scene = new Scene();
     scene->addLightSource(glm::vec3(-20.0f, 35.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
-    //scene->addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
-    //scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
-    //scene->addLightSource(glm::vec3(-70.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    scene->addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    scene->addLightSource(glm::vec3(-70.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
 
-    //scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
+    scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
 
-    scene->addObjects("res/objects/lion/lion.obj", glm::vec3(5.0));
-    scene->InitTextures("res/objects/lion/");
+    //scene->addObjects("res/objects/lion/lion.obj", glm::vec3(5.0));
+    //scene->InitTextures("res/objects/lion/");
 
     //scene->addObjects("res/objects/Pokemon/Pokemon.obj", glm::vec3(0.1f));
     //scene->InitTextures("res/objects/Pokemon/");
@@ -98,7 +98,7 @@ void Engine::run()
 {
     Renderer renderer(scene);
 
-    UI_Mgr.enableCursor();
+    //UI_Mgr.enableCursor();
 
 
     while (!UI_Mgr.windowClosed())
