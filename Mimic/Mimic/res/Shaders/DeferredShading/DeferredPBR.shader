@@ -48,11 +48,13 @@ uniform sampler2D BRDFIntegration;
 uniform sampler2D SSAO;
 
 uniform bool enableAmbient;
-uniform bool enableIBL;
 
 uniform float ao;
 
 uniform float scatteringFactor;
+uniform bool enableIBLDiffuse;
+uniform bool enableIBLSpecular;
+uniform bool enableToneMapping;
 
 
 // ----------------------------------------------------------------------------
@@ -200,6 +202,9 @@ vec3 ComputeIBLAO(vec3 N, vec3 V, vec3 R, vec3 albedo, float roughness, float me
     vec2 envBRDF = texture(BRDFIntegration, vec2(max(dot(N, V), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
 
+    if (!enableIBLSpecular) specular = vec3(0.0);
+    if (!enableIBLDiffuse) diffuse = vec3(0.0);
+
     return (kD * diffuse + specular) * scale;
 }
 
@@ -235,7 +240,7 @@ void main()
 
     // ambient
     vec3 ambient = vec3(0);
-    if (enableIBL) ambient = ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
+    ambient = ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
     if (enableAmbient) ambient *= texture(SSAO, TexCoords).x;
 
     // Diffuse AO from IBL
@@ -249,9 +254,9 @@ void main()
 
 
     // HDR tonemapping
-    color = color / (color + vec3(1.0));
+    if (enableToneMapping) color = color / (color + vec3(1.0));
     // gamma correct
-    color = pow(color, vec3(1.0 / 2.2));
+    if (enableToneMapping) color = pow(color, vec3(1.0 / 2.2));
 
     FragColor = vec4(color, 1.0f);
 

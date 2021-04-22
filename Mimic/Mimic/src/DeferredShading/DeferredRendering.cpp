@@ -17,7 +17,7 @@ extern Camera camera;
 
 
 DeferredRendering::DeferredRendering(unsigned int width, unsigned int height)
-    :IBL("res/IBL/fin4_Ref.hdr", 4096), scatteringFactor(0.00)
+    :IBL("res/IBL/Barce_Rooftop_C_3k.hdr", 4096), scatteringFactor(0.00)
 {
     Fill_G_BufferShader = new Shader("res/Shaders/DeferredShading/FillG-Buffer.shader");
     DeferredLightingShader = new Shader("res/Shaders/DeferredShading/DeferredPBR.shader");
@@ -130,7 +130,10 @@ void DeferredRendering::Render(Scene const* scene) const
 
     DeferredLightingShader->setFloat("ao", ao);
     DeferredLightingShader->setFloat("scatteringFactor", scatteringFactor);
-    
+
+    DeferredLightingShader->setInt("enableIBLDiffuse", enableIBLDiffuse);
+    DeferredLightingShader->setInt("enableIBLSpecular", enableIBLSpecular);
+    DeferredLightingShader->setInt("enableToneMapping", enableToneMapping);
 
 
     const std::vector<Light* > lights = scene->getLightSources();
@@ -175,11 +178,16 @@ void DeferredRendering::BindSSAO(unsigned int SSAO)
 
 void DeferredRendering::UI()
 {
-    ImGui::Checkbox("Enable IBL", &enableIBL);
+    ImGui::Checkbox("Enable IBL Diffuse", &enableIBLDiffuse);
+    ImGui::Checkbox("Enable IBL Specular", &enableIBLSpecular);
+    ImGui::Checkbox("Enable Tone Mapping", &enableToneMapping);
 
     ImGui::SliderFloat("ao", &ao, 0.0f, 0.3f);
 
     ImGui::Checkbox("Enable SSAO", &enableSSAO);
 
     ImGui::SliderFloat("Scattering Factor", &scatteringFactor, 0.0f, 0.1f);
+
+
+
 }

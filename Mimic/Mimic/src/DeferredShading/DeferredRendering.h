@@ -29,6 +29,10 @@ private:
 	bool enableSSAO;
 	bool enableIBL;
 
+	bool enableIBLDiffuse;
+	bool enableIBLSpecular;
+	bool enableToneMapping;
+
 	float ao;
 	float scatteringFactor;
 

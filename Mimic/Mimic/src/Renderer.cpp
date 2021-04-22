@@ -32,7 +32,7 @@ Renderer::Renderer(Scene const* scene)
     VolumetricLight(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     PingBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     PongBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
-    IBL("res/IBL/fin4_Ref.hdr", 4096),
+    IBL("res/IBL/Barce_Rooftop_C_3k.hdr", 4096),
     SSAO(128, 4)
 {
 
@@ -67,7 +67,7 @@ Renderer::Renderer(Scene const* scene)
 
     GaussianBlurShader = new Shader("res/Shaders/GaussianBlur.shader");
 
-    shadow->Compute(scene);
+    //shadow->Compute(scene);
     
 }
 
@@ -91,29 +91,21 @@ void Renderer::Render(Scene const* scene)
     RenderUI();
 
     // First Pass, fill G-Buffer
-    //scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
-    //DeferredRenderer.Fill_G_Buffer(scene);
+    scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
+    DeferredRenderer.Fill_G_Buffer(scene);
 
-    //SSAO.RenderSSAO(DeferredRenderer.Get_G_Position(), DeferredRenderer.Get_G_NormalRoughness());
+    SSAO.RenderSSAO(DeferredRenderer.Get_G_Position(), DeferredRenderer.Get_G_NormalRoughness());
 
     //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
 
-    //DeferredRenderer.BindSSAO(GaussianBlur(SSAO.GetSSAO(), 2));
+    DeferredRenderer.BindSSAO(GaussianBlur(SSAO.GetSSAO(), 2));
 
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
 
-    //DeferredRenderer.Render(scene);
+    DeferredRenderer.Render(scene);
 
-    //VisualizeDepthBuffer(shadow->GetRangeShadowMap());
-
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //Quad::Quad().Draw(*ColorQuadShader, VolumetricLight.GetVolumetricLight());
-
-
-    //shadow->Compute(scene);
-
-    ForwardRendering(scene); 
+    //ForwardRendering(scene); 
 
     //IBL.RenderSkybox();
 }
@@ -222,10 +214,8 @@ void Renderer::RenderUI()
     ImGui::Begin("UI");
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ShadowUI();
-    //SSAO_UI();
-    //IBL_UI();
-    VolumetricLight.UI();
+    //ShadowUI();
+    //VolumetricLight.UI();
     DeferredRenderer.UI();
 
     ImGui::End();
