@@ -241,6 +241,8 @@ void main()
     // ambient
     vec3 ambient = vec3(0);
     ambient = ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
+    if (ambient == vec3(0.0)) ambient = albedo;
+
     if (enableAmbient) ambient *= texture(SSAO, TexCoords).x;
 
     // Diffuse AO from IBL

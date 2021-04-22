@@ -47,6 +47,7 @@ private:
 
 	bool debugMode;
 
+	int SSAOBlur;
 
 
 	// Visualize depth buffer

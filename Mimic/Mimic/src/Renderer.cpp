@@ -33,7 +33,7 @@ Renderer::Renderer(Scene const* scene)
     PingBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     PongBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     IBL("res/IBL/Barce_Rooftop_C_3k.hdr", 4096),
-    SSAO(128, 4)
+    SSAO(128, 4), SSAOBlur(0)
 {
 
     //std::cout <<  "Renderer Constructor" << std::endl;
@@ -99,7 +99,7 @@ void Renderer::Render(Scene const* scene)
     //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
 
-    DeferredRenderer.BindSSAO(GaussianBlur(SSAO.GetSSAO(), 2));
+    DeferredRenderer.BindSSAO(GaussianBlur(SSAO.GetSSAO(), SSAOBlur));
 
     //DeferredRenderer.BindVolumetricLight(VolumetricLight);
 
@@ -217,6 +217,8 @@ void Renderer::RenderUI()
     //ShadowUI();
     //VolumetricLight.UI();
     DeferredRenderer.UI();
+
+    ImGui::SliderInt("SSAO Blur Level", &SSAOBlur, 0, 10);
 
     ImGui::End();
 }

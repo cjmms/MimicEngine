@@ -64,10 +64,10 @@ void Engine::init()
     //scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
     //scene->addLightSource(glm::vec3(-70.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
 
-    //scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
+    scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
 
-    scene->addObjects("res/objects/lion/lion.obj", glm::vec3(5.0));
-    scene->InitTextures("res/objects/lion/");
+    //scene->addObjects("res/objects/lion/lion.obj", glm::vec3(5.0));
+    //scene->InitTextures("res/objects/lion/");
 
     //scene->addObjects("res/objects/Pokemon/Pokemon.obj", glm::vec3(0.1f));
     //scene->InitTextures("res/objects/Pokemon/");
