@@ -71,5 +71,5 @@ void VolumetricLight::UI()
     ImGui::SliderInt("Marching steps", &Steps, 1, 100);
     ImGui::Checkbox("Enable Dithering", &enableDithering);
     ImGui::Checkbox("Enable Bilateral Upsampling", &BilateralSwitch);
-    ImGui::SliderFloat("Asymmetry factor", &G_SCATTERING, -1, 1);
+    ImGui::SliderFloat("Asymmetry factor", &G_SCATTERING, 0, 1);
 }

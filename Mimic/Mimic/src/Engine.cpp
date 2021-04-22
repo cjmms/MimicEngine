@@ -57,11 +57,14 @@ void Engine::init()
     // init scene
     scene = new Scene();
     scene->addLightSource(glm::vec3(-20.0f, 35.0f, 10.0f), glm::vec3(550.0f, 550.0f, 550.0f));
-    scene->addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
-    scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
-    scene->addLightSource(glm::vec3(-70.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    //scene->addLightSource(glm::vec3(40.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    //scene->addLightSource(glm::vec3(40.0f, 10.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    //scene->addLightSource(glm::vec3(20.0f, 30.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    //scene->addLightSource(glm::vec3(20.0f, 30.0f, -10.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    //scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
+    //scene->addLightSource(glm::vec3(-70.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
 
-    scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
+    //scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
 
     //scene->addObjects("res/objects/lion/lion.obj", glm::vec3(5.0));
     //scene->InitTextures("res/objects/lion/");
@@ -75,7 +78,7 @@ void Engine::init()
     //scene->addObjects("res/objects/Axe/Axe.obj", glm::vec3(1.0));
     //scene->InitTextures("res/objects/Axe/");
 
-    //scene->addObjects("res/objects/backpack/backpack.obj", glm::vec3(3.0));
+    scene->addObjects("res/objects/backpack/backpack.obj", glm::vec3(3.0));
 
     /*
     // dragon
@@ -98,8 +101,8 @@ void Engine::run()
 {
     Renderer renderer(scene);
 
-    UI_Mgr.enableCursor();
-    camera.disable();
+    //UI_Mgr.enableCursor();
+    //camera.disable();
 
     while (!UI_Mgr.windowClosed())
     {

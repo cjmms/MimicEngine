@@ -17,7 +17,7 @@ extern Camera camera;
 
 
 DeferredRendering::DeferredRendering(unsigned int width, unsigned int height)
-    :IBL("res/IBL/fin4_Ref.hdr", 4096), scatteringFactor(0.01)
+    :IBL("res/IBL/fin4_Ref.hdr", 4096), scatteringFactor(0.00)
 {
     Fill_G_BufferShader = new Shader("res/Shaders/DeferredShading/FillG-Buffer.shader");
     DeferredLightingShader = new Shader("res/Shaders/DeferredShading/DeferredPBR.shader");
@@ -34,7 +34,7 @@ void DeferredRendering::init_G_Buffer(unsigned int width, unsigned int height)
     // Albedo + Metallic
     glGenTextures(1, &gAlbedoMetallic);
     glBindTexture(GL_TEXTURE_2D, gAlbedoMetallic);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gAlbedoMetallic, 0);

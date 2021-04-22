@@ -39,7 +39,7 @@ Renderer::Renderer(Scene const* scene)
     //std::cout <<  "Renderer Constructor" << std::endl;
 	glEnable(GL_DEPTH_TEST);
 
-    /*
+    
     //shadow for Project 2
     glm::mat4 lightView = glm::lookAt(
         glm::vec3(-20.0f, 35.0f, 10.0),glm::vec3(0.0f, 0.0f, 00.0f), glm::vec3(0.0, 1.0, 0.0));
@@ -48,8 +48,8 @@ Renderer::Renderer(Scene const* scene)
         glm::radians(45.0f), (float)UI_Mgr.getScreenWidth() / UI_Mgr.getScreenHeight(), 0.1f, 80.0f);
 
     shadow = new Shadow(lightView, lightProjection, UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
-    */
     
+    /*
     // shadow for project 5
     glm::mat4 lightView = glm::lookAt(
         glm::vec3(-70.0f, 70.0f, -10.0f), glm::vec3(30.0f, 60.0f, 55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -57,7 +57,7 @@ Renderer::Renderer(Scene const* scene)
     glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
 
     shadow = new Shadow(lightView, lightProjection, UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
-    
+    */
 
     ColorQuadShader = new Shader("res/Shaders/ColorQuad.shader");
 
@@ -91,19 +91,19 @@ void Renderer::Render(Scene const* scene)
     RenderUI();
 
     // First Pass, fill G-Buffer
-    scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
-    DeferredRenderer.Fill_G_Buffer(scene);
+    //scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
+    //DeferredRenderer.Fill_G_Buffer(scene);
 
     //SSAO.RenderSSAO(DeferredRenderer.Get_G_Position(), DeferredRenderer.Get_G_NormalRoughness());
 
-    VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
+    //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
 
 
     //DeferredRenderer.BindSSAO(GaussianBlur(SSAO.GetSSAO(), 2));
 
-    DeferredRenderer.BindVolumetricLight(VolumetricLight);
+    //DeferredRenderer.BindVolumetricLight(VolumetricLight);
 
-    DeferredRenderer.Render(scene);
+    //DeferredRenderer.Render(scene);
 
     //VisualizeDepthBuffer(shadow->GetRangeShadowMap());
 
@@ -113,7 +113,7 @@ void Renderer::Render(Scene const* scene)
 
     //shadow->Compute(scene);
 
-    //ForwardRendering(scene); 
+    ForwardRendering(scene); 
 
     //IBL.RenderSkybox();
 }
@@ -161,7 +161,7 @@ void Renderer::ForwardRendering(Scene const* scene)
 
 void Renderer::RenderLightSources(Scene const* scene) const
 {
-	 //glDisable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     lightShader->setMat4("projection", camera.getProjectionMatrix());
@@ -176,7 +176,7 @@ void Renderer::RenderLightSources(Scene const* scene) const
         light->getModel()->Draw(*lightShader);
     }
 
-	 //glEnable(GL_DEPTH_TEST);
+	 glEnable(GL_DEPTH_TEST);
 }
 
 
@@ -222,7 +222,7 @@ void Renderer::RenderUI()
     ImGui::Begin("UI");
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    //ShadowUI();
+    ShadowUI();
     //SSAO_UI();
     //IBL_UI();
     VolumetricLight.UI();

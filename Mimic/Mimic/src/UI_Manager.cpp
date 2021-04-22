@@ -6,6 +6,11 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "imgui/imgui_internal.h"
 
+#include "Core/Camera.h"
+
+extern Camera camera;
+extern UI_Manager UI_Mgr;
+
 bool test = true;
 
 void processInput(GLFWwindow* window)
@@ -13,8 +18,10 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     else if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-        test = !test;
-
+    {
+        camera.disable();
+        UI_Mgr.enableCursor();
+    }
     
     camera.setCameraKey(window);
 }
