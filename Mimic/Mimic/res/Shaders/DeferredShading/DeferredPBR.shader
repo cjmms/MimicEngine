@@ -32,7 +32,7 @@ uniform sampler2D gNormalRoughness;
 
 const float PI = 3.141f;
 
-const int N_LIGHTS = 10;
+const int N_LIGHTS = 500;
 uniform vec3 lightPositions[N_LIGHTS];
 uniform vec3 lightColors[N_LIGHTS];
 
@@ -106,6 +106,10 @@ vec3 reflection(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, ve
     vec3 Lo = vec3(0.0);
     for (int i = 0; i < N_LIGHTS; ++i)
     {
+        float d = length(lightPositions[i] - WorldPos);
+        if (d > 10) continue;
+
+
         // calculate per-light radiance
         vec3 L = normalize(lightPositions[i] - WorldPos);
         vec3 H = normalize(V + L);

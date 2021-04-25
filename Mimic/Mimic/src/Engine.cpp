@@ -9,6 +9,7 @@
 #include "Core//FBO.h"
 #include "ResourceManager.h"
 #include <sstream>
+#include <random>
 
 
 #define SHADOW_MAP_DEBUG 0
@@ -64,6 +65,21 @@ void Engine::init()
     //scene->addLightSource(glm::vec3(110.0f, 20.0f, -20.0f), glm::vec3(350.0f, 350.0f, 350.0f));
     //scene->addLightSource(glm::vec3(-70.0f, 70.0f, 0.0f), glm::vec3(350.0f, 350.0f, 350.0f));
 
+    for (int i = 0; i < 500; i++)
+    {
+        float x = rand() % 200 - 100;
+        float z = rand() % 100 - 50;
+        float y = rand() % 40 + 5;
+
+        float r = rand() % 20;
+        float g = rand() % 5;
+        float b = rand() % 20;
+
+
+        scene->addLightSource(glm::vec3(x, y, z), glm::vec3(r, g, b));
+    }
+
+
     scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
 
     //scene->addObjects("res/objects/lion/lion.obj", glm::vec3(5.0));
@@ -115,7 +131,7 @@ void Engine::run()
         UI_Mgr.NewUIFrame();      
 
         renderer.Render(scene);
-        renderer.RenderLightSources(scene);
+        //renderer.RenderLightSources(scene);
 
         UI_Mgr.RenderUI();
     }

@@ -94,6 +94,8 @@ void Renderer::Render(Scene const* scene)
     scene->BindTextures(DeferredRenderer.GetFillBufferShader());       
     DeferredRenderer.Fill_G_Buffer(scene);
 
+    
+
     SSAO.RenderSSAO(DeferredRenderer.Get_G_Position(), DeferredRenderer.Get_G_NormalRoughness());
 
     //VolumetricLight.Compute(*shadow, DeferredRenderer.Get_G_Position());
@@ -108,6 +110,15 @@ void Renderer::Render(Scene const* scene)
     //ForwardRendering(scene); 
 
     //IBL.RenderSkybox();
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, DeferredRenderer.Get_G_Buffer());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
+    glBlitFramebuffer(
+        0, 0, UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight(), 0, 0, UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight(), GL_DEPTH_BUFFER_BIT, GL_NEAREST
+    );
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    RenderLightSources(scene);
 }
 
 
@@ -153,7 +164,7 @@ void Renderer::ForwardRendering(Scene const* scene)
 
 void Renderer::RenderLightSources(Scene const* scene) const
 {
-	glDisable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     lightShader->setMat4("projection", camera.getProjectionMatrix());
@@ -168,7 +179,7 @@ void Renderer::RenderLightSources(Scene const* scene) const
         light->getModel()->Draw(*lightShader);
     }
 
-	 glEnable(GL_DEPTH_TEST);
+	 //glEnable(GL_DEPTH_TEST);
 }
 
 

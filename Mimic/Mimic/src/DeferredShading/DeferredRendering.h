@@ -43,6 +43,7 @@ public:
 	void Bind_G_Buffer(Shader* shader) const;
 	void Render(Scene const* scene) const;
 
+	inline unsigned int Get_G_Buffer () { return gBuffer; }
 	inline Shader* GetDeferredShader() const { return DeferredLightingShader; }
 	inline unsigned int Get_G_Position() const { return gPosition; }
 	inline unsigned int Get_G_NormalRoughness() const { return gNormalRoughness; }
