@@ -193,7 +193,7 @@ void DeferredRendering::UI()
     ImGui::Checkbox("Enable Tone Mapping", &enableToneMapping);
     ImGui::Checkbox("Enable Gamma Correction", &enableGammaCorrection);
 
-    ImGui::SliderFloat("ao", &ao, 0.0f, 0.3f);
+    ImGui::SliderFloat("ao", &ao, 0.0f, 1.0f);
     ImGui::SliderFloat("Exposure", &exposure, 0.1f, 100.0f);
 
     ImGui::Checkbox("Enable SSAO", &enableSSAO);

@@ -110,7 +110,7 @@ vec3 reflection(vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, ve
     for (int i = 0; i < N_LIGHTS; ++i)
     {
         float d = length(lightPositions[i] - WorldPos);
-        if (d > 10) continue;
+        //if (d > 10) continue;
 
 
         // calculate per-light radiance
@@ -204,7 +204,7 @@ vec3 ComputeIBLAO(vec3 N, vec3 V, vec3 R, vec3 albedo, float roughness, float me
     vec3 irradiance = texture(IrradianceMap, N).rgb;
     vec3 diffuse = irradiance * albedo;
 
-    const float MAX_REFLECTION_LOD = 4.0;
+    const float MAX_REFLECTION_LOD = 10.0;
     vec3 prefilteredColor = textureLod(PrefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
     vec2 envBRDF = texture(BRDFIntegration, vec2(max(dot(N, V), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
@@ -243,14 +243,19 @@ void main()
     // ambient
     vec3 ambient = vec3(0);
     ambient = ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
-    if (ambient == vec3(0.0)) ambient = albedo;
+    //if (ambient == vec3(0.0)) ambient = albedo;
 
-    if (enableAmbient) ambient *= texture(SSAO, TexCoords).x;
+    //if (enableAmbient) ambient *= texture(SSAO, TexCoords).x;
 
+    float ssao = texture(SSAO, TexCoords).x;
+
+    vec3 color;
     // Diffuse AO from IBL
-    //vec3 color = Lo + ambient * ao;
+    if (enableAmbient) color = Lo + ambient * ssao;
+    else color = Lo + ambient;
 
-    vec3 color = Lo +  ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
+
+    //vec3 color = Lo +  ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
 
     // volumetric lighting
     color += scatteringFactor * texture(volumetricLightTexture, TexCoords).xyz;
