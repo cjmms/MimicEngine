@@ -19,6 +19,14 @@ extern Camera camera;
 DeferredRendering::DeferredRendering(unsigned int width, unsigned int height)
     :IBL("res/IBL/Barce_Rooftop_C_3k.hdr", 4096), scatteringFactor(0.00)
 {
+    enableIBLDiffuse = 1;
+    enableIBLSpecular = 1;
+    enableToneMapping = 1;
+    enableGammaCorrection = 1;
+
+    ao = 0.3;
+    exposure = 1.0;
+
     Fill_G_BufferShader = new Shader("res/Shaders/DeferredShading/FillG-Buffer.shader");
     DeferredLightingShader = new Shader("res/Shaders/DeferredShading/DeferredPBR.shader");
 	init_G_Buffer(width, height);
@@ -130,10 +138,12 @@ void DeferredRendering::Render(Scene const* scene) const
 
     DeferredLightingShader->setFloat("ao", ao);
     DeferredLightingShader->setFloat("scatteringFactor", scatteringFactor);
+    DeferredLightingShader->setFloat("exposure", exposure);
 
     DeferredLightingShader->setInt("enableIBLDiffuse", enableIBLDiffuse);
     DeferredLightingShader->setInt("enableIBLSpecular", enableIBLSpecular);
     DeferredLightingShader->setInt("enableToneMapping", enableToneMapping);
+    DeferredLightingShader->setInt("enableGammaCorrection", enableGammaCorrection);
 
 
     const std::vector<Light* > lights = scene->getLightSources();
@@ -181,8 +191,10 @@ void DeferredRendering::UI()
     ImGui::Checkbox("Enable IBL Diffuse", &enableIBLDiffuse);
     ImGui::Checkbox("Enable IBL Specular", &enableIBLSpecular);
     ImGui::Checkbox("Enable Tone Mapping", &enableToneMapping);
+    ImGui::Checkbox("Enable Gamma Correction", &enableGammaCorrection);
 
     ImGui::SliderFloat("ao", &ao, 0.0f, 0.3f);
+    ImGui::SliderFloat("Exposure", &exposure, 0.1f, 100.0f);
 
     ImGui::Checkbox("Enable SSAO", &enableSSAO);
 

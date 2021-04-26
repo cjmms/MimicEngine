@@ -32,9 +32,11 @@ private:
 	bool enableIBLDiffuse;
 	bool enableIBLSpecular;
 	bool enableToneMapping;
+	bool enableGammaCorrection;
 
 	float ao;
 	float scatteringFactor;
+	float exposure;
 
 public:
 	DeferredRendering(unsigned int width, unsigned int height);

@@ -55,6 +55,9 @@ uniform float scatteringFactor;
 uniform bool enableIBLDiffuse;
 uniform bool enableIBLSpecular;
 uniform bool enableToneMapping;
+uniform bool enableGammaCorrection;
+
+uniform float exposure;
 
 
 // ----------------------------------------------------------------------------
@@ -222,11 +225,6 @@ void main()
 
     float visibility = texture(gPosition, TexCoords).a;
 
-    if (visibility != 2.0) // 2.0 is PBR, if it's not PBR, return albedo directly
-    {
-        FragColor = vec4(pow(albedo, vec3(1.0 / 2.2)), 1.0f);
-        return;
-    }
 
     float metallic = texture(gAlbedoMetallic, TexCoords).a;
     float roughness = texture(gNormalRoughness, TexCoords).a;
@@ -250,7 +248,9 @@ void main()
     if (enableAmbient) ambient *= texture(SSAO, TexCoords).x;
 
     // Diffuse AO from IBL
-    vec3 color = Lo + ambient * ao;
+    //vec3 color = Lo + ambient * ao;
+
+    vec3 color = Lo +  ComputeIBLAO(N, V, R, albedo, roughness, metallic, F0, 1.0);
 
     // volumetric lighting
     color += scatteringFactor * texture(volumetricLightTexture, TexCoords).xyz;
@@ -258,21 +258,20 @@ void main()
     // shadow
     //color *= 1 - calculateShadow(N, WorldPos);
 
+    if (visibility != 2.0) // 2.0 is PBR, if it's not PBR, return albedo directly
+    {
+        color = albedo;
+        FragColor = vec4(pow(albedo, vec3(1.0 / 2.2)), 1.0);
+        return;
+    }
+
 
     // HDR tonemapping
-    if (enableToneMapping) color = color / (color + vec3(1.0));
+    if (enableToneMapping) color = exposure * color / (exposure * color + vec3(1.0f));
+
+    //if (enableToneMapping) color = color / (color + vec3(1.0));
     // gamma correct
-    if (enableToneMapping) color = pow(color, vec3(1.0 / 2.2));
+    if (enableGammaCorrection) color = pow(color, vec3(1.0 / 2.2));
 
     FragColor = vec4(color, 1.0f);
-
-    // Debuging purposes
-    //FragColor = vec4(albedo, 1.0f);
-    //FragColor = vec4(N, 1.0f);
-    //FragColor = vec4(WorldPos, 1.0f);
-    //FragColor = vec4(depth, depth, depth, 1.0f);
-    //FragColor = vec4(vec3(metallic), 1.0f);
-    //FragColor = vec4(vec3(roughness), 1.0f);
-
-
 }
