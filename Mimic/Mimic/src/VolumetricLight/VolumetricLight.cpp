@@ -64,7 +64,7 @@ void VolumetricLight::Compute(const Shadow& shadow, unsigned int gPosition)
 void VolumetricLight::RenderUI()
 {
     //ImGui::Text("ShadowMap Gaussian Blur Pass.");
-    ImGui::SliderInt("sample number", &sampleN, 2, 100);
+    ImGui::SliderInt("sample number", &sampleN, 2, 300);
     ImGui::SliderFloat("scattering factor", &g, 0.01, 1.0);
 
     //ImGui::RadioButton("Standard Shadow Map", &ShadowMapType, 0);
