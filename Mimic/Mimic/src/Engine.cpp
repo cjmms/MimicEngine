@@ -106,7 +106,7 @@ void Engine::run()
         UI_Mgr.update();
 
         //camera.Print();
-        camera.disable();
+        //camera.disable();
 
         camera.cameraUpdateFrameTime();
 

@@ -25,8 +25,8 @@ in vec2 TexCoords;
 uniform vec3 camPos;
 
 const float PI = 3.14159265359;
-const float G_SCATTERING = 0.45f;
-const int NB_SAMPLES = 10;
+uniform float g;
+uniform int sampleN;
 
 vec3 lightPos = vec3(-70.0f, 70.0f, -10.0f);
 
@@ -55,8 +55,8 @@ float calculateDitherValue(vec2 pixel)
 // Mie scaterring approximated with Henyey-Greenstein phase function.
 float ComputeScattering(float lightDotView)
 {
-    float result = 1.0f - G_SCATTERING * G_SCATTERING;
-    result /= (4.0f * PI * pow(1.0f + G_SCATTERING * G_SCATTERING - (2.0f * G_SCATTERING) * lightDotView, 1.5f));
+    float result = 1.0f - g * g;
+    result /= (4.0f * PI * pow(1.0f + g * g - (2.0f * g) * lightDotView, 1.5f));
     return result;
 }
 
@@ -68,7 +68,7 @@ vec3 calculateVolumetricLighting(vec3 fragPos)
     float rayLength = length(viewRay);
     vec3 viewRayDir = viewRay / rayLength;
     // Step length
-    float stepLength = rayLength / NB_SAMPLES;
+    float stepLength = rayLength / sampleN;
     //float stepLength = 0.01f;
     vec3 step = viewRayDir * stepLength;	// point from camera to pixel
     // init sampleing position and accumlated fog value
@@ -80,7 +80,7 @@ vec3 calculateVolumetricLighting(vec3 fragPos)
     currentPos += step * calculateDitherValue(gl_FragCoord.xy);
 
     // sampling along with viewRay
-    for (int i = 0; i < NB_SAMPLES; ++i)
+    for (int i = 0; i < sampleN; ++i)
     {
         vec4 InLightWorldSpace = lightProjection * lightView * vec4(currentPos, 1.0f);
         vec4 sampleInLightWorldSpace = InLightWorldSpace / InLightWorldSpace.w;
@@ -95,7 +95,7 @@ vec3 calculateVolumetricLighting(vec3 fragPos)
         if ((depthMapDepth) > sampleInLightWorldSpace.z)
         {
             vec3 sunDir = normalize(lightPos - currentPos);
-            accumFog += ComputeScattering(dot(viewRayDir, sunDir)) * vec3(10.0f) / NB_SAMPLES;
+            accumFog += ComputeScattering(dot(viewRayDir, sunDir)) * vec3(10.0f) / sampleN;
         }
 
         currentPos += step;	// move to next sample

@@ -31,9 +31,7 @@ Renderer::Renderer(Scene const* scene)
     DeferredRenderer(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     VolumetricLight(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
     PingBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
-    PongBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight()),
-    IBL("res/IBL/fin4_Ref.hdr", 4096),
-    SSAO(128, 4)
+    PongBufferFBO(UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight())
 {
 
     //std::cout <<  "Renderer Constructor" << std::endl;
@@ -90,21 +88,12 @@ void Renderer::RenderUI()
 {
     ImGui::Begin("UI");                          
 
-    //ShadowUI();
-    SSAO_UI();
-    IBL_UI();
+    VolumetricLight.RenderUI();
+
     
     ImGui::End();
 }
 
-void Renderer::IBL_UI()
-{
-    ImGui::Checkbox("Enable IBL", &enableIBL);
-    DeferredRenderer.SetIBLEnable(enableIBL);
-
-    ImGui::SliderFloat("ao", &ao, 0.0f, 0.3f);
-    DeferredRenderer.SetAO(ao);
-}
 
 void Renderer::ShadowUI()
 {
@@ -119,11 +108,6 @@ void Renderer::ShadowUI()
 }
 
 
-void Renderer::SSAO_UI()
-{
-    ImGui::Checkbox("Enable SSAO", &ssaoEnable);
-    DeferredRenderer.SetSSAOEnable(ssaoEnable);
-}
 
 
 

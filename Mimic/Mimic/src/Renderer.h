@@ -42,8 +42,7 @@ private:
 	DeferredRendering DeferredRenderer;
 	Shadow* shadow;
 	VolumetricLight VolumetricLight;
-	IBL IBL;
-	SSAO SSAO;
+
 
 	bool debugMode;
 
@@ -59,13 +58,7 @@ private:
 	void RenderUI();
 
 	void ShadowUI();
-	void SSAO_UI();
-	void IBL_UI();
 
-	bool ssaoEnable;
-	bool enableIBL;
-
-	float ao;
 
 public:
 	Renderer(Scene const* scene);
