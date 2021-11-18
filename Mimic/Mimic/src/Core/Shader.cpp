@@ -264,4 +264,29 @@ void Shader::setTexture(const std::string& name, unsigned int texture, int index
 std::string Shader::ReadShaderFile(const char* fileName)
 {
 	// PAGE 82
+	FILE* file = fopen(fileName, "r");
+
+	if (!file)
+	{
+		printf("I/O error. Cannot open '%s'\n", fileName);
+		return std::string();
+	}
+
+	fseek(file, 0L, SEEK_END);
+	const auto bytesinfile = ftell(file);
+	fseek(file, 0L, SEEK_SET);
+
+	char* buffer = (char*)alloca(bytesinfile + 1);
+	const size_t bytesread = fread(buffer, 1, bytesinfile, file);
+
+	fclose(file);
+	buffer[bytesread] = 0;
+
+	static constexpr unsigned char BOM[] = {0xEF, 0xBB, 0xBF};
+	if (bytesread > 3)
+	{
+		if (!memcmp(buffer, BOM, 3)) memset(buffer, ' ', 3);
+	}
+	std::string code(buffer);
+
 }
