@@ -16,7 +16,7 @@
 
 
 
-
+/*
 
 extern bool test;
 extern Camera camera;
@@ -49,7 +49,7 @@ Renderer::Renderer(Scene const* scene)
 
     shadow = new Shadow(lightView, lightProjection, UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
     
-    /*
+    
     // shadow for project 5
     glm::mat4 lightView = glm::lookAt(
         glm::vec3(-70.0f, 70.0f, -10.0f), glm::vec3(30.0f, 60.0f, 55.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -57,7 +57,7 @@ Renderer::Renderer(Scene const* scene)
     glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 325.0f);
 
     shadow = new Shadow(lightView, lightProjection, UI_Mgr.getScreenWidth(), UI_Mgr.getScreenHeight());
-    */
+    
 
     ColorQuadShader = new Shader("res/Shaders/ColorQuad.shader");
 
@@ -248,3 +248,10 @@ void Renderer::ShadowUI()
 
 
 
+*/
+
+
+void Renderer::Update(float deltaTime)
+{
+
+}

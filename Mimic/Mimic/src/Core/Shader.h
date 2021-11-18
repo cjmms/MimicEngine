@@ -66,4 +66,7 @@ private:
 	unsigned int createShader(const std::string& vertexShader,
 		const std::string& fragmentShader,
 		const std::string& geometryShader);
+
+
+	std::string ReadShaderFile(const char* fileName);
 };

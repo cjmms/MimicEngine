@@ -258,3 +258,10 @@ void Shader::setTexture(const std::string& name, unsigned int texture, int index
 {
     setTexture(name.c_str(), texture, index);
 }
+
+
+
+std::string Shader::ReadShaderFile(const char* fileName)
+{
+	// PAGE 82
+}

@@ -24,7 +24,7 @@
 
 
 
-
+/*
 class Renderer
 {
 private:
@@ -79,3 +79,14 @@ public:
 	
 };
 
+*/
+
+class Renderer
+{
+public:
+	Renderer() = default;
+
+	void Update(float deltaTime);
+
+
+};

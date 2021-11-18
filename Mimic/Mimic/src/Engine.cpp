@@ -83,8 +83,8 @@ void Engine::init()
 
     //scene->addObjects("res/objects/sponza/sponza.obj", glm::vec3(0.1));
 
-    scene->addObjects("res/objects/lion/lion.obj", glm::vec3(5.0));
-    scene->InitTextures("res/objects/lion/");
+    //scene->addObjects("res/objects/lion/lion.obj", glm::vec3(5.0));
+    //scene->InitTextures("res/objects/lion/");
 
     //scene->addObjects("res/objects/Pokemon/Pokemon.obj", glm::vec3(0.1f));
     //scene->InitTextures("res/objects/Pokemon/");
@@ -119,9 +119,9 @@ void Engine::close()
 
 void Engine::run()
 {
-    Renderer renderer(scene);
+    //Renderer renderer(scene);
 
-    //UI_Mgr.enableCursor();
+    UI_Mgr.enableCursor();
     //camera.disable();
 
     while (!UI_Mgr.windowClosed())
@@ -134,7 +134,7 @@ void Engine::run()
 
         UI_Mgr.NewUIFrame();      
 
-        renderer.Render(scene);
+        //renderer.Render(scene);
         //renderer.RenderLightSources(scene);
 
         UI_Mgr.RenderUI();
